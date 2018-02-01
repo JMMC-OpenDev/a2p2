@@ -1,2 +1,2 @@
 # a2p2
-Aspro to Proposals Programations
+Aspro to Proposals Programmations
