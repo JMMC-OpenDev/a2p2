@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+from __future__ import with_statement
+from argparse import ArgumentParser
+import sys
+import traceback
+
+
+def main():
+    """Main method to start a2p2 program."""
+    parser = ArgumentParser(description='Move your Aspro2 observation details to an observatory proposal database')
+    parser.add_argument('-c', '--config', action='store_true', help='show instruments and remote service configurations.')
+    parser.add_argument('-v', '--verbose', action='store_true', help='Verbose')
+
+    args = parser.parse_args()
+
+    from a2p2 import A2p2Client
+    try:
+        with A2p2Client() as a2p2c:
+            if  args.config:
+                print(a2p2c)
+            else:
+                a2p2c.run()
+
+    except Exception as e:
+        if args.verbose:
+            traceback.print_exc()
+        else:
+            print('ERROR: %s' % str(e))
+    except:
+        if args.verbose:
+            traceback.print_exc()
+        else:
+            print ("Unexpected error: %s" % sys.exc_info()[0])
+
+
+
+if __name__ == '__main__':
+    print(sys.path)
+    main()
