@@ -52,8 +52,8 @@ class A2p2Client():
 
         # TODO close the connection to the obs database ?
 
-        # WARNING do not return self only else exception is hidden
-        return self
+        # WARNING do not return self only. Else exceptions are hidden
+        # return self
 
     def __str__(self):
         instruments     = "\n- ".join(["Supported instruments:", "TBD"])

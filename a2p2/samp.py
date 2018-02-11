@@ -3,11 +3,6 @@
 __all__ = ['A2p2Client']
 
 from astropy.samp import SAMPIntegratedClient
-from gui import LoginWindow
-import pygtk
-import time
-pygtk.require('2.0')
-import gtk
 
 class Receiver(object):
     def __init__(self, client):

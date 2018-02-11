@@ -3,11 +3,8 @@
 __all__ = ['A2p2Client']
 
 
-import cgi
-import numpy as np
 import p2api
 import pygtk
-import re
 pygtk.require('2.0')
 import gtk
 import xml.etree.ElementTree
