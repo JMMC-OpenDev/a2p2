@@ -6,6 +6,18 @@ import pygtk
 pygtk.require('2.0')
 import gtk
 
+html_escape_table = {
+    "&": "&amp;",
+    '"': "&quot;",
+    "'": "&apos;",
+    ">": "&gt;",
+    "<": "&lt;",
+    }
+
+def html_escape(text):
+    """Produce entities within text."""
+    return "".join(html_escape_table.get(c, c) for c in text)
+
 #help text in Pango Markup syntax https://developer.gnome.org/pango/stable/PangoMarkupFormat.html
 HELPTEXT = """
 This applet provides the link between ASPRO (that you should have started) and ESO's P2 repository for Observing Blocks (OBs).
@@ -247,21 +259,21 @@ class LoginWindow:
     def ShowErrorMessage(self, text):
         dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR,
                                    buttons=gtk.BUTTONS_OK)
-        dialog.set_markup(text)
+        dialog.set_markup(html_escape(text))
         dialog.run()
         dialog.destroy()
 
     def ShowWarningMessage(self, text):
         dialog = gtk.MessageDialog(type=gtk.MESSAGE_WARNING,
                                    buttons=gtk.BUTTONS_OK)
-        dialog.set_markup(text)
+        dialog.set_markup(html_escape(text))
         dialog.run()
         dialog.destroy()
 
     def ShowInfoMessage(self, text):
         dialog = gtk.MessageDialog(type=gtk.MESSAGE_INFO,
                                    buttons=gtk.BUTTONS_OK)
-        dialog.set_markup(text)
+        dialog.set_markup(html_escape(text))
         dialog.run()
         dialog.destroy()
 
