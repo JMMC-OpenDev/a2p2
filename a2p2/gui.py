@@ -2,15 +2,9 @@
 
 __all__ = ['A2p2Client']
 
-
-import p2api
 import pygtk
 pygtk.require('2.0')
 import gtk
-import xml.etree.ElementTree
-
-from utils import parseXmlMessage
-
 
 #help text in Pango Markup syntax https://developer.gnome.org/pango/stable/PangoMarkupFormat.html
 HELPTEXT = """
@@ -55,16 +49,18 @@ class P2Container:
         return """projectId:'%s', instrument:'%s', containerId:'%s'""" % (self.projectId, self.instrument, self.containerId)
 
 class LoginWindow:
-    def __init__(self):
+    def __init__(self, a2p2client):
+
+        self.a2p2client = a2p2client
+        self.api = None
+
         username = '52052'
         password = 'tutorial'
-
         self.login = [username, password]
+
         self.containerInfo = P2Container()
 
         self.requestAbort = False
-
-        self.api = None
 
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.set_title("Connect with ESO DATABASE")
@@ -122,11 +118,6 @@ class LoginWindow:
         self.buttonhelp.connect("clicked", self.on_buttonhelp_clicked)
         hbox.pack_start(self.buttonhelp, False, True, 0)
 
-
-        self.buttonfake = gtk.Button(label="FAKE READY")
-        self.buttonfake.connect("clicked", self.on_buttonfake_clicked)
-        hbox.pack_start(self.buttonfake, False, True, 0)
-
         self.window.connect("delete-event", gtk.main_quit)
         self.window.show_all()
 
@@ -144,31 +135,15 @@ class LoginWindow:
         return self.api
 
     def is_ready_to_submit(self):
-        print ("%s" % self.containerInfo)
         return self.api and self.containerInfo.is_ok()
 
-
-    def load_ob(self, url):
-        xml_ob = xml.etree.ElementTree.parse(url)
-        parseXmlMessage(self, xml_ob, self.api, self.containerInfo)
-
-    def on_buttonfake_clicked(self, widget):
-        self.containerInfo.store("a", "GRAVITY", "c")
-        toto.titi()
-        self.api = "fake"
-
+    def get_containerInfo(self):
+        return self.containerInfo
 
     def on_buttonok_clicked(self, widget):
-        self.login[0] = (self.username.get_text())
-        self.login[1] = (self.password.get_text())
-
-        if self.login[0] == '52052':
-            type = 'demo'
-        else:
-            type = 'production'
-        self.api = p2api.ApiConnection(type, self.login[0], self.login[1])
-        api = self.api
+        self.api = self.a2p2client.apiManager.connect(self.username.get_text(), self.password.get_text())
         runs, _ = self.api.getRuns()
+
         if len(runs) == 0:
             self.ShowErrorMessage("No Runs defined, impossible to program ESO's P2 interface.")
             self.requestAbort = True
@@ -201,12 +176,12 @@ class LoginWindow:
                 # if folders, add them
                 containerId = runs[i]['containerId']
                 # FIXME: make it recursive!
-                folders = getFolders(api, containerId)
+                folders = getFolders(self.api, containerId)
                 for j in range(len(folders)):
                     name = folders[j]['name']
                     contid = folders[j]['containerId']
                     entry_folder = self.store.append(entry_run, ['Folder:', name, contid])
-                    folders2 = getFolders(api, contid)
+                    folders2 = getFolders(self.api, contid)
                     for k in range(len(folders2)):
                         name2 = folders2[k]['name']
                         contid2 = folders2[k]['containerId']

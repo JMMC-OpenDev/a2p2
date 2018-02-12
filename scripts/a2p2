@@ -8,6 +8,7 @@ def main():
     """Main method to start a2p2 program."""
     parser = ArgumentParser(description='Move your Aspro2 observation details to an observatory proposal database')
     parser.add_argument('-c', '--config', action='store_true', help='show instruments and remote service configurations.')
+    parser.add_argument('-f', '--fakeapi', action='store_true', help='fake API to avoid remote connection.')
     parser.add_argument('-u', '--username', type=str, help='use another user login in history\'s comments.')
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose')
 
@@ -15,9 +16,9 @@ def main():
 
     from a2p2 import A2p2Client
     try:
-        with A2p2Client() as a2p2c:
+        with A2p2Client(args.fakeapi) as a2p2c:
             if args.username:
-                a2p2c.setUserName(args.username)
+                a2p2c.setUsername(args.username)
 
             if  args.config:
                 print(a2p2c)

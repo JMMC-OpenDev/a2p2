@@ -2,21 +2,23 @@
 
 __all__ = []
 
-
-
 from astropy.coordinates import SkyCoord
 import cgi
 import numpy as np
 import re
+import xml.etree.ElementTree
 
 
-def parseXmlMessage(gui, e, api, p2container): #e is parsedTree.
-    import getpass
-    username = getpass.getuser()
+def parseXmlMessage(client, url, p2container):
+    ui = client.ui
+    api = client.apiManager.getAPI()
 
-    gui.setProgress(0)
+    ui.setProgress(0)
+
     currentInstrument = p2container.instrument
     containerId = p2container.containerId
+
+    e = xml.etree.ElementTree.parse(url)
 
 #    try:
     if True:
@@ -24,7 +26,7 @@ def parseXmlMessage(gui, e, api, p2container): #e is parsedTree.
         interferometer = interferometerConfiguration.find('name').text
 
         if interferometer != "VLTI":
-            gui.ShowErrorMessage("ASPRO did not sent obs for VLTI, no action taken.")
+            ui.ShowErrorMessage("ASPRO did not sent obs for VLTI, no action taken.")
             return
 
         BASELINE = interferometerConfiguration.find('stations').text
@@ -32,11 +34,12 @@ def parseXmlMessage(gui, e, api, p2container): #e is parsedTree.
         instrumentConfiguration = e.find('instrumentConfiguration')
         instrument = instrumentConfiguration.find('name').text
         if instrument != currentInstrument:
-            gui.ShowErrorMessage("ASPRO not set for currently selected instrument: %s , expected %s" % (currentInstrument, instrument))
+            ui.ShowErrorMessage("ASPRO not set for currently selected instrument: %s , expected %s" % (currentInstrument, instrument))
             return
         # FIXME: TBD CHANGE TO HAVE OTHER INSTRUMENTS THAN GRAVITY!
-        if instrument != "GRAVITY":
-            gui.ShowErrorMessage("ASPRO not set for GRAVITY, no action taken.")
+        supportedInstruments = client.apiManager.getSupportedInstruments()
+        if not instrument in supportedInstruments:
+            ui.ShowErrorMessage("ASPRO not set for supported instruments [%s], no action taken." % (', '.join(supportedInstruments)))
             return
 
         instrumentMode = instrumentConfiguration.find('instrumentMode').text
@@ -67,7 +70,7 @@ def parseXmlMessage(gui, e, api, p2container): #e is parsedTree.
             w = SCRA.rfind('.')
             l = len(SCRA)
             if l-w < 4:
-                gui.ShowErrorMessage("Object " + NAME + " has a too low precision in RA to be useable by VLTI, please correct.")
+                ui.ShowErrorMessage("Object " + NAME + " has a too low precision in RA to be useable by VLTI, please correct.")
                 return
 
             if l-w > 4:
@@ -76,7 +79,7 @@ def parseXmlMessage(gui, e, api, p2container): #e is parsedTree.
             w = SCDEC.rfind('.')
             l = len(SCDEC)
             if l-w < 3:
-                gui.ShowErrorMessage("Object " + NAME + " has a too low precision in DEC to be useable by VLTI, please correct.")
+                ui.ShowErrorMessage("Object " + NAME + " has a too low precision in DEC to be useable by VLTI, please correct.")
                 return
             if l-w > 4:
                 SCDEC = SCDEC[0:w + 4]
@@ -126,7 +129,7 @@ def parseXmlMessage(gui, e, api, p2container): #e is parsedTree.
                     w = FTRA.rfind('.')
                     l = len(FTRA)
                     if l-w < 4:
-                        gui.ShowErrorMessage("Object " + SEQ_FT_ROBJ_NAME + " has a too low precision in RA to be useable by VLTI, please correct.")
+                        ui.ShowErrorMessage("Object " + SEQ_FT_ROBJ_NAME + " has a too low precision in RA to be useable by VLTI, please correct.")
                         return
                     if l-w > 4:
                         FTRA = FTRA[0:w + 4]
@@ -134,7 +137,7 @@ def parseXmlMessage(gui, e, api, p2container): #e is parsedTree.
                     w = FTDEC.rfind('.')
                     l = len(FTDEC)
                     if l-w < 3:
-                        gui.ShowErrorMessage("Object " + SEQ_FT_ROBJ_NAME + " has a too low precision in DEC to be useable by VLTI, please correct.")
+                        ui.ShowErrorMessage("Object " + SEQ_FT_ROBJ_NAME + " has a too low precision in DEC to be useable by VLTI, please correct.")
                     return
                     if l-w > 4:
                         FTDEC = FTDEC[0:w + 4]
@@ -146,7 +149,7 @@ def parseXmlMessage(gui, e, api, p2container): #e is parsedTree.
                     dualField = True
                 except:
                     #print "incomplete Fringe Tracker Target definition!"
-                    gui.ShowErrorMessage("incomplete Fringe Tracker Target definition, OB not set!")
+                    ui.ShowErrorMessage("incomplete Fringe Tracker Target definition, OB not set!")
 
             #AO target
             aoTarget = observationConfiguration.find('AOTarget')
@@ -177,7 +180,7 @@ def parseXmlMessage(gui, e, api, p2container): #e is parsedTree.
 
                 except:
                     #print "incomplete Adaptive Optics Target definition!"
-                    gui.ShowErrorMessage("incomplete Adaptive Optics Target definition, OB not set!")
+                    ui.ShowErrorMessage("incomplete Adaptive Optics Target definition, OB not set!")
 
             #Guide Star
             gsTarget = observationConfiguration.find('GSTarget')
@@ -200,7 +203,7 @@ def parseXmlMessage(gui, e, api, p2container): #e is parsedTree.
 
                 except:
                     #print "incomplete GuideStar Target definition!"
-                    gui.ShowErrorMessage("incomplete GuideStar Target definition, OB not set!")
+                    ui.ShowErrorMessage("incomplete GuideStar Target definition, OB not set!")
 
             #LST interval
             try:
@@ -210,8 +213,8 @@ def parseXmlMessage(gui, e, api, p2container): #e is parsedTree.
                 pass
 
             #then call the ob-creation using the API.
-            createGravityOB(gui, username, api, containerId, OBJTYPE, NAME, BASELINE, instrumentMode, SCRA, SCDEC, PMRA, PMDEC, SEQ_INS_SOBJ_MAG, SEQ_FI_HMAG, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, COU_AG_PMA, COU_AG_PMD, dualField, FTRA, FTDEC, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
-            gui.addToLog("Processed: " + NAME)
+            createGravityOB(ui, client.getUsername(), api, containerId, OBJTYPE, NAME, BASELINE, instrumentMode, SCRA, SCDEC, PMRA, PMDEC, SEQ_INS_SOBJ_MAG, SEQ_FI_HMAG, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, COU_AG_PMA, COU_AG_PMD, dualField, FTRA, FTDEC, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
+            ui.addToLog("Processed: " + NAME)
         #endfor
         if doFolder:
             containerId = parentContainerId
@@ -309,9 +312,9 @@ def getDit(mag, spec, pol, tel, mode):
     return string_dit
 
 #define function creating the OB:
-def createGravityOB(gui, username, api, containerId, OBJTYPE, NAME, BASELINE, instrumentMode, SCRA, SCDEC, PMRA, PMDEC, SEQ_INS_SOBJ_MAG, SEQ_FI_HMAG, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, COU_AG_PMA, COU_AG_PMD, dualField, FTRA, FTDEC, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
+def createGravityOB(ui, username, api, containerId, OBJTYPE, NAME, BASELINE, instrumentMode, SCRA, SCDEC, PMRA, PMDEC, SEQ_INS_SOBJ_MAG, SEQ_FI_HMAG, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, COU_AG_PMA, COU_AG_PMD, dualField, FTRA, FTDEC, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
 
-    gui.setProgress(0.1)
+    ui.setProgress(0.1)
     # UT or AT?
     isUT = (BASELINE[0] == "U")
     if isUT:
@@ -340,10 +343,10 @@ def createGravityOB(gui, username, api, containerId, OBJTYPE, NAME, BASELINE, in
         #compute x,y between science and ref beams:
         diff = getSkyDiff(SCRA, SCDEC, FTRA, FTDEC)
         if np.abs(diff[0]) < SCtoREFminDist:
-            gui.ShowErrorMessage("Dual-Field distance of two stars is  < " + str(SCtoREFminDist) + " mas, Please Correct.")
+            ui.ShowErrorMessage("Dual-Field distance of two stars is  < " + str(SCtoREFminDist) + " mas, Please Correct.")
             return
         elif  np.abs(diff[0]) > SCtoREFmaxDist:
-            gui.ShowErrorMessage("Dual-Field distance of two stars is  > " + str(SCtoREFmaxDist) + " mas, Please Correct.")
+            ui.ShowErrorMessage("Dual-Field distance of two stars is  > " + str(SCtoREFmaxDist) + " mas, Please Correct.")
             return
 
     if instrumentMode == 'LOW-COMBINED':
@@ -377,7 +380,7 @@ def createGravityOB(gui, username, api, containerId, OBJTYPE, NAME, BASELINE, in
         INS_SPEC_POL = 'IN'
         string_dit = getDit(SEQ_INS_SOBJ_MAG, 2, 1, tel, dualmode)
     else:
-        gui.ShowErrorMessage("Invalid Instrument Mode, Please Correct.")
+        ui.ShowErrorMessage("Invalid Instrument Mode, Please Correct.")
         return
 
     #compute ndit, nexp
@@ -391,7 +394,7 @@ def createGravityOB(gui, username, api, containerId, OBJTYPE, NAME, BASELINE, in
     exptime = int(ndit * dit + 40) #40 sec overhead by exp
     nexp = (1800-900) / exptime
     nexp = int(nexp)
-    gui.addToLog('number of exposures to reach 1800 s per OB is ' + str(nexp))
+    ui.addToLog('number of exposures to reach 1800 s per OB is ' + str(nexp))
     if nexp < 3:
         nexp = 3 #min is O S O
         # recompute ndit
@@ -400,7 +403,7 @@ def createGravityOB(gui, username, api, containerId, OBJTYPE, NAME, BASELINE, in
         ndit = int(ndit)
         if ndit < 10:
             ndit = 10
-            gui.addToLog("**Warning**, OB NDIT has been set to min value=10, but OB will take longer than 1800 s")
+            ui.addToLog("**Warning**, OB NDIT has been set to min value=10, but OB will take longer than 1800 s")
     nexp %= 40
     sequence = 'O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O'
     my_sequence = sequence[0:2 * nexp]
@@ -455,8 +458,7 @@ def createGravityOB(gui, username, api, containerId, OBJTYPE, NAME, BASELINE, in
     ## else:
     api.saveSiderealTimeConstraints(obId, [{'from': lstStartSex, 'to': lstEndSex}], stcVersion)
 
-    gui.setProgress(0.2)
-
+    ui.setProgress(0.2)
 
     #then, attach acquisition template(s)
     if dualField:
@@ -510,8 +512,7 @@ def createGravityOB(gui, username, api, containerId, OBJTYPE, NAME, BASELINE, in
 
     templateId = tpl['templateId']
 
-
-    gui.setProgress(0.3)
+    ui.setProgress(0.3)
 
     if isCalib:
         if dualField:
@@ -525,7 +526,7 @@ def createGravityOB(gui, username, api, containerId, OBJTYPE, NAME, BASELINE, in
             tpl, tplVersion = api.createTemplate(obId, 'GRAVITY_single_obs_exp')
     templateId = tpl['templateId']
 
-    gui.setProgress(0.4)
+    ui.setProgress(0.4)
 
     # put values. they are the same except for dual obs science (?)
     if dualField and not isCalib:
@@ -549,22 +550,22 @@ def createGravityOB(gui, username, api, containerId, OBJTYPE, NAME, BASELINE, in
                                                 'SEQ.SKY.Y':  2000
                                                 }, tplVersion)
 
-    gui.setProgress(0.5)
+    ui.setProgress(0.5)
 
     #verify OB online
     response, _ = api.verifyOB(obId, True)
 
-    gui.setProgress(1.0)
+    ui.setProgress(1.0)
 
     if response['observable']:
-        gui.ShowInfoMessage('OB ' + str(obId) + ' ' + ob['name'] + ' is OK.')
-        gui.addToLog('OB: ' + str(obId) + ' is ok')
+        ui.ShowInfoMessage('OB ' + str(obId) + ' ' + ob['name'] + ' is OK.')
+        ui.addToLog('OB: ' + str(obId) + ' is ok')
     else:
         s = ""
         for ss in response['messages']:
             s += cgi.escape(ss) + '\n'
-        gui.ShowWarningMessage('OB ' + str(obId) + ' <b>HAS Warnings</b>. ESO says:\n\n' + s)
-        gui.addToLog('OB: ' + str(obId) + ' created with warnings')
+        ui.ShowWarningMessage('OB ' + str(obId) + ' <b>HAS Warnings</b>. ESO says:\n\n' + s)
+        ui.addToLog('OB: ' + str(obId) + ' created with warnings')
         # (NOTE: we need to escape things like <= in returned text)
 
         #   # fetch OB again to confirm its status change

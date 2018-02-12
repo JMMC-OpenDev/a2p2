@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 __all__ = ['A2p2Client']
+from apis import APIManager
 from gui import LoginWindow
 import logging
 import pygtk
@@ -10,13 +11,16 @@ import time
 pygtk.require('2.0')
 import gtk
 
+from utils import parseXmlMessage
+
+
 class A2p2Client():
     """Transmit your Aspro2 observation to remote Observatory scheduling database.
 
        with A2p2Client() as a2p2:
            a2p2.run()
            ..."""
-    def __init__(self):
+    def __init__(self, fakeAPI=False):
         """Create the A2p2 client."""
         logging.basicConfig(level=logging.DEBUG,
                             format=('%(filename)s: '
@@ -26,6 +30,9 @@ class A2p2Client():
                             '%(message)s')
                             )
         self.username = None
+        self.apiName = None
+        if fakeAPI:
+            self.apiName = "fakeAPI"
 
         pass
 
@@ -34,9 +41,10 @@ class A2p2Client():
         # Instantiate the samp client and connect to the hub later
         self.a2p2SampClient = A2p2SampClient()
 
-        # Instantiate a UI
-        self.gui = LoginWindow()
+        self.apiManager = APIManager(self.apiName)
 
+        # Instantiate a UI with selected api
+        self.ui = LoginWindow(self)
 
         return self
 
@@ -46,10 +54,8 @@ class A2p2Client():
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Handle closing the 'with' statement."""
-
         del self.a2p2SampClient
-        del self.gui
-
+        del self.ui
         # TODO close the connection to the obs database ?
 
         # WARNING do not return self only. Else exceptions are hidden
@@ -64,14 +70,23 @@ class A2p2Client():
     def changeSampStatus(self, connected_flag):
         self.sampConnected = connected_flag
 
-    def setUserName(self, username):
+    def setUsername(self, username):
         self.username = username
 
-    def getApi(self):
-        """ Return an API to interact with remote observation proposals"""
-        # At present time only ESO P2 API is available
+    def getUsername(self):
+        if not self.username:
+            import getpass
+            self.username = getpass.getuser()
+        return self.username
+
+    def setProgress(self, perc, actionName=None):
+        if actionName:
+            print ("%s action progress is  %s" % (actionName, perc))
+        else:
+            print ("progress is  %s %%" % (perc))
 
     def run(self):
+
         # bool of status change
         flag = [0]
 
@@ -88,7 +103,8 @@ class A2p2Client():
             try:
                 loop_cnt += 1
                 time.sleep(delay)
-                toto.titi()
+
+                # move next lines into the ui part so main code does not depend to gtk
                 while (gtk.events_pending ()):
                     gtk.main_iteration()
 
@@ -101,22 +117,22 @@ class A2p2Client():
                         pass # TODO raise other exception excepted
 
                 if self.a2p2SampClient.has_message(): # TODO implement a stack for received messages
-                    if not self.gui.is_connected():
+                    if not self.ui.is_connected():
                         logging.debug("samp message received and api not connected")
-                        self.gui.ShowErrorMessage('a2p2 is not currently connected with ESO P2 database.')
+                        self.ui.ShowErrorMessage('a2p2 is not currently connected with ESO P2 database.')
                         # TODO fix case where we are connected but haven't selected container
                         #r.received = False
-                    elif not self.gui.is_ready_to_submit():
+                    elif not self.ui.is_ready_to_submit():
                         logging.debug("samp message received and api not ready to transmit")
-                        self.gui.ShowErrorMessage('Please select a runId ESO P2 database.')
+                        self.ui.ShowErrorMessage('Please select a runId ESO P2 database.')
                     else:
                         logging.debug("samp message received and api ready to transmit")
                         ob_url = self.a2p2SampClient.get_ob_url()
-                        self.gui.load_ob(ob_url)
+                        parseXmlMessage(self, ob_url, self.ui.get_containerInfo())
                     # always clear previous received message
                     self.a2p2SampClient.clear_message()
 
-                if self.gui.requestAbort:
+                if self.ui.requestAbort:
                     loop_cnt = -1
             except KeyboardInterrupt:
                 loop_cnt = -1
