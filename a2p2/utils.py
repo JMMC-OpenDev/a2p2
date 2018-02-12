@@ -6,6 +6,7 @@ from astropy.coordinates import SkyCoord
 import cgi
 import numpy as np
 import re
+import traceback
 import xml.etree.ElementTree
 
 
@@ -20,8 +21,7 @@ def parseXmlMessage(client, url, p2container):
 
     e = xml.etree.ElementTree.parse(url)
 
-#    try:
-    if True:
+    try:
         interferometerConfiguration = e.find('interferometerConfiguration')
         interferometer = interferometerConfiguration.find('name').text
 
@@ -219,10 +219,10 @@ def parseXmlMessage(client, url, p2container):
         if doFolder:
             containerId = parentContainerId
             doFolder = False
-#    except:
-#        #print "General error or Absent Parameter in template (missing magnitude?), OB not set."
-#        gui.ShowErrorMessage("General error or Absent Parameter in template (missing magnitude?), OB not set.")
-#        gui.setProgress(0)
+    except Exception as e:
+        trace = traceback.format_exc(limit=1)
+        ui.ShowErrorMessage("General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s " % (trace))
+        ui.setProgress(0)
 
 # here dit must be a string since this is what p2 expects. NOT an integer or real/double.
 def getDit(mag, spec, pol, tel, mode):
