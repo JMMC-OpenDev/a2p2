@@ -69,8 +69,10 @@ class A2p2SampClient():
 
     def get_ob_url(self):
         url = self.r.params['url']
-        if url.startswith("file:"):
+        if url.startswith("file:///"):
             return url[7:]
+        elif url.startswith("file:/"): # work arround bugged file urls
+            return url[5:]
         return url
 
 
