@@ -218,7 +218,7 @@ class LoginWindow:
             if id == 'Folder:': #we have a folder
                 new_containerId_same_run = model[treeiter][2]
                 folderName = model[treeiter][1]
-                print "*** Working in Folder %s, containerId: %i ***" % (folderName, new_containerId_same_run)
+                print ("*** Working in Folder %s, containerId: %i ***" % (folderName, new_containerId_same_run))
                 self.addToLog('Folder: ' + folderName)
                 self.containerInfo.store_containerId(new_containerId_same_run)
             else:
