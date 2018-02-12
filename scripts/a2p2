@@ -26,17 +26,10 @@ def main():
                 a2p2c.run()
 
     except Exception as e:
-        if args.verbose:
+        if True or args.verbose:
             traceback.print_exc()
         else:
             print('ERROR: %s' % str(e))
-    except:
-        if args.verbose:
-            traceback.print_exc()
-        else:
-            print ("Unexpected error: %s" % sys.exc_info()[0])
-
-
 
 if __name__ == '__main__':
     main()
