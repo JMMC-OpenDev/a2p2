@@ -31,6 +31,6 @@ setup(
       ],
       license='GPL',
       packages=['a2p2'],
-      scripts=['scripts/a2p2', 'scripts/a2p2-diag'],
+      scripts=['scripts/a2p2'],
       keywords='observation preparation tool optical-interferometry p2 samp'
 )
