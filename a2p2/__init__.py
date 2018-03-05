@@ -8,5 +8,3 @@ from . import gui
 from . import samp
 from . import client
 from .client import A2p2Client
-
-print("__init__ called")
