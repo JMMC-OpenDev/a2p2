@@ -47,10 +47,10 @@ Test
 Minimal tests have been implemented.
 A green badge corresponds to integration success with PIP on a subset of Python version (look at setup.py). 
 
-A2P2Badge 
+|A2P2Badge| 
 
 
-.. A2P2Badge:: https://travis-ci.org/gmella/a2p2.svg?branch=master
+.. |A2P2Badge| image:: https://travis-ci.org/gmella/a2p2.svg?branch=master
    :alt: A2P2 Badge on master branch
    :target: https://travis-ci.org/gmella/a2p2
 .. _PyPI:   https://pypi.python.org
