@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-__all__ = ['A2p2Client']
+__all__ = []
 
 class APIManager():
     """

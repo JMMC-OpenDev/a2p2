@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
-__all__ = ['A2p2Client']
+__all__ = []
 
-import pygtk
-pygtk.require('2.0')
-import gtk
+try:
+    import pygtk
+    pygtk.require('2.0')
+    import gtk
+except ImportError:
+    pass # We should flag NO-GUI
 
 html_escape_table = {
     "&": "&amp;",
@@ -137,6 +140,9 @@ class LoginWindow:
         if not self.window.emit("delete-event", gtk.gdk.Event(gtk.gdk.DELETE)):
             self.window.destroy()
 
+    def loop(self):
+        while (gtk.events_pending ()):
+            gtk.main_iteration()
 
 
     def addToLog(self, text):

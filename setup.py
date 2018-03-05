@@ -25,12 +25,12 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GPL License',
         'Programming Language :: Python :: 2',
-#        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-#        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.6',
       ],
       license='GPL',
       packages=['a2p2'],
-      scripts=['scripts/a2p2'],
+      scripts=['scripts/a2p2', 'scripts/a2p2-diag'],
       keywords='observation preparation tool optical-interferometry p2 samp'
 )

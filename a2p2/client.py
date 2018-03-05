@@ -1,17 +1,16 @@
 #!/usr/bin/env python
 
 __all__ = ['A2p2Client']
-from apis import APIManager
-from gui import LoginWindow
+
+
+from a2p2.apis import APIManager
+from a2p2.gui import LoginWindow
+from a2p2.utils import parseXmlMessage
+from a2p2.samp import A2p2SampClient
 import logging
-import pygtk
-from samp import A2p2SampClient
 import sys
 import time
-pygtk.require('2.0')
-import gtk
 
-from utils import parseXmlMessage
 
 
 class A2p2Client():
@@ -103,10 +102,8 @@ class A2p2Client():
             try:
                 loop_cnt += 1
                 time.sleep(delay)
-
-                # move next lines into the ui part so main code does not depend to gtk
-                while (gtk.events_pending ()):
-                    gtk.main_iteration()
+		
+                self.ui.loop()
 
                 if not self.a2p2SampClient.is_connected() and loop_cnt % each == 0:
                     loop_cnt = 0
