@@ -16,7 +16,7 @@ setup(
       # anaconda also fails 
       # prefere the use of your default python packages on your linux
       # what is the solution for mac ?
-      install_requires=['astropy', 'p2api'] + (['pygtk'] if platform.startswith("win") else ['curses']),
+      install_requires=['astropy', 'p2api'] + (['pygtk'] if platform.startswith("win") else []),
       url='http://www.jmmc.fr/a2p2',
       author='JMMC Tech Group',
       author_email='jmmc-tech-group@jmmc.fr',
