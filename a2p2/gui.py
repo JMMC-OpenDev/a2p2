@@ -169,11 +169,11 @@ class TextWindow(LoginWindow):
         selectedOB = self.get_containerInfo().projectId
         if not selectedOB:
             selectedOB = " -- "
-        banner = "- Welcome in the text UI of A2P2 - username:%s / SAMP %s / API %s [%s]" % (self.login[0], self.a2p2client.a2p2SampClient.get_status(), self.a2p2client.apiManager.get_status(), selectedOB)
+        banner = "- Welcome in the text UI of A2P2 - / SAMP %s / API %s [%s] : username:%s" % (self.a2p2client.a2p2SampClient.get_status(), self.a2p2client.apiManager.get_status(), selectedOB, self.login[0])
         self.stdscr.addstr(0, 0, banner)
-        menu = "( c/onnect - q/uit - r/efresh screen)"
+        menu = "( c/onnect - q/uit - r/efresh screen - u/ser credential)"
         if self.a2p2client.apiManager.is_connected():
-            menu = "( s/elect run - q/uit - r/efresh screen)"
+            menu = "( s/elect run - q/uit - r/efresh screen - u/ser credential)"
         self.stdscr.addstr(1, 30, menu)
 
         # TODO dequeu last logs
@@ -237,6 +237,17 @@ class TextWindow(LoginWindow):
                 self.ShowInfoMessage("selected container : '%s'" % (self.containerInfo))
             except Exception as e:
                 self.ShowInfoMessage("invalid user input : '%s' %s" % (str(s), str(e)))
+        elif key == "u":
+            self.stdscr.addstr(3, 0, "1/2 - set API username :")
+            s = self.stdscr.getstr(15)
+            self.login[0] = s.decode('utf-8')
+            self.stdscr.clear()
+
+            self.stdscr.addstr(3, 0, "2/2 - set API password :")
+            s = self.stdscr.getstr(15)
+            self.login[1] = s.decode('utf-8')
+            self.stdscr.clear()
+
 
 
 
