@@ -7,7 +7,9 @@ try:
     pygtk.require('2.0')
     import gtk
 except ImportError:
-    pass # We should flag NO-GUI
+    pass # We should switch to NO-GUI mode
+
+import time
 
 html_escape_table = {
     "&": "&amp;",
@@ -23,7 +25,7 @@ def html_escape(text):
 
 #help text in Pango Markup syntax https://developer.gnome.org/pango/stable/PangoMarkupFormat.html
 HELPTEXT = """
-This applet provides the link between ASPRO (that you should have started) and ESO's P2 repository for Observing Blocks (OBs).
+This application provides the link between ASPRO (that you should have started) and ESO's P2 repository for Observing Blocks (OBs).
 
 <span foreground="blue" size="x-large"> <b>Login:</b></span>
 You must log in to the ESO User Portal using your identifiers to access the P2 repository. Please check on the ESO website in case of doubt.
@@ -44,6 +46,7 @@ log"""
 class P2Container:
     def __init__(self):
         self.projectId = None
+        # TODO check projectId because it is not used ?
         self.instrument = None
         self.containerId = None
 
@@ -61,7 +64,8 @@ class P2Container:
         return (self.projectId != None)
 
     def __str__(self):
-        return """projectId:'%s', instrument:'%s', containerId:'%s'""" % (self.projectId, self.instrument, self.containerId)
+    #    return """projectId:'%s', instrument:'%s', containerId:'%s'""" % (self.projectId, self.instrument, self.containerId)
+        return """instrument:'%s', containerId:'%s'""" % (self.instrument, self.containerId)
 
 class LoginWindow:
     def __init__(self, a2p2client):
@@ -76,6 +80,203 @@ class LoginWindow:
         self.containerInfo = P2Container()
 
         self.requestAbort = False
+
+        #one could probably limit the treeView with the instrument supported by ASPRO!!!!
+        self.supportedInstrumentsByAspro = ['GRAVITY', 'MATISSE', 'AMBER', 'PIONIER']
+
+    def get_api(self):
+        return self.api
+
+    def is_connected(self):
+        # return None other the api connected
+        return self.api
+
+    def is_ready_to_submit(self):
+        return self.api and self.containerInfo.is_ok()
+
+    def get_containerInfo(self):
+        return self.containerInfo
+
+
+
+
+    # store runs in a list of tuples
+    # TODO move this code into the api module
+    def get_runs(self):
+
+        runs, _ = self.api.getRuns()
+        valid_runs = {}
+        try:
+            for run in runs:
+                if run['instrument'] in self.supportedInstrumentsByAspro:
+                    itemLabel = "%s - %s" % (run['progId'], run['instrument'])
+                    valid_runs[itemLabel] = self.get_items(run)
+
+            res = []
+            pos = 0
+            for label, item in valid_runs.items():
+                if "containerId" in item.keys():
+                    e = "%s / %s" % (label, item['containerId'])
+                else:
+                    e = " TBD for %s / %s" % (label, item)
+                pos += 1
+                res.append ([pos, e, item])
+
+        except Exception as e:
+            import time
+            self.ShowErrorMessage('%s' % str(e))
+            return
+
+        return res
+
+
+    def get_items(self, run):
+        return run
+        containerId = run['containerId']
+        # TODO take advantage of itemType ?OB Group / Concatenation
+        items = getFolders(self.api, containerId)
+        if len(items) == 0:
+            return run
+        else:
+            children = {}
+            for item in items:
+                itemLabel = "%s - %s" % (item['containerId'], item['name'])
+                children[item] = get_items(item)
+            return children
+
+
+class TextWindow(LoginWindow):
+    def __init__(self, a2p2client):
+        LoginWindow.__init__(self, a2p2client)
+        print("Welcome in the text UI of A2P2")
+        import curses
+        self.stdscr = curses.initscr()
+        self.stdscr.keypad(True)
+        self.stdscr.clear()
+        curses.halfdelay(10)
+
+    def __del__(self):
+        import curses
+        curses.endwin()
+        print("closing the text UI")
+
+    def loop(self):
+        # force to react to every typed key
+        import curses
+        curses.cbreak()
+        curses.halfdelay(10)
+
+        selectedOB = self.get_containerInfo().projectId
+        if not selectedOB:
+            selectedOB = " -- "
+        banner = "- Welcome in the text UI of A2P2 - username:%s / SAMP %s / API %s [%s]" % (self.login[0], self.a2p2client.a2p2SampClient.get_status(), self.a2p2client.apiManager.get_status(), selectedOB)
+        self.stdscr.addstr(0, 0, banner)
+        menu = "( c/onnect - q/uit - r/efresh screen)"
+        if self.a2p2client.apiManager.is_connected():
+            menu = "( s/elect run - q/uit - r/efresh screen)"
+        self.stdscr.addstr(1, 30, menu)
+
+        # TODO dequeu last logs
+        lastLogs = []
+        #q = self.a2p2client.getLoggingQueue()
+        s = 0
+        #while not q.empty() and len(lastLogs) < 5:
+            #lastLogs.append(q.get())
+        self.ShowLog(lastLogs)
+
+        # Clean and place cursor
+        self.stdscr.addstr(2, 0, "?    ")
+        self.stdscr.addstr(2, 0, "? ")
+
+        self.stdscr.refresh()
+        try:
+            key = self.stdscr.getkey()
+            self.handle(key)
+        except: # todo filter execption
+            pass
+
+
+    def handle(self, key):
+        if key == "r":
+            self.stdscr.clear()
+        if key == "p":
+            self.progress(50)
+        if key == "q":
+            self.requestAbort = True
+            return
+        elif key == "c":
+            self.ShowInfoMessage("Trying to connect on API")
+            self.api = self.a2p2client.apiManager.connect(self.login[0], self.login[1])
+            self.ShowInfoMessage("Connected on API")
+            runs, _ = self.api.getRuns()
+            if len(runs) == 0:
+                self.ShowErrorMessage("No Runs defined, impossible to program ESO's P2 interface. Quit or try again.")
+                #self.requestAbort = True
+                return
+        elif key == "s":
+            id2run = {}
+            id2label = {}
+            runs = self.get_runs()
+            summary = ["%i runs retrieved for supported instruments" % (len(runs))]
+            run_choices = []
+            for pos, label, run in runs:
+                run_choices.append("%i) %s " % (pos, label))
+                id2run[pos] = run
+                id2label[pos] = label
+            self.ShowMessages("..", summary + run_choices)
+            self.stdscr.addstr(3, 0, "Select destination container :")
+            s = self.stdscr.getstr(15)
+            self.stdscr.clear()
+            try:
+                i = int(s)
+                run = id2run[i]
+                id = id2label[i]
+                instru = run['instrument']
+                containerId = run['containerId']
+                self.containerInfo.store(id, instru, containerId)
+                self.ShowInfoMessage("selected container : '%s'" % (self.containerInfo))
+            except Exception as e:
+                self.ShowInfoMessage("invalid user input : '%s' %s" % (str(s), str(e)))
+
+
+
+    def setProgress(self, perc):
+        self.stdscr.addstr(2, 50, "Progress: [{1:10}] {0}%".format(perc, "#"))
+
+    def ShowMessages(self, level, msgs):
+        eraser = "                                          "
+        i = 0
+        for msg in msgs:
+            self.stdscr.addstr(4 + i, 1, "%s: %s%s" % (level, msg, eraser))
+            i += 1
+        self.stdscr.refresh()
+
+    def ShowMessage(self, level, msg):
+        eraser = "                                          "
+        self.stdscr.addstr(4, 1, "%s: %s%s" % (level, msg, eraser))
+        self.stdscr.refresh()
+
+    def ShowErrorMessage(self, msg):
+        self.ShowMessage("  ERROR", msg)
+        #time.sleep(1)
+
+    def ShowWarningMessage(self, msg):
+        self.ShowMessage("WARNING", msg)
+        #time.sleep(1)
+
+    def ShowInfoMessage(self, msg):
+        self.ShowMessage("   INFO", msg)
+
+    def addToLog(self, text):
+        self.stdscr.addstr(20, 0, "LOG: %s" % (text))
+
+    def ShowLog(self, logs):
+        for i in range(0, len(logs)):
+            self.stdscr.addstr(20 + i, 0, "LOG: %s" % (logs[i]))
+
+class GtkWindow(LoginWindow):
+    def __init__(self, a2p2client):
+        LoginWindow.__init__(self, a2p2client)
 
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.set_title("Connect with ESO DATABASE")
@@ -148,16 +349,6 @@ class LoginWindow:
     def addToLog(self, text):
         self.log.set_label(text)
 
-    def is_connected(self):
-        # return None other the api connected
-        return self.api
-
-    def is_ready_to_submit(self):
-        return self.api and self.containerInfo.is_ok()
-
-    def get_containerInfo(self):
-        return self.containerInfo
-
     def on_buttonok_clicked(self, widget):
         self.api = self.a2p2client.apiManager.connect(self.username.get_text(), self.password.get_text())
         runs, _ = self.api.getRuns()
@@ -178,11 +369,9 @@ class LoginWindow:
         self.instrument = []
         self.containerId = []
         self.treeiter = []
-        #one could probably limit the treeView with the instrument supported by ASPRO!!!!
-        supportedInstruments = ['GRAVITY', 'MATISSE', 'AMBER', 'PIONIER']
 
         for i in range(len(runs)):
-            if supportedInstruments.count(runs[i]['instrument']) == 1:
+            if runs[i]['instrument'] in self.supportedInstrumentsByAspro:
                 runName = runs[i]['progId']
                 self.runName.append(runName)
                 instrument = runs[i]['instrument']
@@ -259,8 +448,6 @@ class LoginWindow:
             return True
         else:
             return model[iter][2] == self.current_filter_language
-    def get_api(self):
-        return self.api
 
     def ShowErrorMessage(self, text):
         dialog = gtk.MessageDialog(type=gtk.MESSAGE_ERROR,

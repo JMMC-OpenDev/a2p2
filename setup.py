@@ -11,26 +11,26 @@ setup(
       version='0.0.1',
       description=description,
       long_description=long_description,
-#      install_requires=['astropy', 'p2api','pygtk'],
-# PyGtk is not working on some linux
-# anaconda also fails 
-# prefere the use of your default python packages on your linux
-# what is the solution for mac ?
-      install_requires=['astropy', 'p2api']+(['pygtk'] if platform.startswith("win") else []),
+      #      install_requires=['astropy', 'p2api','pygtk'],
+      # PyGtk is not working on some linux
+      # anaconda also fails 
+      # prefere the use of your default python packages on your linux
+      # what is the solution for mac ?
+      install_requires=['astropy', 'p2api'] + (['pygtk'] if platform.startswith("win") else ['curses']),
       url='http://www.jmmc.fr/a2p2',
       author='JMMC Tech Group',
       author_email='jmmc-tech-group@jmmc.fr',
-      classifiers=[ 
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: GPL License',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
+      classifiers=[
+      'Development Status :: 4 - Beta',
+      'Intended Audience :: Developers',
+      'License :: OSI Approved :: GPL License',
+      'Programming Language :: Python :: 2',
+      'Programming Language :: Python :: 2.7',
+      'Programming Language :: Python :: 3',
+      'Programming Language :: Python :: 3.6',
       ],
       license='GPL',
       packages=['a2p2'],
       scripts=['scripts/a2p2'],
       keywords='observation preparation tool optical-interferometry p2 samp'
-)
+      )

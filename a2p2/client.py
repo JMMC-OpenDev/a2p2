@@ -4,14 +4,15 @@ __all__ = ['A2p2Client']
 
 
 from a2p2.apis import APIManager
-from a2p2.gui import LoginWindow
-from a2p2.utils import parseXmlMessage
+from a2p2.gui import GtkWindow
+from a2p2.gui import TextWindow
 from a2p2.samp import A2p2SampClient
+from a2p2.utils import parseXmlMessage
 import logging
 import sys
 import time
 
-
+logLevel = logging.ERROR
 
 class A2p2Client():
     """Transmit your Aspro2 observation to remote Observatory scheduling database.
@@ -21,13 +22,18 @@ class A2p2Client():
            ..."""
     def __init__(self, fakeAPI=False):
         """Create the A2p2 client."""
-        logging.basicConfig(level=logging.DEBUG,
-                            format=('%(filename)s: '
-                            '%(levelname)s: '
-                            '%(funcName)s(): '
-                            '%(lineno)d:\t'
-                            '%(message)s')
-                            )
+        logger = logging.getLogger()
+        logger.setLevel(logLevel)
+    #        logging.basicConfig(level=logging.DEBUG,
+    #                            format=('%(filename)s: '
+    #                            '%(levelname)s: '
+    #                            '%(funcName)s(): '
+    #                            '%(lineno)d:\t'
+    #                            '%(message)s')
+    #                            )
+
+        # finish logging
+
         self.username = None
         self.apiName = None
         if fakeAPI:
@@ -40,10 +46,13 @@ class A2p2Client():
         # Instantiate the samp client and connect to the hub later
         self.a2p2SampClient = A2p2SampClient()
 
-        self.apiManager = APIManager(self.apiName)
+        # Instantiate a UI
+        try:
+            self.ui = GtkWindow(self)
+        except:
+            self.ui = TextWindow(self)
 
-        # Instantiate a UI with selected api
-        self.ui = LoginWindow(self)
+        self.apiManager = APIManager(self.apiName, self.ui)
 
         return self
 
@@ -65,7 +74,6 @@ class A2p2Client():
         apis       = "\n- ".join(["Supported APIs:", "TBD"])
         return """a2p2 client\n%s\n%s\n""" % (instruments, apis)
 
-
     def changeSampStatus(self, connected_flag):
         self.sampConnected = connected_flag
 
@@ -85,7 +93,6 @@ class A2p2Client():
             print ("progress is  %s %%" % (perc))
 
     def run(self):
-
         # bool of status change
         flag = [0]
 
@@ -95,14 +102,17 @@ class A2p2Client():
 
         # We test every 1s to see if the hub has sent a message
         delay = 0.1
-        each = 10
+        if isinstance(self.ui, TextWindow):
+            each = 1
+        else:
+            each = 10
         loop_cnt = 0
 
         while loop_cnt >= 0:
             try:
                 loop_cnt += 1
                 time.sleep(delay)
-		
+
                 self.ui.loop()
 
                 if not self.a2p2SampClient.is_connected() and loop_cnt % each == 0:
@@ -117,11 +127,9 @@ class A2p2Client():
                     if not self.ui.is_connected():
                         logging.debug("samp message received and api not connected")
                         self.ui.ShowErrorMessage('a2p2 is not currently connected with ESO P2 database.')
-                        # TODO fix case where we are connected but haven't selected container
-                        #r.received = False
                     elif not self.ui.is_ready_to_submit():
-                        logging.debug("samp message received and api not ready to transmit")
                         self.ui.ShowErrorMessage('Please select a runId ESO P2 database.')
+                        logging.debug("samp message received and api not ready to transmit")
                     else:
                         logging.debug("samp message received and api ready to transmit")
                         ob_url = self.a2p2SampClient.get_ob_url()
@@ -133,3 +141,4 @@ class A2p2Client():
                     loop_cnt = -1
             except KeyboardInterrupt:
                 loop_cnt = -1
+

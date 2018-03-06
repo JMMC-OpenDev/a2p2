@@ -56,7 +56,15 @@ class A2p2SampClient():
         self.set_connected(False)
 
     def is_connected(self):
+        # TODO do not trust this flag but try to ask sampClient.is_registered
         return self.connected
+
+    def get_status(self):
+        if self.is_connected():
+            return "    connected"
+        else:
+            return "not connected"
+
 
     def set_connected(self, flag):
         self.connected = flag
