@@ -50,7 +50,13 @@ License
 -------
 A2P2 is released under GPL license. Please have a look in the LICENSE file for any detail and feel free to fill issues.
 
+Interaction diagram
+-------------------
+|flowchart|
 
+.. |flowchart| image:: https://raw.githubusercontent.com/JMMC-OpenDev/a2p2/master/doc/A2P2_in_3steps.png
+   :alt: A2P2 interaction diagram
+   :target: https://raw.githubusercontent.com/JMMC-OpenDev/a2p2/master/doc/A2P2_in_3steps.png
 .. |A2P2Badge| image:: https://travis-ci.org/gmella/a2p2.svg?branch=master
    :alt: A2P2 Badge on master branch
    :target: https://travis-ci.org/gmella/a2p2
