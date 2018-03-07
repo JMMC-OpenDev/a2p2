@@ -1,53 +1,54 @@
-a2p2
-====
+a2p2 |A2P2Badge| 
+================
 
-* Aspro2 to Proposals Programmations *
+**Move your Aspro2 observation details to an observatory proposal database**
 
 Description
 -----------
 
-Aspro2 is ... available ...
-P2 is ... available ... You will need an account to perform operation on ESO database.
+Prepare your observations within Aspro2_ and run a2p2_ to submit your OB.
 
-``a2p2`` is a python bridge (both API and GUI) to help astronomical observation programmation among main Observatories facilities.
+You will need an account to perform operation on ESO database through P2_.
+
 
 Installation
 ------------
 
-The package is uploaded to `PyPI`_, so you can
-install the package using pip:
+The package is uploaded to `PyPI`_, so you can install the package using pip:
 
-    pip install a2p2
+    ``pip install a2p2``
+
+You can also build and install from sources:
+
+    ``git clone https://github.com/JMMC-OpenDev/a2p2.git``
+
+    ``cd a2p2``
+
+    ``pip install .``
 
 Usage
 -----
 
-You can use the ``a2p2`` command to ....authenticate using your username and password.
+**a2p2 [-h] [-f] [-u USERNAME] [-v]**
 
-    usage: a2ps [-h] 
 
-You can also authenticate using
+optional arguments:
+ -h, --help                show this help message and exit
+ -f, --fakeapi             fake API to avoid remote connection (dev. only).
+ -u USERNAME, --username   USERNAME use another user login in history's comments.
+ -v, --verbose             Verbose
 
-Example
+A GUI is run if your python installation supports gtk, else a text UI will run. 
+
+Once Aspro2_ is running and a2p2_ is connected to an OB submission service (using P2API_) :
+ * select your target 
+ * enter the Aspro2'menu ``interop`` / ``Send Obs. Block(s)`` 
+
+After few seconds, you shoud get a report of your new submission.
+
+License
 -------
-
-TODO ?
-
-API Usage sample
-.. code:: python
-
-    from a2ps import A2p2Client
-
-APIs
-----
-TODO
-
-Test
-----
-Minimal tests have been implemented.
-A green badge corresponds to integration success with PIP on a subset of Python version (look at setup.py). 
-
-|A2P2Badge| 
+A2P2 is released under GPL license. Please have a look in the LICENSE file for any detail and feel free to fill issues.
 
 
 .. |A2P2Badge| image:: https://travis-ci.org/gmella/a2p2.svg?branch=master
@@ -57,3 +58,4 @@ A green badge corresponds to integration success with PIP on a subset of Python 
 .. _P2:     https://www.eso.org/sci/observing/phase2/p2intro.html
 .. _P2API:  https://www.eso.org/copdemo/apidoc/
 .. _Aspro2: http://www.jmmc.fr/aspro2
+.. _a2p2:   http://www.jmmc.fr/a2p2
