@@ -63,7 +63,7 @@ class A2p2SampClient():
 
     def get_status(self):
         if self.is_connected():
-            return "    connected"
+            return "connected [%s]" % (self.sampClient.get_public_id())
         else:
             return "not connected"
 
