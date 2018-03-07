@@ -28,7 +28,6 @@ class A2p2SampClient():
     # TODO watch hub disconnection
     def __init__(self):
         self.sampClient = SAMPIntegratedClient("A2P2 samp relay") # TODO get title from main program class instead of HardCoded value
-        self.connected = False
 
     def __del__(self):
         self.disconnect()
@@ -38,8 +37,6 @@ class A2p2SampClient():
         # an error is thrown here if no hub is present
 
         # TODO get samp client name and display it in the UI
-
-        self.set_connected(True)
 
         # Instantiate the receiver
         self.r = Receiver(self.sampClient)
@@ -53,11 +50,16 @@ class A2p2SampClient():
 
     def disconnect(self):
         self.sampClient.disconnect()
-        self.set_connected(False)
 
     def is_connected(self):
-        # TODO do not trust this flag but try to ask sampClient.is_registered
-        return self.connected
+        # Workarround the 'non' reliable is_connected attribute
+        # this helps to reconnect after hub connection lost
+        try:
+            return self.sampClient.is_connected and (self.sampClient.ping() or self.sampClient.is_connected)
+        except:
+            # consider connection refused exception as not connected state
+            return False
+
 
     def get_status(self):
         if self.is_connected():
@@ -66,11 +68,8 @@ class A2p2SampClient():
             return "not connected"
 
 
-    def set_connected(self, flag):
-        self.connected = flag
-
     def has_message(self):
-        return self.connected and self.r.received
+        return self.is_connected() and self.r.received
 
     def clear_message(self):
         return self.r.clear()
