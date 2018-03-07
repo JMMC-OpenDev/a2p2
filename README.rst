@@ -33,10 +33,10 @@ Usage
 
 
 optional arguments:
- -h, --help                show this help message and exit
- -f, --fakeapi             fake API to avoid remote connection (dev. only).
- -u USERNAME, --username   USERNAME use another user login in history's comments.
- -v, --verbose             Verbose
+ -h, --help                        show this help message and exit
+ -f, --fakeapi                     fake API to avoid remote connection (dev. only).
+ -u USERNAME, --username USERNAME  use another user login in history's comments.
+ -v, --verbose                     Verbose
 
 A GUI is run if your python installation supports gtk, else a text UI will run. 
 
