@@ -182,7 +182,7 @@ class TextWindow(LoginWindow):
         s = 0
         #while not q.empty() and len(lastLogs) < 5:
             #lastLogs.append(q.get())
-        self.ShowLog(lastLogs)
+        self.ShowLogs(lastLogs)
 
         # Clean and place cursor
         self.stdscr.addstr(2, 0, "?    ")
@@ -250,9 +250,9 @@ class TextWindow(LoginWindow):
 
 
 
-
     def setProgress(self, perc):
-        self.stdscr.addstr(2, 50, "Progress: [{1:10}] {0}%".format(perc, "#"))
+        self.stdscr.addstr(2, 50, "Progress: [{1:10}] {0}%".format(perc * 10, "#"))
+        self.stdscr.refresh()
 
     def ShowMessages(self, level, msgs):
         eraser = "                                          "
@@ -263,9 +263,7 @@ class TextWindow(LoginWindow):
         self.stdscr.refresh()
 
     def ShowMessage(self, level, msg):
-        eraser = "                                          "
-        self.stdscr.addstr(4, 1, "%s: %s%s" % (level, msg, eraser))
-        self.stdscr.refresh()
+        self.ShowMessages(level, [msg])
 
     def ShowErrorMessage(self, msg):
         self.ShowMessage("  ERROR", msg)
@@ -281,9 +279,10 @@ class TextWindow(LoginWindow):
     def addToLog(self, text):
         self.stdscr.addstr(20, 0, "LOG: %s" % (text))
 
-    def ShowLog(self, logs):
+    def ShowLogs(self, logs):
         for i in range(0, len(logs)):
             self.stdscr.addstr(20 + i, 0, "LOG: %s" % (logs[i]))
+
 
 class GtkWindow(LoginWindow):
     def __init__(self, a2p2client):

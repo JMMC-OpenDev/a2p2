@@ -131,6 +131,7 @@ class A2p2Client():
                         self.ui.ShowErrorMessage('Please select a runId ESO P2 database.')
                         logging.debug("samp message received and api not ready to transmit")
                     else:
+                        self.ui.addToLog('Sending request to API ...')
                         logging.debug("samp message received and api ready to transmit")
                         ob_url = self.a2p2SampClient.get_ob_url()
                         parseXmlMessage(self, ob_url, self.ui.get_containerInfo())
