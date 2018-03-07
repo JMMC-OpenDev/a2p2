@@ -210,7 +210,7 @@ def parseXmlMessage(client, url, p2container):
                 obsConstraint = observationConfiguration.find('observationConstraints')
                 LSTINTERVAL = obsConstraint.find('LSTinterval').text
             except:
-                pass
+                LSTINTERVAL = None
 
             #then call the ob-creation using the API.
             createGravityOB(ui, client.getUsername(), api, containerId, OBJTYPE, NAME, BASELINE, instrumentMode, SCRA, SCDEC, PMRA, PMDEC, SEQ_INS_SOBJ_MAG, SEQ_FI_HMAG, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, COU_AG_PMA, COU_AG_PMD, dualField, FTRA, FTDEC, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
@@ -444,19 +444,20 @@ def createGravityOB(ui, username, api, containerId, OBJTYPE, NAME, BASELINE, ins
 
     ob, obVersion = api.saveOB(ob, obVersion)
 
-    ##LST constraints
+    ##LST constraints if present
     ##by default, above 40 degree. Will generate a WAIVERABLE ERROR if not.
-    sidTCs, stcVersion = api.getSiderealTimeConstraints(obId)
-    lsts = LSTINTERVAL.split('/')
-    lstStartSex = lsts[0]
-    lstEndSex = lsts[1]
-    ## p2 seems happy with endlst < startlst
-    ## a = SkyCoord(lstStartSex+' +0:0:0',unit=(u.hourangle,u.deg))
-    ## b = SkyCoord(lstEndSex+' +0:0:0',unit=(u.hourangle,u.deg))
-    ## if b.ra.deg < a.ra.deg:
-    ## api.saveSiderealTimeConstraints(obId,[ {'from': lstStartSex, 'to': '00:00'},{'from': '00:00','to': lstEndSex}], stcVersion)
-    ## else:
-    api.saveSiderealTimeConstraints(obId, [{'from': lstStartSex, 'to': lstEndSex}], stcVersion)
+    if LSTINTERVAL:
+        sidTCs, stcVersion = api.getSiderealTimeConstraints(obId)
+        lsts = LSTINTERVAL.split('/')
+        lstStartSex = lsts[0]
+        lstEndSex = lsts[1]
+        ## p2 seems happy with endlst < startlst
+        ## a = SkyCoord(lstStartSex+' +0:0:0',unit=(u.hourangle,u.deg))
+        ## b = SkyCoord(lstEndSex+' +0:0:0',unit=(u.hourangle,u.deg))
+        ## if b.ra.deg < a.ra.deg:
+        ## api.saveSiderealTimeConstraints(obId,[ {'from': lstStartSex, 'to': '00:00'},{'from': '00:00','to': lstEndSex}], stcVersion)
+        ## else:
+        api.saveSiderealTimeConstraints(obId, [{'from': lstStartSex, 'to': lstEndSex}], stcVersion)
 
     ui.setProgress(0.2)
 
