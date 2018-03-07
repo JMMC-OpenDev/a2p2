@@ -23,13 +23,12 @@ setup(
       classifiers=[
       'Development Status :: 4 - Beta',
       'Intended Audience :: Developers',
-      'License :: OSI Approved :: GPL License',
       'Programming Language :: Python :: 2',
       'Programming Language :: Python :: 2.7',
       'Programming Language :: Python :: 3',
       'Programming Language :: Python :: 3.6',
       ],
-      license='GPL',
+      license='OSI Approved :: GNU General Public License v3 (GPLv3)',
       packages=['a2p2'],
       scripts=['scripts/a2p2'],
       keywords='observation preparation tool optical-interferometry p2 samp'
