@@ -7,7 +7,12 @@ try:
     pygtk.require('2.0')
     import gtk
 except ImportError:
-    pass # We should switch to NO-GUI mode
+    try:
+      import tkinter as tk
+      from tkinter.messagebox import *
+      import tkinter.ttk as ttk
+    except ImportError:
+      pass # We should switch to NO-GUI mode
 
 import time
 
@@ -250,6 +255,7 @@ class TextWindow(LoginWindow):
 
 
 
+
     def setProgress(self, perc):
         self.stdscr.addstr(2, 50, "Progress: [{1:10}] {0}%".format(perc * 10, "#"))
         self.stdscr.refresh()
@@ -282,7 +288,6 @@ class TextWindow(LoginWindow):
     def ShowLogs(self, logs):
         for i in range(0, len(logs)):
             self.stdscr.addstr(20 + i, 0, "LOG: %s" % (logs[i]))
-
 
 class GtkWindow(LoginWindow):
     def __init__(self, a2p2client):
@@ -494,6 +499,203 @@ class GtkWindow(LoginWindow):
             gtk.main_iteration ()
 
 # TODO move into a common part
+
+class TkWindow(LoginWindow):
+    def __init__(self, a2p2client):
+        LoginWindow.__init__(self, a2p2client)
+
+        self.window=tk.Tk()
+        self.window.title("Connect with ESO DATABASE")
+
+        self.frame = tk.Frame(self.window)
+        self.tree = ttk.Treeview(self.frame,columns=('Project Id'))#, 'instrument'))#, 'folder Id'))
+        ysb = ttk.Scrollbar(self.frame, orient='vertical', command=self.tree.yview)
+        xsb = ttk.Scrollbar(self.frame, orient='horizontal', command=self.tree.xview)
+        self.tree.configure(yscroll=ysb.set, xscroll=xsb.set)
+        self.tree.heading('#0', text='Project Id', anchor='w')
+        self.tree.heading('#1', text='Instrument', anchor='w')
+        self.tree.heading('#2', text='folder Id', anchor='w')
+        self.tree.bind('<ButtonRelease-1>', self.on_tree_selection_changed)
+        self.tree.grid()
+        ysb.grid(row=0, column=1, sticky='ns')
+        xsb.grid(row=1, column=0, sticky='ew')
+        self.frame.pack()
+
+        self.loginframe  = tk.LabelFrame(self.window, text="login")
+
+        self.username_label = tk.Label(self.loginframe, text="USERNAME")
+        self.username_label.pack()
+        self.username = tk.StringVar()
+        self.username.set(self.login[0])
+        self.username_entry = tk.Entry(self.loginframe,textvariable=self.username)
+        self.username_entry.pack()
+
+        self.password_label = tk.Label(self.loginframe, text="PASSWORD")
+        self.password_label.pack()
+        self.password = tk.StringVar()
+        self.password.set(self.login[1])
+        self.password_entry = tk.Entry(self.loginframe,textvariable=self.password)
+        self.password_entry.pack()
+
+        self.tempo_strval=tk.StringVar()
+        self.tempo_strval.set("Please Log In ESO USER PORTAL")
+        self.tempolabel = tk.Label(self.window,textvariable=self.tempo_strval)
+        self.tempolabel.pack()
+
+        self.loginframe.pack()
+      
+        self.progress_value = tk.DoubleVar()
+        self.progress_value.set(0.0)
+        self.progressbar = ttk.Progressbar(self.window, orient='horizontal',length=200,maximum=1,variable=self.progress_value,mode='determinate')#, from_=0, to=1, resolution=0.01,showvalue=0,takefocus=0)
+        self.progressbar.pack()
+        
+        self.log_string = tk.StringVar()
+        self.log_string.set("log...")
+        self.log = tk.Label(self.window,textvariable=self.log_string)
+        self.log.pack()
+
+#
+        f1 = tk.Frame(self.window)
+        f1.columnconfigure(3, weight=1)
+        f1.rowconfigure(0, weight=1)
+        self.buttonok = tk.Button(f1,text="LOG IN",command=self.on_buttonok_clicked)
+        self.buttonok.grid(row=0,column=1)
+#
+        self.buttonabort_strval=tk.StringVar()
+        self.buttonabort_strval.set("ABORT")
+        self.buttonabort = tk.Button(f1,textvariable=self.buttonabort_strval,command=self.on_buttonabort_clicked)
+        self.buttonabort.grid(row=0,column=2)
+#        
+        self.buttonhelp = tk.Button(f1,text="HELP",command=self.on_buttonhelp_clicked)
+        self.buttonhelp.grid(row=0,column=3)
+        f1.pack()
+
+    def __del__(self):
+      self.window.destroy()
+
+    def quitAfterRunOnce(self):
+      self.window.quit()
+
+    def loop(self):
+        self.window.after(50, self.quitAfterRunOnce)
+        self.window.mainloop();
+
+    def innerloop(self):
+        self.window.after(50, self.quitAfterRunOnce)
+        self.window.mainloop();
+        
+    def addToLog(self,text):
+        self.log_string.set(text)
+
+    def folder_added(self,name,pid,cid):
+        ret=self.tree.item(pid)
+        curinst=ret['values'][0]
+        tag=ret['tags']
+        rid=tag[1]
+        self.tree.insert(pid,'end',cid,text=name,values=(curinst,cid),tags=('folder',rid))
+
+    def folder_explore(self,folders,contid,instrument,rid):
+        for j in range(len(folders)):
+            name=folders[j]['name']
+            contid2=folders[j]['containerId']
+            self.tree.insert(contid,'end',contid2,text=name,values=(instrument,contid2),tags=('folder',rid))
+            folders2=self.api.getFolders(contid2)
+            if len(folders2) > 0 :
+                try:
+                    self.folder_explore(folders2,contid2,instrument,rid)
+                except:
+                    pass
+                
+    def on_buttonok_clicked(self):
+        self.api = self.a2p2client.apiManager.connect(self.username.get(), self.password.get())
+        runs, _ = self.api.getRuns()
+
+        if len(runs) == 0:
+            self.ShowErrorMessage("No Runs defined, impossible to program ESO's P2 interface.")
+            self.requestAbort = True
+            return
+
+        self.loginframe.destroy() 
+        self.buttonok.destroy()
+        self.buttonabort_strval.set("EXIT")
+        self.tempo_strval.set("Select a Project Id or Folder in the above list. OBs are not shown")
+
+        for i in range(len(runs)):
+            if  runs[i]['instrument'] in self.supportedInstrumentsByAspro:
+                runName=runs[i]['progId']
+                instrument=runs[i]['instrument']
+                rid=runs[i]['runId']
+                cid=runs[i]['containerId']
+                self.tree.insert('','end',cid,text=runName,values=(instrument, cid),tags=('run',rid))
+                # if folders, add them recursively
+                folders=getFolders(self.api,cid)
+                if len(folders) > 0 :
+                    try:
+                        self.folder_explore(folders,cid,instrument,rid)
+                    except:
+                        pass
+   
+    def on_tree_selection_changed(self, selection):
+        curItem = self.tree.focus()
+        ret=self.tree.item(curItem)
+        curinst=ret['values'][0]
+        cid=ret['values'][1]
+        curname=ret['text']
+        tag=ret['tags']
+        rid=tag[1]
+        entryType=tag[0]
+        # self.flag[0]=1
+        # TODO can we remove previous line ?
+        if ( entryType == 'folder' ) : #we have a folder
+               new_containerId_same_run=cid
+               folderName = curname
+               print ("*** Working in Folder",folderName,", containerId: ", new_containerId_same_run, "***")
+               self.addToLog('Folder: '+folderName)
+               self.containerInfo.store_containerId(new_containerId_same_run)
+        else:
+            instru=curinst
+            run, _ = self.api.getRun(rid)
+            containerId = run["containerId"]
+            print ("*** Working with ",run["instrument"]," run ",run["progId"],", containerId: ",containerId,"***")
+            self.addToLog('Run: '+str(rid))
+            self.containerInfo.store(rid, instru, containerId)
+
+    def on_buttonabort_clicked(self):
+        self.requestAbort = True
+
+    def get_api(self):
+        return self.api
+
+    def ShowErrorMessage(self,text):
+        dialog = showerror("Error",text)
+
+    def ShowWarningMessage(self,text):
+        dialog = showwarning("Warning",text)
+
+    def ShowInfoMessage(self,text):
+        dialog = showinfo("Info",text)
+
+    def on_buttonhelp_clicked(self):
+         self.ShowInfoMessage(HELPTEXT)
+
+    def setProgress(self,perc):
+      self.progress_value.set(perc)
+      if ( perc <= 0 ) or ( perc > 0.99 ):
+        self.isIdle();
+      else:
+        self.isBusy();
+      self.innerloop()    
+
+    def isBusy(self):
+      self.tree.configure(selectmode='none')
+      self.window.config(cursor="watch")
+      self.innerloop()    
+
+    def isIdle(self):
+      self.tree.configure(selectmode='browse')
+      self.window.config(cursor="left_ptr")
+      self.innerloop()    
+
 def getFolders(p2api, containerId):
     folders = []
     itemList, _ = p2api.getItems(containerId)

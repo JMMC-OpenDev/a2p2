@@ -4,6 +4,7 @@ __all__ = ['A2p2Client']
 
 
 from a2p2.apis import APIManager
+from a2p2.gui import TkWindow
 from a2p2.gui import GtkWindow
 from a2p2.gui import TextWindow
 from a2p2.samp import A2p2SampClient
@@ -48,8 +49,11 @@ class A2p2Client():
 
         # Instantiate a UI
         try:
-            self.ui = GtkWindow(self)
+          self.ui = TkWindow(self)
         except:
+          try:
+            self.ui = GtkWindow(self)
+          except:
             self.ui = TextWindow(self)
 
         self.apiManager = APIManager(self.apiName, self.ui)
