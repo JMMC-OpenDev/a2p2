@@ -8,7 +8,7 @@ with open('README.rst') as README:
 
 setup(
       name='a2p2',
-      version='0.0.1',
+      version='0.0.2',
       description=description,
       long_description=long_description,
       #      install_requires=['astropy', 'p2api','pygtk'],
@@ -16,6 +16,8 @@ setup(
       # anaconda also fails 
       # prefere the use of your default python packages on your linux
       # what is the solution for mac ?
+      # we continue moving tk as first gui backend
+      # install_requires=['astropy', 'p2api', 'python-tk'] + (['pygtk'] if platform.startswith("win") else []),
       install_requires=['astropy', 'p2api'] + (['pygtk'] if platform.startswith("win") else []),
       url='http://www.jmmc.fr/a2p2',
       author='JMMC Tech Group',
