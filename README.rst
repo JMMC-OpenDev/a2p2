@@ -46,6 +46,18 @@ Once Aspro2_ is running and a2p2_ is connected to an OB submission service (usin
 
 After few seconds, you shoud get a report of your new submission.
 
+Pypi deployement
+----------------
+
+Look at the a2p2/version.py then run:
+
+    ``python setup.py sdist bdist_wheel``
+
+    ``twine upload --repository-url https://test.pypi.org/legacy/ dist/*``
+
+    ``twine upload dist/*``
+
+
 License
 -------
 A2P2 is released under GPL license. Please have a look in the LICENSE file for any detail and feel free to fill issues.
