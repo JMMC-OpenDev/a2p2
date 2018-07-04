@@ -2,16 +2,24 @@
 
 __all__ = []
 
+import sys
+
+# try to import TKinter first, gtk GUI toolkit. Else text ui will be used.
 try:
-    import pygtk
-    pygtk.require('2.0')
-    import gtk
+    if sys.version_info[0] == 2:
+       import Tkinter as tk
+       from tkMessageBox import *
+       import ttk
+    else:
+       import tkinter as tk
+       from tkinter.messagebox import *
+       import tkinter.ttk as ttk
 except ImportError:
-    try:
-      import tkinter as tk
-      from tkinter.messagebox import *
-      import tkinter.ttk as ttk
-    except ImportError:
+   try:
+       import pygtk
+       pygtk.require('2.0')
+       import gtk
+   except ImportError:
       pass # We should switch to NO-GUI mode
 
 import time
@@ -73,10 +81,11 @@ class P2Container:
         return """instrument:'%s', containerId:'%s'""" % (self.instrument, self.containerId)
 
 class LoginWindow:
-    def __init__(self, a2p2client):
+    def __init__(self, a2p2client, uiname):
 
         self.a2p2client = a2p2client
         self.api = None
+        self.uiname = uiname
 
         username = '52052'
         password = 'tutorial'
@@ -152,8 +161,7 @@ class LoginWindow:
 
 class TextWindow(LoginWindow):
     def __init__(self, a2p2client):
-        LoginWindow.__init__(self, a2p2client)
-        print("Welcome in the text UI of A2P2")
+        LoginWindow.__init__(self, a2p2client,"Curses")
         import curses
         self.stdscr = curses.initscr()
         self.stdscr.keypad(True)
@@ -291,7 +299,7 @@ class TextWindow(LoginWindow):
 
 class GtkWindow(LoginWindow):
     def __init__(self, a2p2client):
-        LoginWindow.__init__(self, a2p2client)
+        LoginWindow.__init__(self, a2p2client, "Gtk")
 
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.set_title("Connect with ESO DATABASE")
@@ -502,7 +510,7 @@ class GtkWindow(LoginWindow):
 
 class TkWindow(LoginWindow):
     def __init__(self, a2p2client):
-        LoginWindow.__init__(self, a2p2client)
+        LoginWindow.__init__(self, a2p2client, "Tkinter")
 
         self.window=tk.Tk()
         self.window.title("Connect with ESO DATABASE")

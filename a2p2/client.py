@@ -2,13 +2,13 @@
 
 __all__ = ['A2p2Client']
 
-
 from a2p2.apis import APIManager
 from a2p2.gui import TkWindow
 from a2p2.gui import GtkWindow
 from a2p2.gui import TextWindow
 from a2p2.samp import A2p2SampClient
 from a2p2.utils import parseXmlMessage
+from a2p2 import __version__
 import logging
 import sys
 import time
@@ -56,6 +56,7 @@ class A2p2Client():
           except:
             self.ui = TextWindow(self)
 
+        self.ui.addToLog("Welcome in the " + self.ui.uiname + " UI of A2P2 V" + __version__)
         self.apiManager = APIManager(self.apiName, self.ui)
 
         return self

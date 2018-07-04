@@ -2,6 +2,8 @@
 
 __all__ = ['utils', 'apis', 'gui', 'samp', 'client']
 
+from .version import __version__
+
 from . import utils
 from . import apis
 from . import gui

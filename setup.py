@@ -6,9 +6,12 @@ with open('README.rst') as README:
     description = long_description[:long_description.index('Description')].split("*")[1].strip()
     long_description = long_description[long_description.index('Description'):]
 
+execfile('a2p2/version.py')
+
+
 setup(
       name='a2p2',
-      version='0.0.2',
+      version=__version__,
       description=description,
       long_description=long_description,
       #      install_requires=['astropy', 'p2api','pygtk'],
