@@ -448,7 +448,6 @@ class GtkWindow(LoginWindow):
             if id == 'Folder:': #we have a folder
                 new_containerId_same_run = model[treeiter][2]
                 folderName = model[treeiter][1]
-                print ("*** Working in Folder %s, containerId: %i ***" % (folderName, new_containerId_same_run))
                 self.addToLog('Folder: ' + folderName)
                 self.containerInfo.store_containerId(new_containerId_same_run)
             else:
@@ -657,14 +656,12 @@ class TkWindow(LoginWindow):
         if ( entryType == 'folder' ) : #we have a folder
                new_containerId_same_run=cid
                folderName = curname
-               print ("*** Working in Folder",folderName,", containerId: ", new_containerId_same_run, "***")
                self.addToLog('Folder: '+folderName)
                self.containerInfo.store_containerId(new_containerId_same_run)
         else:
             instru=curinst
             run, _ = self.api.getRun(rid)
             containerId = run["containerId"]
-            print ("*** Working with ",run["instrument"]," run ",run["progId"],", containerId: ",containerId,"***")
             self.addToLog('Run: '+str(rid))
             self.containerInfo.store(rid, instru, containerId)
 
