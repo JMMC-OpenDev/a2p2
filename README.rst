@@ -57,7 +57,8 @@ Interaction diagram
 .. |flowchart| image:: https://raw.githubusercontent.com/JMMC-OpenDev/a2p2/master/doc/A2P2_in_3steps.png
    :alt: A2P2 interaction diagram
    :target: https://raw.githubusercontent.com/JMMC-OpenDev/a2p2/master/doc/A2P2_in_3steps.png
-.. |A2P2Badge| image:: https://travis-ci.org/JMMC-OpenDev/a2p2.svg?branch=master :alt: A2P2 Badge on master branch
+.. |A2P2Badge| image:: https://travis-ci.org/JMMC-OpenDev/a2p2.svg?branch=master
+   :alt: A2P2 Badge on master branch
    :target: https://travis-ci.org/JMMC-OpenDev/a2p2
 .. _PyPI:   https://pypi.python.org
 .. _P2:     https://www.eso.org/sci/observing/phase2/p2intro.html
