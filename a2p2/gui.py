@@ -14,43 +14,31 @@ else:
    import tkinter.ttk as ttk
 
 import time
+      
+HELPTEXT = """This application provides the link between ASPRO (that you should have started) and interferometers facilities.
 
-html_escape_table = {
-    "&": "&amp;",
-    '"': "&quot;",
-    "'": "&apos;",
-    ">": "&gt;",
-    "<": "&lt;",
-    }
+"""
+ESOHELPTEXT="""
+OLD ESO doc: 
+ESO's P2 repository for Observing Blocks (OBs):
 
-def html_escape(text):
-    """Produce entities within text."""
-    return "".join(html_escape_table.get(c, c) for c in text)
-
-#help text in Pango Markup syntax https://developer.gnome.org/pango/stable/PangoMarkupFormat.html
-HELPTEXT = """
-TODO: Please update documentation. 
-
-OLD doc: 
-This application provides the link between ASPRO (that you should have started) and ESO's P2 repository for Observing Blocks (OBs).
-
-<span foreground="blue" size="x-large"> <b>Login:</b></span>
+Login:
 You must log in to the ESO User Portal using your identifiers to access the P2 repository. Please check on the ESO website in case of doubt.
 
-<span foreground="blue" size="x-large"> <b>Select Run ID:</b> </span>
+Select Run ID:
 After successful login, you are presented with the Runs compatible with Aspro's known instruments. Select the Run, and eventually the subfolder of this Run, where you want to create the OB. Each Run corresponds to a specific instrument. This instrument must be the same as the one selected in ASPRO.
 
-<span foreground="blue" size="x-large"> <b>Send configuration from Aspro:</b></span>
+Send configuration from Aspro:
 - In ASPRO, have an object, or an object selected, and check that all important informations (magnitudes, but also Instrument and Fringe Tracker Modes, eventually hour angles), are correctly set.
-- In menu "Interop" select "<b>Send Obs. blocks to A2p2</b>"
+- In menu "Interop" select "Send Obs. blocks to A2p2"
 - Block(s) are created and put in the P2 repository.
 - If the source had one or more calibrators, blocks are created for them too.
 - For each block submitted, a report is produced. Warnings are usually not significant.
-- For more than 1 object sent, a <b>folder</b> containing the two or more blocks <b>is created</b>. In the absence of availability of grouping OBs (like for CAL-SCI-CAL) provided by ESO, this is the closets we can do.
-- All the new OBs and folders will be available on <span foreground="blue" > <a href=\"https://eso.org/p2\">p2web</a> </span>
+- For more than 1 object sent, a <b>folder</b> containing the two or more blocks is created. In the absence of availability of grouping OBs (like for CAL-SCI-CAL) provided by ESO, this is the closets we can do.
+- All the new OBs and folders will be available on p2web at https://eso.org/p2 
 log"""
 
-        
+          
 class MainWindow():    
     def __init__(self, a2p2client):
                 
@@ -69,18 +57,18 @@ class MainWindow():
         scroll = Scrollbar(self.logFrame, command=self.logtext.yview)
         self.logtext.configure(yscrollcommand=scroll.set)
         scroll.pack(side=RIGHT, fill=Y)
-        self.logtext.pack(fill=BOTH)
-        self.logFrame.pack()
+        self.logtext.pack(side=LEFT, fill=BOTH)
+        self.logFrame.pack(fill=BOTH)
         
         self.helpFrame = Frame(self.notebook)
         
-        self.helptext = Text(self.helpFrame, width=120)
+        self.helptext = Text(self.helpFrame, width=120)        
         self.helptext.insert(END,HELPTEXT)
         helpscroll = Scrollbar(self.helpFrame, command=self.helptext.yview)
         self.helptext.configure(yscrollcommand=helpscroll.set)
         helpscroll.pack(side=RIGHT, fill=Y)
-        self.helptext.pack(fill=BOTH)
-        self.helpFrame.pack()
+        self.helptext.pack(side=LEFT, fill=BOTH)
+        self.helpFrame.pack(fill=BOTH)
         
         # add tab and store index for later use in showFacilityUI
         self.tabIdx={}
@@ -93,7 +81,7 @@ class MainWindow():
 
         self.log_string = StringVar()
         self.log_string.set("log...")
-        self.log = Label(self.window,textvariable=self.log_string)
+        self.log = Label(self.window, textvariable=self.log_string)
         self.log.pack()
 
 #
@@ -117,6 +105,9 @@ class MainWindow():
     
     def __del__(self):
       self.window.destroy()
+    
+    def addHelp(self, txt):
+        self.helptext.insert(END,txt)
 
     def registerTab(self, text, widget):
         self.notebook.add(widget, text=text)
@@ -164,7 +155,7 @@ class MainWindow():
         dialog = showinfo("Info",text)
 
     def on_buttonhelp_clicked(self):
-         self.ShowInfoMessage(HELPTEXT)
+         self.ShowInfoMessage(self.helptext.get("1.0",END))
 
     def setProgress(self,perc):
       self.progress_value.set(perc)

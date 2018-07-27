@@ -5,10 +5,12 @@ __all__ = []
 from a2p2.apis import Facility
 from a2p2.chara.gui import CharaUI
 
+HELPTEXT="TODO update this HELP message in a2p2/chara/facility.py"
+
 class CharaFacility(Facility):
 
     def __init__(self, a2p2client):
-        Facility.__init__(self, a2p2client, "CHARA")
+        Facility.__init__(self, a2p2client, "CHARA", HELPTEXT)
         self.charaUI = CharaUI(self)
         
     def processOB(self, ob):

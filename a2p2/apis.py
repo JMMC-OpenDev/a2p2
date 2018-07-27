@@ -5,7 +5,6 @@ __all__ = []
 # Constants
 _HR="\n---------------------------------------------------------------------------\n"
 
-
 # TODO rename FacilitiesManager
 class APIManager():
     """
@@ -23,11 +22,11 @@ class APIManager():
         from a2p2.chara.facility import CharaFacility
         self.registerFacility(CharaFacility(self.a2p2client))
         # and default one
-        self.defaultFacility = Facility(self.a2p2client, "Dumm-facilit-y")
-        
+        self.defaultFacility = Facility(self.a2p2client, "Dumm-facilit-y","")           
     
     def registerFacility(self, facilityObject ):
-        self.facilities[facilityObject.facilityName]=facilityObject        
+        self.facilities[facilityObject.facilityName]=facilityObject
+        self.a2p2client.ui.addHelp("\n\n"+facilityObject.facilityHelp)
         
     def connect(self, username=None, password=None):
         """ Return an API to interact with remote observation proposals"""
@@ -93,10 +92,11 @@ class APIManager():
 
 class Facility():
     
-    def __init__(self, a2p2client, facilityName):
+    def __init__(self, a2p2client, facilityName, facilityHelp):
         self.a2p2client=a2p2client
         self.facilityName=facilityName
-    
+        self.facilityHelp=facilityHelp
+            
     def processOB(self, ob):
         interferometer =  ob.interferometerConfiguration.name
         self.a2p2client.ui.addToLog("'"+interferometer+"' interferometer not supported by A2P2")
