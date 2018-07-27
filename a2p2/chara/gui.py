@@ -124,7 +124,7 @@ AO Flat Star:
                 fluxes = ", ".join([e[0]+"="+e[1] for e in ob.getFluxes(aot).items()])
                 buffer += aot.name + " : "+ fluxes + "\n"     
                 
-            if len(cals)>=0:
+            if len(cals)>=1:
                 buffer+= "Cals:\n"
                 for cal in cals:
                     buffer+= "- "+ cal +"\n"                
