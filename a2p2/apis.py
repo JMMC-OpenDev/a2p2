@@ -2,16 +2,33 @@
 
 __all__ = []
 
+# Constants
+_HR="\n---------------------------------------------------------------------------\n"
+
+
+# TODO rename FacilitiesManager
 class APIManager():
     """
     Manage real and fake apis.
     """
-    def __init__(self, apiName, ui):
-        self.apiName = apiName
-        self.ui = ui
+    
+    def __init__(self, a2p2client):
+        self.apiName = a2p2client.apiName
+        self.a2p2client = a2p2client
 
         self.api = None
-
+        
+        # define facilities
+        self.facilities= {}
+        from a2p2.chara.facility import CharaFacility
+        self.registerFacility(CharaFacility(self.a2p2client))
+        # and default one
+        self.defaultFacility = Facility(self.a2p2client, "Dumm-facilit-y")
+        
+    
+    def registerFacility(self, facilityObject ):
+        self.facilities[facilityObject.facilityName]=facilityObject        
+        
     def connect(self, username=None, password=None):
         """ Return an API to interact with remote observation proposals"""
         # At present time only ESO P2 API is available for real use
@@ -19,7 +36,7 @@ class APIManager():
         # api is None if fake one has not been requested by option
         # TODO add logging  instead of self.ui.ShowInfoMessage("create API for %s" % self.apiName)
         if self.apiName:
-            self.api = FakeAPI(username, password, self.ui)
+            self.api = FakeAPI(username, password, self.a2p2client.ui)
         else:
             import p2api
             if username == '52052':
@@ -38,15 +55,51 @@ class APIManager():
 
     def get_status(self):
         if self.api:
-            return "    connected"
+            return self.apiName+" connected"
         else:
-            return "not connected"
+            return self.apiName+" not connected"
 
+    def processOB(self, ob): 
+        interferometer=ob.interferometerConfiguration.name
+        self.a2p2client.ui.addToLog("Received OB for the '"+interferometer+"' interferometer ")                
+    
+        if interferometer in self.facilities:        
+            facility = self.facilities[interferometer]
+        else:
+            facility = self.defaultFacility
+        
+        facility.processOB(ob)
+        
+        #        if not self.ui.is_connected():
+#            logging.debug("samp message received and api not connected")
+#            self.ui.ShowErrorMessage('a2p2 is not currently connected with ESO P2 database.')
+#        elif not self.ui.is_ready_to_submit():
+#            self.ui.ShowErrorMessage('Please select a runId ESO P2 database.')
+#            logging.debug("samp message received and api not ready to transmit")
+#        else:
+#            self.ui.addToLog('Sending request to API ...')
+#            logging.debug("samp message received and api ready to transmit")
+#            
+#            parseXmlMessage(self, ob_url, self.ui.get_containerInfo())
+
+
+
+    # TODO move into eso side
     def getSupportedInstruments(self):
         if self.apiName:
             return ["dummy"]
         else:
             return ["GRAVITY"]
+
+class Facility():
+    
+    def __init__(self, a2p2client, facilityName):
+        self.a2p2client=a2p2client
+        self.facilityName=facilityName
+    
+    def processOB(self, ob):
+        interferometer =  ob.interferometerConfiguration.name
+        self.a2p2client.ui.addToLog("'"+interferometer+"' interferometer not supported by A2P2")
 
 class FakeAPI():
     """
