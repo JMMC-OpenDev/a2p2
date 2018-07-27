@@ -38,13 +38,15 @@ optional arguments:
  -u USERNAME, --username USERNAME  use another user login in history's comments.
  -v, --verbose                     Verbose
 
-A GUI is run if your python installation supports tkinter or gtk, else a text UI will run. 
+A GUI is provided using tkinter. 
 
 Once Aspro2_ is running and a2p2_ is connected to an OB submission service (using P2API_) :
  * select your target 
  * enter the Aspro2'menu ``interop`` / ``Send Obs. Block(s)`` 
 
 After few seconds, you shoud get a report of your new submission.
+
+Each facilities get it's own code directory to manage specific GUI and specific OB processing.
 
 License
 -------
