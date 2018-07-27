@@ -96,10 +96,10 @@ AO Flat Star:
         # Retrieve cals from schedule
         cals={}        
         for schedule in ob.observationSchedule.OB:                        
-            if isinstance(schedule,unicode): # hack for single element observationSchedule
-                ref = schedule
-            else:
+            try: # hack for single element observationSchedule
                 ref = schedule.ref
+            except:
+                ref = schedule
             target=targets[ref]
             if "CAL" in target.type:
                 cals[ref]=target
