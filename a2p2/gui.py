@@ -3,6 +3,7 @@
 __all__ = []
 
 import sys
+from a2p2 import __version__
 
 if sys.version_info[0] == 2:
    from Tkinter import *
@@ -18,27 +19,7 @@ import time
 HELPTEXT = """This application provides the link between ASPRO (that you should have started) and interferometers facilities.
 
 """
-ESOHELPTEXT="""
-OLD ESO doc: 
-ESO's P2 repository for Observing Blocks (OBs):
 
-Login:
-You must log in to the ESO User Portal using your identifiers to access the P2 repository. Please check on the ESO website in case of doubt.
-
-Select Run ID:
-After successful login, you are presented with the Runs compatible with Aspro's known instruments. Select the Run, and eventually the subfolder of this Run, where you want to create the OB. Each Run corresponds to a specific instrument. This instrument must be the same as the one selected in ASPRO.
-
-Send configuration from Aspro:
-- In ASPRO, have an object, or an object selected, and check that all important informations (magnitudes, but also Instrument and Fringe Tracker Modes, eventually hour angles), are correctly set.
-- In menu "Interop" select "Send Obs. blocks to A2p2"
-- Block(s) are created and put in the P2 repository.
-- If the source had one or more calibrators, blocks are created for them too.
-- For each block submitted, a report is produced. Warnings are usually not significant.
-- For more than 1 object sent, a <b>folder</b> containing the two or more blocks is created. In the absence of availability of grouping OBs (like for CAL-SCI-CAL) provided by ESO, this is the closets we can do.
-- All the new OBs and folders will be available on p2web at https://eso.org/p2 
-log"""
-
-          
 class MainWindow():    
     def __init__(self, a2p2client):
                 
@@ -47,7 +28,7 @@ class MainWindow():
         self.requestAbort = False
         
         self.window=Tk()        
-        self.window.title("Title TBD")
+        self.window.title("A2P2 v"+ __version__)
 
         self.notebook = ttk.Notebook(self.window)
 
@@ -60,15 +41,11 @@ class MainWindow():
         self.logtext.pack(side=LEFT, fill=BOTH)
         self.logFrame.pack(fill=BOTH)
         
-        self.helpFrame = Frame(self.notebook)
-        
-        self.helptext = Text(self.helpFrame, width=120)        
-        self.helptext.insert(END,HELPTEXT)
-        helpscroll = Scrollbar(self.helpFrame, command=self.helptext.yview)
-        self.helptext.configure(yscrollcommand=helpscroll.set)
-        helpscroll.pack(side=RIGHT, fill=Y)
-        self.helptext.pack(side=LEFT, fill=BOTH)
-        self.helpFrame.pack(fill=BOTH)
+        self.helpFrame = Frame(self.notebook)        
+        self.helptabs = ttk.Notebook(self.helpFrame)        
+        self.helptabs.pack(side=TOP,fill=BOTH, expand=True)                
+        self.helpFrame.pack(fill=BOTH, expand=True)              
+        self.addHelp("A2P2", HELPTEXT)
         
         # add tab and store index for later use in showFacilityUI
         self.tabIdx={}
@@ -106,8 +83,17 @@ class MainWindow():
     def __del__(self):
       self.window.destroy()
     
-    def addHelp(self, txt):
-        self.helptext.insert(END,txt)
+    def addHelp(self, tabname, txt):
+        frame = Frame(self.helptabs)
+        widget = Text(frame, width=120)        
+        helpscroll = Scrollbar(frame, command=widget.yview)
+        widget.configure(yscrollcommand=helpscroll.set)
+        helpscroll.pack(side=RIGHT, fill=Y)
+        widget.pack(side=LEFT, fill=BOTH)
+        frame.pack(fill=BOTH)
+        self.helptabs.add(frame,text=tabname)        
+        
+        widget.insert(END,txt)  
 
     def registerTab(self, text, widget):
         self.notebook.add(widget, text=text)
@@ -144,6 +130,7 @@ class MainWindow():
         if displayString:
             self.log_string.set(text)
         self.logtext.insert(END, "\n"+text)
+        self.showFrameToFront()
   
     def ShowErrorMessage(self,text):
         dialog = showerror("Error",text)
@@ -164,6 +151,11 @@ class MainWindow():
       else:
         self.isBusy();
       self.innerloop()
+      self.showFrameToFront()
+      
+    def showFrameToFront(self):
+        self.window.attributes('-topmost', 1)
+        self.window.attributes('-topmost', 0)
 
 class StatusBar(Frame):
     def __init__(self, root, **kw):

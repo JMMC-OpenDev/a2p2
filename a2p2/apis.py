@@ -20,13 +20,15 @@ class APIManager():
         # define facilities
         self.facilities= {}
         from a2p2.chara.facility import CharaFacility
-        self.registerFacility(CharaFacility(self.a2p2client))
-        # and default one
+        self.registerFacility(CharaFacility(self.a2p2client))        
+        from a2p2.vlti.facility import VltiFacility
+        self.registerFacility(VltiFacility(self.a2p2client))
+        # with default one
         self.defaultFacility = Facility(self.a2p2client, "Dumm-facilit-y","")           
     
     def registerFacility(self, facilityObject ):
         self.facilities[facilityObject.facilityName]=facilityObject
-        self.a2p2client.ui.addHelp("\n\n"+facilityObject.facilityHelp)
+        self.a2p2client.ui.addHelp(facilityObject.facilityName, facilityObject.facilityHelp)
         
     def connect(self, username=None, password=None):
         """ Return an API to interact with remote observation proposals"""
@@ -68,27 +70,7 @@ class APIManager():
             facility = self.defaultFacility
         
         facility.processOB(ob)
-        
-        #        if not self.ui.is_connected():
-#            logging.debug("samp message received and api not connected")
-#            self.ui.ShowErrorMessage('a2p2 is not currently connected with ESO P2 database.')
-#        elif not self.ui.is_ready_to_submit():
-#            self.ui.ShowErrorMessage('Please select a runId ESO P2 database.')
-#            logging.debug("samp message received and api not ready to transmit")
-#        else:
-#            self.ui.addToLog('Sending request to API ...')
-#            logging.debug("samp message received and api ready to transmit")
-#            
-#            parseXmlMessage(self, ob_url, self.ui.get_containerInfo())
-
-
-
-    # TODO move into eso side
-    def getSupportedInstruments(self):
-        if self.apiName:
-            return ["dummy"]
-        else:
-            return ["GRAVITY"]
+      
 
 class Facility():
     
