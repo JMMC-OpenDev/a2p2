@@ -61,15 +61,23 @@ class APIManager():
             return self.apiName+" not connected"
 
     def processOB(self, ob): 
-        interferometer=ob.interferometerConfiguration.name
-        self.a2p2client.ui.addToLog("Received OB for the '"+interferometer+"' interferometer ")                
-    
+        interferometer=ob.interferometerConfiguration.name                            
+        insname=ob.instrumentConfiguration.name
+        
         if interferometer in self.facilities:        
             facility = self.facilities[interferometer]
         else:
             facility = self.defaultFacility
         
-        facility.processOB(ob)
+        supportedIns=facility.getSupportedInstrument()
+        # test instrument on facility that registerInstrument()
+        if len(supportedIns)==0 or insname in supportedIns:
+            self.a2p2client.ui.addToLog("Received OB for '"+insname+"@"+interferometer+"' ")
+            facility.processOB(ob)
+        else:
+            self.a2p2client.ui.ShowErrorMessage("Received OB for unsupported instrument \n"+
+            insname+" @ "+interferometer+"\n"+"Supported instrument(s): "+", ".join(supportedIns))
+            
       
 
 class Facility():
@@ -78,10 +86,17 @@ class Facility():
         self.a2p2client=a2p2client
         self.facilityName=facilityName
         self.facilityHelp=facilityHelp
+        self.facilityInstruments=[]    
             
     def processOB(self, ob):
         interferometer =  ob.interferometerConfiguration.name
         self.a2p2client.ui.addToLog("'"+interferometer+"' interferometer not supported by A2P2")
+        
+    def registerInstrument(self,instrumentName):
+        self.facilityInstruments.append(instrumentName)
+    
+    def getSupportedInstrument(self):
+        return self.facilityInstruments
 
 class FakeAPI():
     """
