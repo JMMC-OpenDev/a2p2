@@ -30,6 +30,9 @@ class VltiFacility(Facility):
         Facility.__init__(self, a2p2client, "VLTI", HELPTEXT)
         self.vltiUI = VltiUI(self)
         
+        self.registerInstrument("GRAVITY")
+        
+        
     def processOB(self, ob):
         self.a2p2client.ui.addToLog("Receive OB for '"+self.facilityName+"' interferometer")
         # show ob dict for debug
@@ -42,9 +45,8 @@ class VltiFacility(Facility):
         self.a2p2client.ui.showFacilityUI(self.vltiUI)
         
         
-    def consumeOB(self, ob):
+    def consumeOB(self, ob):  
         pass
-          
 #        if not self.ui.is_connected():
 #            logging.debug("samp message received and api not connected")
 #            self.ui.ShowErrorMessage('a2p2 is not currently connected with ESO P2 database.')
@@ -56,15 +58,5 @@ class VltiFacility(Facility):
 #            logging.debug("samp message received and api ready to transmit")
 #            
 #            parseXmlMessage(self, ob_url, self.ui.get_containerInfo())
-
-
-
-    # TODO move into eso side
-    def getSupportedInstruments(self):
-        if self.apiName:
-            return ["dummy"]
-        else:
-            return ["GRAVITY"]
-        
-        
+  
 
