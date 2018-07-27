@@ -60,25 +60,10 @@ class MainWindow():
         self.log_string.set("log...")
         self.log = Label(self.window, textvariable=self.log_string)
         self.log.pack()
-
-#
-        buttonsFrame = Frame(self.window)
-        buttonsFrame.columnconfigure(3, weight=1)
-        buttonsFrame.rowconfigure(0, weight=1)
-#
-        self.buttonabort_strval=StringVar()
-        self.buttonabort_strval.set("ABORT")
-        self.buttonabort = Button(buttonsFrame,textvariable=self.buttonabort_strval,command=self.on_buttonabort_clicked)
-        self.buttonabort.grid(row=0,column=2)
-#        
-        self.buttonhelp = Button(buttonsFrame,text="HELP",command=self.on_buttonhelp_clicked)
-        self.buttonhelp.grid(row=0,column=3)
-        buttonsFrame.pack(anchor=S)
         
         self.status_bar = StatusBar(self.window)
         self.status_bar.pack(side=BOTTOM,  fill=X)
         self.progress_value=self.status_bar.progress_value
-        
     
     def __del__(self):
       self.window.destroy()
@@ -91,8 +76,7 @@ class MainWindow():
         helpscroll.pack(side=RIGHT, fill=Y)
         widget.pack(side=LEFT, fill=BOTH)
         frame.pack(fill=BOTH)
-        self.helptabs.add(frame,text=tabname)        
-        
+        self.helptabs.add(frame,text=tabname)                
         widget.insert(END,txt)  
 
     def registerTab(self, text, widget):
@@ -115,10 +99,7 @@ class MainWindow():
     def innerloop(self):
         self.window.after(50, self.quitAfterRunOnce)
         self.window.mainloop();
-        
-    def on_buttonabort_clicked(self):
-        self.requestAbort = True
-        
+             
     def update_status_bar(self):
         self.status_bar.set_label("SAMP","SAMP: %s" % self.a2p2client.a2p2SampClient.get_status())
         self.status_bar.set_label("API","API: %s" % self.a2p2client.apiManager.get_status())
