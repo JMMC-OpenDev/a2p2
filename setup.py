@@ -37,7 +37,7 @@ setup(
       'Programming Language :: Python :: 3.6',
       ],
       license='OSI Approved :: GNU General Public License v3 (GPLv3)',
-      packages=['a2p2'],
+      packages=['a2p2', 'a2p2.chara'],
       scripts=['scripts/a2p2'],
       keywords='observation preparation tool optical-interferometry p2 samp'
       )
