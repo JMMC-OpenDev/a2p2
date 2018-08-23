@@ -23,95 +23,161 @@ class VltiUI(FacilityUI):
 
     def __init__(self, a2p2client):
         FacilityUI.__init__(self, a2p2client)
-        
-    
-    def displayOB(self, ob):        
-        try:
-            buffer=self.extractReport(ob)
-        except:
-            buffer="Error during report generation\n"+traceback.format_exc()+_HR+str(ob)
-        
-        self.text.insert(END, buffer)        
-    
-    def extractReport(self, ob):
-        """ We coud try to mimic the output below        
-----------------------------------------------
-Baselines: S2(2)-E2(4)
-           Ref Cart: BL 2
-Times in [brackets] are when target is above 30 deg and has delay
-----------------------------------------------
-S2(2)E2(4)
-----------------------------------------------
-Start-5:00 UT [Start-7:58 UT]
-Object:
-HD 78209 (A3V, 30pc): V=4.45, R=4.21, tht=0.54
-Fringe Finder:
-HD 79158: V=5.29, R=5.29, tht=0.19 (good for fringe finding)
-AO Flat Star:
-HD 82328: V=3.18
-Cals:
-1) HD 77309: V=5.73, R=5.65, tht=0.22
-2) HD 79158: V=5.29, R=5.29, tht=0.19 (good for fringe finding)
-----------------------------------------------
-5:00-6:30 UT [Start-9:44 UT]
-Object:
-HD 91312 (A7IV, IRx, 35pc): V=4.72, R=3.76, tht=0.58
-AO Flat Star:
-""" 
-        buffer =""
-        
-        # Display baselines on change
-        stations=ob.interferometerConfiguration.stations
-        if self.lastBaselines!=stations :
-            buffer += _HR
-            buffer += "Baselines: " + stations +"\n"
-            self.lastBaselines=stations
-        buffer += _HR
-           
-        # Retrieve all stars (as obsConf) and build sciences list
-        sciences=[]
-        targets={} # store  ids for futur retrieval in schedule        
-        for oc in ob.observationConfiguration:
-            targets[oc.id]=oc
-            if "SCI" in oc.type:
-                sciences.append(oc)                        
                 
-        # Retrieve cals from schedule
-        cals={}        
-        for schedule in ob.observationSchedule.OB:                        
-            try: # hack for single element observationSchedule
-                ref = schedule.ref
-            except:
-                ref = schedule
-            target=targets[ref]
-            if "CAL" in target.type:
-                cals[ref]=target
-            
-        # TODO check for calibrator only ?
-            
-        for oc in sciences:
-            sct=oc.SCTarget
-            ftt=self.get(oc,"FTTarget") 
-            aot=self.get(oc,"AOTarget")
-            buffer +=  oc.observationConstraints.LSTinterval +"\n"            
-            buffer += "Object:\n"
-            fluxes = ", ".join([e[0]+"="+e[1] for e in ob.getFluxes(sct).items()])
-            info = sct.SPECTYP + ", " + sct.PARALLAX
-            buffer += sct.name + " (" + info + ") : "+ fluxes + "\n"
-            if ftt :
-                buffer += "Fringe Finder:\n"
-                fluxes = ", ".join([e[0]+"="+e[1] for e in ob.getFluxes(ftt).items()])
-                buffer += ftt.name + " : "+ fluxes + "\n" 
-            if aot :
-                buffer += "AO Flat Star:\n"
-                fluxes = ", ".join([e[0]+"="+e[1] for e in ob.getFluxes(aot).items()])
-                buffer += aot.name + " : "+ fluxes + "\n"     
-                
-            if len(cals)>=1:
-                buffer+= "Cals:\n"
-                for cal in cals:
-                    buffer+= "- "+ cal +"\n"                
+        self.container = Frame(self, bd=3, relief=SUNKEN)
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=1)
+        
+        self.loginFrame=LoginFrame(self)
+        self.loginFrame.grid(row=0, column=0, sticky="nsew")        
+        
+        self.treeFrame=TreeFrame(self)
+        self.treeFrame.grid(row=0, column=0, sticky="nsew")
+        self.tree = self.treeFrame.tree
+               
+        self.container.pack(fill=BOTH, expand=True)        
+                 
+    def showLoginFrame(self, ob):
+        self.ob=ob
+        self.addToLog("Please Log In ESO USER PORTAL to process %s OB"%(ob.instrumentConfiguration.name))
+        self.loginFrame.tkraise()
+    
+    def showTreeFrame(self, ob):
+        self.addToLog("Please select a runId in ESO P2 database to process %s OB"%(ob.instrumentConfiguration.name))
+        self.treeFrame.tkraise()
+        
+    def fillTree(self, runs):        
+        if len(runs) == 0:
+            self.ShowErrorMessage("No Runs defined, impossible to program ESO's P2 interface.")
+            self.requestAbort = True
+            return
 
-            buffer += _HR
+        for i in range(len(runs)):
+            if  self.facility.hasSupportedInstrument(runs[i]['instrument']):
+                runName=runs[i]['progId']
+                instrument=runs[i]['instrument']
+                rid=runs[i]['runId']
+                cid=runs[i]['containerId']
+                self.tree.insert('','end',cid,text=runName,values=(instrument, cid),tags=('run',rid))
+                # if folders, add them recursively
+                folders=getFolders(self.facility.api,cid)
+                if len(folders) > 0 :
+                    try:
+                        self.folder_explore(folders,cid,instrument,rid)
+                    except:
+                        pass
+                    
+    def folder_added(self,name,pid,cid):
+        ret=self.tree.item(pid)
+        curinst=ret['values'][0]
+        tag=ret['tags']
+        rid=tag[1]
+        self.tree.insert(pid,'end',cid,text=name,values=(curinst,cid),tags=('folder',rid))
+
+    def folder_explore(self,folders,contid,instrument,rid):
+        for j in range(len(folders)):
+            name=folders[j]['name']
+            contid2=folders[j]['containerId']
+            self.tree.insert(contid,'end',contid2,text=name,values=(instrument,contid2),tags=('folder',rid))
+            folders2=getFolders(self.facility.api,contid2)
+            if len(folders2) > 0 :
+                try:
+                    self.folder_explore(folders2,contid2,instrument,rid)
+                except:
+                    pass
+
+    def on_tree_selection_changed(self, selection):
+        curItem = self.tree.focus()
+        ret=self.tree.item(curItem)
+        if len(ret['values'])>0:
+            curinst=ret['values'][0]
+            cid=ret['values'][1]
+            curname=ret['text']
+            tag=ret['tags']
+            rid=tag[1]
+            entryType=tag[0]
+            # self.flag[0]=1
+            # TODO can we remove previous line ?
+            if ( entryType == 'folder' ) : #we have a folder
+                   new_containerId_same_run=cid
+                   folderName = curname
+                   self.facility.containerInfo.store_containerId(new_containerId_same_run)
+            else:
+                instru=curinst
+                run, _ = self.facility.api.getRun(rid)
+                containerId = run["containerId"]
+                self.facility.containerInfo.store(rid, instru, containerId)
+
+class TreeFrame(Frame):
+    def __init__(self, vltiUI):                        
+        Frame.__init__(self, vltiUI.container)
+        self.vltiUI=vltiUI
         
-        return buffer
+        subframe = Frame(self)
+        
+        self.tree = ttk.Treeview( subframe,columns=('Project Id'))#, 'instrument'))#, 'folder Id'))
+        ysb = ttk.Scrollbar( subframe, orient='vertical', command=self.tree.yview)
+        xsb = ttk.Scrollbar( subframe, orient='horizontal', command=self.tree.xview)
+        
+        self.tree.configure(yscroll=ysb.set, xscroll=xsb.set)
+        self.tree.heading('#0', text='Project Id', anchor='w')
+        self.tree.heading('#1', text='Instrument', anchor='w')
+        self.tree.heading('#2', text='folder Id', anchor='w')
+        self.tree.bind('<ButtonRelease-1>', self.vltiUI.on_tree_selection_changed)
+
+        # grid layout does not expand and fill all area then move to pack
+#       self.tree.grid(row=0, column=0, sticky='nsew')
+#       ysb.grid(row=0, column=1, sticky='ns')
+#       xsb.grid(row=1, column=0, sticky='ew')
+        self.tree.pack(side=LEFT, fill=BOTH, expand=True)
+        ysb.pack(side=RIGHT, fill="y")
+        #xsb.pack(side=BOTTOM, fill="y") # will probably require to add another 2 frames
+       
+        subframe.pack(side=TOP, fill=BOTH, expand=True)
+                
+class LoginFrame(Frame):
+    def __init__(self, vltiUI):                        
+        Frame.__init__(self, vltiUI.container)
+        self.vltiUI=vltiUI
+        
+        # TODO Would be better to move such config up
+        username = '52052'
+        password = 'tutorial'
+        self.login = [username, password]        
+        
+        self.loginframe  = LabelFrame(self, text="login")
+
+        self.username_label = Label(self.loginframe, text="USERNAME")
+        self.username_label.pack()
+        self.username = StringVar()
+        self.username.set(self.login[0])
+        self.username_entry = Entry(self.loginframe,textvariable=self.username)
+        self.username_entry.pack()
+
+        self.password_label = Label(self.loginframe, text="PASSWORD")
+        self.password_label.pack()
+        self.password = StringVar()
+        self.password.set(self.login[1])
+        self.password_entry = Entry(self.loginframe,textvariable=self.password)
+        self.password_entry.pack()
+        
+        self.loginbutton = Button(self.loginframe,text="LOG IN",command=self.on_loginbutton_clicked)
+        self.loginbutton.pack()
+        
+        self.loginframe.pack()
+        self.pack(side=TOP, fill=BOTH,expand=True)
+        
+                        
+    def on_loginbutton_clicked(self):
+        self.vltiUI.facility.connectAPI(self.username.get(),  self.password.get(), self.vltiUI.ob)
+       
+       
+
+# TODO move into a common part
+def getFolders(p2api, containerId):
+    folders = []
+    itemList, _ = p2api.getItems(containerId)
+    for i in range(len(itemList)):
+        if itemList[i]['itemType'] == 'Folder':
+            folders.append(itemList[i])
+    return folders

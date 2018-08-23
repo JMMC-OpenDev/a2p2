@@ -30,13 +30,19 @@ class VltiFacility(Facility):
         Facility.__init__(self, a2p2client, "VLTI", HELPTEXT)
         self.vltiUI = VltiUI(self)
         
+        # TODO complete list and make it more object oriented
         self.registerInstrument("GRAVITY")
         
+        self.connected = False
+        self.containerInfo = P2Container(self)        
+        
+        # will store later : name for status info, api 
+        self.username = None
+        self.api = None   
         
     def processOB(self, ob):
-        self.a2p2client.ui.addToLog("Receive OB for '"+self.facilityName+"' interferometer")
         # show ob dict for debug
-        self.a2p2client.ui.addToLog(str(ob), False)
+        self.vltiUI.addToLog(str(ob), False)
         
         # performs operation
         self.consumeOB(ob)
@@ -45,8 +51,15 @@ class VltiFacility(Facility):
         self.a2p2client.ui.showFacilityUI(self.vltiUI)
         
         
-    def consumeOB(self, ob):  
-        pass
+    def consumeOB(self, ob):
+        if not self.isConnected():
+            self.vltiUI.showLoginFrame(ob)
+        elif not self.isReadyToSubmit():
+             #self.a2p2client.ui.addToLog("Receive OB for '"+ob.instrumentConfiguration.name+"'")
+            self.vltiUI.addToLog("Please select a Project Id or Folder in the above list. OBs are not shown")
+        else:
+            self.vltiUI.addToLog("everything ready! TODO process OB for selected container")
+        
 #        if not self.ui.is_connected():
 #            logging.debug("samp message received and api not connected")
 #            self.ui.ShowErrorMessage('a2p2 is not currently connected with ESO P2 database.')
@@ -58,5 +71,62 @@ class VltiFacility(Facility):
 #            logging.debug("samp message received and api ready to transmit")
 #            
 #            parseXmlMessage(self, ob_url, self.ui.get_containerInfo())
-  
 
+    def isReadyToSubmit(self):
+        return self.api and self.containerInfo.isOk()
+
+    def isConnected(self):
+        return self.connected
+    
+    def setConnected(self, flag):
+        self.connected=flag
+
+    def getStatus(self):
+        if self.isConnected():
+            return " P2API connected with "+self.username
+        
+    def connectAPI(self, username, password, ob):
+        import p2api
+        if username == '52052':
+            type = 'demo'
+        else:
+            type = 'production'
+        self.api = p2api.ApiConnection(type, username, password)
+        # TODO test that api is ok and handle error if any...
+        
+        runs, _ = self.api.getRuns()
+        self.vltiUI.fillTree(runs)
+
+        self.setConnected(True)
+        self.username=username
+        self.vltiUI.showTreeFrame(ob)
+        pass
+
+class P2Container:
+    # TODO add runName field so we can show information instead of numeric projectId
+    def __init__(self, facility):
+        self.facility = facility
+        self.projectId = None
+        # TODO check projectId because it is not used ?
+        self.instrument = None
+        self.containerId = None
+
+    def store (self, projectId, instrument, containerId):
+        self.projectId = projectId
+        self.instrument = instrument
+        self.containerId = containerId
+        self.log()
+
+    def store_containerId (self, containerId):
+        self.containerId = containerId
+        self.log()
+    
+    def log(self):
+        self.facility.vltiUI.addToLog("*** Working with %s ***" % self)
+
+    def isOk(self):
+        return (self.projectId != None)
+
+    def __str__(self):
+#        return """projectId:'%s', instrument:'%s', containerId:'%s'""" % (self.projectId, self.instrument, self.containerId)
+        return """instrument:'%s', containerId:'%s'""" % (self.instrument, self.containerId)
