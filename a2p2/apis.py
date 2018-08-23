@@ -86,7 +86,7 @@ class Facility():
         self.a2p2client=a2p2client
         self.facilityName=facilityName
         self.facilityHelp=facilityHelp
-        self.facilityInstruments=[]    
+        self.facilityInstruments=[]
             
     def processOB(self, ob):
         interferometer =  ob.interferometerConfiguration.name
