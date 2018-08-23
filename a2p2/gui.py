@@ -127,12 +127,26 @@ class MainWindow():
 
     def setProgress(self,perc):
       self.progress_value.set(perc)
-      if ( perc <= 0 ) or ( perc > 0.99 ):
-        self.isIdle();
-      else:
-        self.isBusy();
+# TODO (ask Gilles for this requirement and ) re-enable isBusy and isIdle 
+#      if ( perc <= 0 ) or ( perc > 0.99 ):
+#        self.isIdle();
+#      else:
+#        self.isBusy();
       self.innerloop()
       self.showFrameToFront()
+      
+#     def isBusy(self):
+#      self.tree.configure(selectmode='none')
+#      self.window.config(cursor="watch")
+#      self.innerloop()    
+#
+#    def isIdle(self):
+#      self.tree.configure(selectmode='browse')
+#      self.window.config(cursor="left_ptr")
+#      self.innerloop()
+
+
+
       
     def showFrameToFront(self):
         self.window.attributes('-topmost', 1)
