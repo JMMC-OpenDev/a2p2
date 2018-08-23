@@ -31,7 +31,7 @@ class VltiFacility(Facility):
         self.vltiUI = VltiUI(self)
         
         # TODO complete list and make it more object oriented
-        self.registerInstrument("GRAVITY")
+        gravity = Gravity(self,"GRAVITY")
         # self.supportedInstrumentsByAspro = ['GRAVITY', 'MATISSE', 'AMBER', 'PIONIER']
         
         self.connected = False
@@ -59,20 +59,10 @@ class VltiFacility(Facility):
              #self.a2p2client.ui.addToLog("Receive OB for '"+ob.instrumentConfiguration.name+"'")
             self.vltiUI.addToLog("Please select a Project Id or Folder in the above list. OBs are not shown")
         else:
-            self.vltiUI.addToLog("everything ready! TODO process OB for selected container")
+            self.vltiUI.addToLog("everything ready! process OB for selected container")
+            #forward to instrument 
+            self.getInstrument(container.instrument).submitOB(ob, containerInfo)
         
-#        if not self.ui.is_connected():
-#            logging.debug("samp message received and api not connected")
-#            self.ui.ShowErrorMessage('a2p2 is not currently connected with ESO P2 database.')
-#        elif not self.ui.is_ready_to_submit():
-#            self.ui.ShowErrorMessage('Please select a runId ESO P2 database.')
-#            logging.debug("samp message received and api not ready to transmit")
-#        else:
-#            self.ui.addToLog('Sending request to API ...')
-#            logging.debug("samp message received and api ready to transmit")
-#            
-#            parseXmlMessage(self, ob_url, self.ui.get_containerInfo())
-
     def isReadyToSubmit(self):
         return self.api and self.containerInfo.isOk()
 
@@ -102,7 +92,7 @@ class VltiFacility(Facility):
         self.username=username
         self.vltiUI.showTreeFrame(ob)
         pass
-
+        
 class P2Container:
     # TODO add runName field so we can show information instead of numeric projectId
     def __init__(self, facility):
