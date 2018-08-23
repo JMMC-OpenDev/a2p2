@@ -51,15 +51,14 @@ class APIManager():
     def getAPI(self):
         return self.api
 
-    def is_connected(self):
-        return self.api != None
-
     def get_status(self):
-        if self.api:
-            return self.apiName+" connected"
-        else:
-            return self.apiName+" not connected"
-
+        status=[]
+        for facility in self.facilities.values():
+            if facility.getStatus():
+                status.append(facility.facilityName+" [" + facility.getStatus() + " ]")
+        
+        return " | ".join(status)
+        
     def processOB(self, ob): 
         interferometer=ob.interferometerConfiguration.name                            
         insname=ob.instrumentConfiguration.name
@@ -77,7 +76,7 @@ class APIManager():
         else:
             self.a2p2client.ui.ShowErrorMessage("Received OB for unsupported instrument \n"+
             insname+" @ "+interferometer+"\n"+"Supported instrument(s): "+", ".join(supportedIns))
-            
+    
       
 
 class Facility():
@@ -89,6 +88,7 @@ class Facility():
         self.facilityInstruments=[]
             
     def processOB(self, ob):
+        """ Please overwrite this method in your facility class to handle incoming OB. """
         interferometer =  ob.interferometerConfiguration.name
         self.a2p2client.ui.addToLog("'"+interferometer+"' interferometer not supported by A2P2")
         
@@ -97,6 +97,15 @@ class Facility():
     
     def getSupportedInstrument(self):
         return self.facilityInstruments
+    
+    def hasSupportedInstrument(self, insname):
+        # ... we may log failures
+        return insname in self.facilityInstruments
+    
+    def getStatus(self):
+        """ Please overwrite this method in your facility class to include status in the API entry of the main status bar. """
+        return None
+    
 
 class FakeAPI():
     """
