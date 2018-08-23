@@ -58,7 +58,7 @@ class MainWindow():
 
         self.log_string = StringVar()
         self.log_string.set("log...")
-        self.log = Label(self.window, textvariable=self.log_string)
+        self.log = Label(self.window, textvariable=self.log_string, fg="blue")
         self.log.pack()
         
         self.status_bar = StatusBar(self.window)
@@ -102,7 +102,7 @@ class MainWindow():
              
     def update_status_bar(self):
         self.status_bar.set_label("SAMP","SAMP: %s" % self.a2p2client.a2p2SampClient.get_status())
-        self.status_bar.set_label("API","API: %s" % self.a2p2client.apiManager.get_status())
+        self.status_bar.set_label("API","%s" % self.a2p2client.apiManager.get_status())
 
     def get_api(self):
         return self.api
@@ -166,4 +166,9 @@ class FacilityUI(Frame):
         #self.pack(fill=BOTH)
         self.facility=facility
         self.a2p2client=facility.a2p2client
-        
+    
+    def addToLog(self,text,displayString=True):
+        """ Wrapper to log message in the common textfield """
+        self.a2p2client.ui.addToLog(text,displayString)
+
+                
