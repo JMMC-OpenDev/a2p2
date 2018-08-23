@@ -32,6 +32,7 @@ class VltiFacility(Facility):
         
         # TODO complete list and make it more object oriented
         self.registerInstrument("GRAVITY")
+        # self.supportedInstrumentsByAspro = ['GRAVITY', 'MATISSE', 'AMBER', 'PIONIER']
         
         self.connected = False
         self.containerInfo = P2Container(self)        
