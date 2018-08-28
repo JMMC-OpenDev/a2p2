@@ -41,9 +41,10 @@ class OB():
     You can use attributes to walk to associated configurations values, e.g.: 
     - ob.interferometerConfiguration.name
     - ob.instrumentConfiguration
-    - ob.observationConfiguration
+    - ob.observationConfiguration[]
     - ob.observationSchedule
     
+    every values are string (must be converted for numeric values).
     
     """
     def __init__(self, url):
@@ -57,7 +58,7 @@ class OB():
              # parse JSON into an object with attributes corresponding to dict keys.
              # We should probably avoid json use...
             o=json.loads( json.dumps(ds[e]) , object_hook=lambda d: namedtuple(e, d.keys())(*d.values()))
-            # observationConfiguration may be uniq or 
+            # observationConfiguration may be uniq but force it to be a list
             if "observationConfiguration" in e and not isinstance(o,list):
                 setattr(self,e,[o])
             else:
@@ -74,6 +75,12 @@ class OB():
             if k.startswith("FLUX_"):
                 fluxes[k[5:]]=els[k] # remove FLUX_ prefix for dict key
         return fluxes
+    
+    def get(self,obj,fieldname, defaultvalue=None):
+        if fieldname in obj._fields:
+            return getattr(obj,fieldname)
+        else:
+            return defaultvalue
 
     def __str__(self):
         if True:

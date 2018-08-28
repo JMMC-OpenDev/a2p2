@@ -53,7 +53,7 @@ class VltiUI(FacilityUI):
             return
 
         for i in range(len(runs)):
-            if  self.facility.hasSupportedInstrument(runs[i]['instrument']):
+            if  self.facility.hasSupportedInsname(runs[i]['instrument']):
                 runName=runs[i]['progId']
                 instrument=runs[i]['instrument']
                 rid=runs[i]['runId']
@@ -107,6 +107,13 @@ class VltiUI(FacilityUI):
                 run, _ = self.facility.api.getRun(rid)
                 containerId = run["containerId"]
                 self.facility.containerInfo.store(rid, instru, containerId)
+    
+   
+    def isBusy(self):
+        self.tree.configure(selectmode='browse')
+
+    def isIdle(self):
+        self.tree.configure(selectmode='none') 
 
 class TreeFrame(Frame):
     def __init__(self, vltiUI):                        

@@ -3,6 +3,8 @@
 __all__ = []
 
 from a2p2.apis import Facility
+from a2p2.apis import Instrument
+
 from a2p2.vlti.gui import VltiUI
 
 HELPTEXT="""
@@ -28,10 +30,11 @@ class VltiFacility(Facility):
 
     def __init__(self, a2p2client):
         Facility.__init__(self, a2p2client, "VLTI", HELPTEXT)
-        self.vltiUI = VltiUI(self)
+        self.ui = VltiUI(self)
         
         # TODO complete list and make it more object oriented
-        gravity = Gravity(self,"GRAVITY")
+        from a2p2.vlti.gravity import Gravity
+        gravity = Gravity(self)
         # self.supportedInstrumentsByAspro = ['GRAVITY', 'MATISSE', 'AMBER', 'PIONIER']
         
         self.connected = False
@@ -42,26 +45,24 @@ class VltiFacility(Facility):
         self.api = None   
         
     def processOB(self, ob):
+        # give focus on last updated UI
+        self.a2p2client.ui.showFacilityUI(self.ui)
         # show ob dict for debug
-        self.vltiUI.addToLog(str(ob), False)
+        self.ui.addToLog(str(ob), False)
         
         # performs operation
-        self.consumeOB(ob)
-        
-        # give focus on last updated UI
-        self.a2p2client.ui.showFacilityUI(self.vltiUI)
-        
-        
-    def consumeOB(self, ob):
         if not self.isConnected():
-            self.vltiUI.showLoginFrame(ob)
+            self.ui.showLoginFrame(ob)
         elif not self.isReadyToSubmit():
              #self.a2p2client.ui.addToLog("Receive OB for '"+ob.instrumentConfiguration.name+"'")
-            self.vltiUI.addToLog("Please select a Project Id or Folder in the above list. OBs are not shown")
+            self.ui.addToLog("Please select a Project Id or Folder in the above list. OBs are not shown")
         else:
-            self.vltiUI.addToLog("everything ready! process OB for selected container")
-            #forward to instrument 
-            self.getInstrument(container.instrument).submitOB(ob, containerInfo)
+            self.ui.addToLog("everything ready! process OB for selected container")
+            # Forward to instrument 
+            # We may also handle the common process and just ask for specific check
+            instrument = self.getInstrument(self.containerInfo.instrument)
+            instrument.checkOB(ob, self.containerInfo)
+            instrument.submitOB(ob,self.containerInfo)
         
     def isReadyToSubmit(self):
         return self.api and self.containerInfo.isOk()
@@ -82,17 +83,24 @@ class VltiFacility(Facility):
             type = 'demo'
         else:
             type = 'production'
-        self.api = p2api.ApiConnection(type, username, password)
-        # TODO test that api is ok and handle error if any...
-        
-        runs, _ = self.api.getRuns()
-        self.vltiUI.fillTree(runs)
+        try:
+            self.api = p2api.ApiConnection(type, username, password)
+            # TODO test that api is ok and handle error if any...
 
-        self.setConnected(True)
-        self.username=username
-        self.vltiUI.showTreeFrame(ob)
-        pass
-        
+            runs, _ = self.api.getRuns()
+            self.ui.fillTree(runs)
+
+            self.setConnected(True)
+            self.username=username
+            self.ui.showTreeFrame(ob)
+        except:
+            self.ui.addToLog("Can't connect to P2")
+            # TODO show an error frame
+            
+    def getAPI(self):
+        return self.api
+            
+# TODO Move code out of this class        
 class P2Container:
     # TODO add runName field so we can show information instead of numeric projectId
     def __init__(self, facility):
@@ -113,7 +121,7 @@ class P2Container:
         self.log()
     
     def log(self):
-        self.facility.vltiUI.addToLog("*** Working with %s ***" % self)
+        self.facility.ui.addToLog("*** Working with %s ***" % self)
 
     def isOk(self):
         return (self.projectId != None)

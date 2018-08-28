@@ -114,39 +114,34 @@ class MainWindow():
         self.showFrameToFront()
   
     def ShowErrorMessage(self,text):
-        dialog = showerror("Error",text)
+        showerror("Error",text)
+        self.addToLog("Info message")
+        self.addToLog(text,False)
 
     def ShowWarningMessage(self,text):
-        dialog = showwarning("Warning",text)
+        top = Toplevel(width=500)
+        showwarning("Warning",text, parent=top )
+        self.addToLog("Info message")
+        self.addToLog(text,False)
 
     def ShowInfoMessage(self,text):
-        dialog = showinfo("Info",text)
+        showinfo("Info",text)
+        self.addToLog("Info message")
+        self.addToLog(text,False)
 
     def on_buttonhelp_clicked(self):
          self.ShowInfoMessage(self.helptext.get("1.0",END))
 
     def setProgress(self,perc):
-      self.progress_value.set(perc)
-# TODO (ask Gilles for this requirement and ) re-enable isBusy and isIdle 
-#      if ( perc <= 0 ) or ( perc > 0.99 ):
-#        self.isIdle();
-#      else:
-#        self.isBusy();
-      self.innerloop()
-      self.showFrameToFront()
-      
-#     def isBusy(self):
-#      self.tree.configure(selectmode='none')
-#      self.window.config(cursor="watch")
-#      self.innerloop()    
-#
-#    def isIdle(self):
-#      self.tree.configure(selectmode='browse')
-#      self.window.config(cursor="left_ptr")
-#      self.innerloop()
-
-
-
+        if perc > 1:
+            perc=perc/100.0
+        self.progress_value.set(perc) 
+        if ( perc <= 0 ) or ( perc > 0.99 ):
+            self.window.config(cursor="left_ptr")
+        else:
+            self.window.config(cursor="watch")
+        self.innerloop()
+        self.showFrameToFront()
       
     def showFrameToFront(self):
         self.window.attributes('-topmost', 1)
@@ -184,5 +179,31 @@ class FacilityUI(Frame):
     def addToLog(self,text,displayString=True):
         """ Wrapper to log message in the common textfield """
         self.a2p2client.ui.addToLog(text,displayString)
+        
+    def ShowErrorMessage(self,text):
+        self.a2p2client.ui.ShowErrorMessage(text)
 
+    def ShowWarningMessage(self,text):
+        self.a2p2client.ui.ShowWarningMessage(text)
+
+    def ShowInfoMessage(self,text):
+        self.a2p2client.ui.ShowInfoMessage(text)
+        
+    def setProgress(self,perc):
+        """ Wrapper to update progress bar """
+        if perc > 1:
+            perc=perc/100.0
+        if ( perc <= 0 ) or ( perc > 0.99 ):
+            self.isIdle()
+        else:
+            self.isBusy()
+        self.a2p2client.ui.setProgress(perc)
+        
+    def isBusy(self):
+        """ Override me to lock specific widgets. """
+        pass
+    
+    def isIdle(self):
+        """ Override me to unlock specific widgets. """
+        pass
                 

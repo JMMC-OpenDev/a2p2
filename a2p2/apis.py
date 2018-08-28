@@ -60,6 +60,7 @@ class APIManager():
         return " | ".join(status)
         
     def processOB(self, ob): 
+        """ Test instrument on facility that registerInstrument() before OB forward for specialized handling."""        
         interferometer=ob.interferometerConfiguration.name                            
         insname=ob.instrumentConfiguration.name
         
@@ -68,8 +69,7 @@ class APIManager():
         else:
             facility = self.defaultFacility
         
-        supportedIns=facility.getSupportedInstrument()
-        # test instrument on facility that registerInstrument()
+        supportedIns=facility.getSupportedInsnames()
         if len(supportedIns)==0 or insname in supportedIns:
             self.a2p2client.ui.addToLog("Received OB for '"+insname+"@"+interferometer+"' ")
             facility.processOB(ob)
@@ -85,27 +85,49 @@ class Facility():
         self.a2p2client=a2p2client
         self.facilityName=facilityName
         self.facilityHelp=facilityHelp
-        self.facilityInstruments=[]
+        self.facilityInstruments={}
             
     def processOB(self, ob):
-        """ Please overwrite this method in your facility class to handle incoming OB. """
+        """ Please override this method in your facility class to handle incoming OB. """
         interferometer =  ob.interferometerConfiguration.name
         self.a2p2client.ui.addToLog("'"+interferometer+"' interferometer not supported by A2P2")
         
-    def registerInstrument(self,instrumentName):
-        self.facilityInstruments.append(instrumentName)
+    def registerInstrument(self,instrument):
+        self.facilityInstruments[instrument.getName()]=instrument
     
-    def getSupportedInstrument(self):
-        return self.facilityInstruments
-    
-    def hasSupportedInstrument(self, insname):
+    def getSupportedInsnames(self):
+        return self.facilityInstruments.keys()
+
+    def hasSupportedInsname(self, insname):
         # ... we may log failures
-        return insname in self.facilityInstruments
+        return insname in self.getSupportedInsnames()
+
+    def getSupportedInstruments(self):
+        return self.facilityInstruments.values()
+    
+    def getInstrument(self, insname):
+        return self.facilityInstruments[insname]
+    
+    def getName(self):
+        return self.facilityName
     
     def getStatus(self):
-        """ Please overwrite this method in your facility class to include status in the API entry of the main status bar. """
+        """ Please override this method in your facility class to include status in the API entry of the main status bar. """
         return None
-    
+
+
+class Instrument():
+    def __init__(self, facility, insname, help="Help TBD"):
+        self.facility=facility
+        self.insname=insname
+        self.help=help
+        facility.registerInstrument(self)
+
+    def getName(self):
+        return self.insname
+
+    def getHelp(self):
+        return self.help
 
 class FakeAPI():
     """
