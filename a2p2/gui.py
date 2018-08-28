@@ -119,8 +119,7 @@ class MainWindow():
         self.addToLog(text,False)
 
     def ShowWarningMessage(self,text):
-        top = Toplevel(width=500)
-        showwarning("Warning",text, parent=top )
+        showwarning("Warning",text)
         self.addToLog("Info message")
         self.addToLog(text,False)
 
