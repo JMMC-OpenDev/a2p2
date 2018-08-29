@@ -111,6 +111,7 @@ class MainWindow():
         if displayString:
             self.log_string.set(text)
         self.logtext.insert(END, "\n"+text)
+        self.logtext.see(END)
         self.showFrameToFront()
   
     def ShowErrorMessage(self,text):
