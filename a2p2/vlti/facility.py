@@ -2,10 +2,25 @@
 
 __all__ = []
 
+import os
 from a2p2.apis import Facility
 from a2p2.apis import Instrument
 
 from a2p2.vlti.gui import VltiUI
+
+
+
+CONFDIR="conf"
+
+# Look for configuration files in the same level directory as this module/conf/
+try:
+    _confdir = os.path.join(os.path.dirname(__file__), CONFDIR)
+except NameError:
+    _confdir = CONFDIR
+if os.path.isdir(_confdir):
+    CONFDIR = _confdir
+elif not os.path.isdir(CONFDIR):
+    raise RuntimeError, "can't find conf directory (%r)" % (CONFDIR,)
 
 HELPTEXT="""
 ESO's P2 repository for Observing Blocks (OBs):
@@ -24,7 +39,9 @@ Send configuration from Aspro:
 - For each block submitted, a report is produced. Warnings are usually not significant.
 - For more than 1 object sent, a <b>folder</b> containing the two or more blocks is created. In the absence of availability of grouping OBs (like for CAL-SCI-CAL) provided by ESO, this is the closets we can do.
 - All the new OBs and folders will be available on p2web at https://eso.org/p2 
+
 """
+HELPTEXT+="Config files loaded from "+CONFDIR
 
 class VltiFacility(Facility):
 
@@ -50,18 +67,20 @@ class VltiFacility(Facility):
         # show ob dict for debug
         self.ui.addToLog(str(ob), False)
         
+        # OB is checked and submitted by instrument (TODO delegate submission to facility)            
+        instrument = self.getInstrument(ob.instrumentConfiguration.name)
+        validOB = instrument.checkOB(ob, self.containerInfo)            
+        
         # performs operation
-        if not self.isConnected():
+        if not validOB:
+            self.ui.addToLog("Your OB is not valid, please check logs and fix before new submission.")
+        elif not self.isConnected():
             self.ui.showLoginFrame(ob)
         elif not self.isReadyToSubmit():
              #self.a2p2client.ui.addToLog("Receive OB for '"+ob.instrumentConfiguration.name+"'")
             self.ui.addToLog("Please select a Project Id or Folder in the above list. OBs are not shown")
         else:
-            self.ui.addToLog("everything ready! process OB for selected container")
-            # Forward to instrument 
-            # We may also handle the common process and just ask for specific check
-            instrument = self.getInstrument(self.containerInfo.instrument)
-            instrument.checkOB(ob, self.containerInfo)
+            self.ui.addToLog("everything ready! process OB for selected container")            
             instrument.submitOB(ob,self.containerInfo)
         
     def isReadyToSubmit(self):
