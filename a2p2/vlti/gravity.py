@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 
 __all__ = []
 
@@ -14,6 +15,8 @@ import numpy as np
 import re
 import traceback
 
+import datetime
+
 
 
 HELPTEXT="""
@@ -23,12 +26,14 @@ Please define Gravity instrument help in a2p2/vlti/gravity.py
 class Gravity(VltiInstrument):
     def  __init__(self, facility):
         VltiInstrument.__init__(self, facility, "GRAVITY")
+        self.insmodes=[ 'LOW-COMBINED', 'LOW-SPLIT', 'MEDIUM-COMBINED' ,'MEDIUM-SPLIT', 'MED', 'HIGH-COMBINED', 'HIGH-SPLIT']                
     
     # mainly corresponds to a refactoring of old utils.processXmlMessage
-    def checkOB(self, ob, p2container): 
+    def checkOB(self, ob, p2container, dryMode=True): 
         api = self.facility.getAPI()
         ui = self.ui
-        ui.setProgress(0)
+
+        errors=[]
         
         currentInstrument = p2container.instrument
         containerId = p2container.containerId
@@ -37,13 +42,16 @@ class Gravity(VltiInstrument):
             instrumentConfiguration = ob.instrumentConfiguration
             BASELINE = ob.interferometerConfiguration.stations
             instrumentMode = instrumentConfiguration.instrumentMode
-    
+            
+            if not instrumentMode in self.insmodes:               
+                raise ValueError ( "Invalid Instrument Mode '%s'.\n Must be one of %s .\nPlease Correct."%(instrumentMode, self.insmodes) )
+        
             #if we have more than 1 obs, then better put it in a subfolder waiting for the existence of a block sequence not yet implemented in P2
             obsconflist = ob.observationConfiguration
             doFolder = (len(obsconflist) > 1)
             parentContainerId = containerId
-            if doFolder:
-                folderName = (obsconflist[0].find('SCTarget')).find('name').text
+            if doFolder and not dryMode:
+                folderName = obsconflist[0].SCTarget.name
                 folderName = re.sub('[^A-Za-z0-9]+', '_', folderName.strip())
                 folder, _ = api.createFolder(containerId, folderName)
                 containerId = folder['containerId']
@@ -95,13 +103,29 @@ class Gravity(VltiInstrument):
                     SEQ_FT_ROBJ_DIAMETER = 0.0 #FIXME
                     SEQ_FT_ROBJ_VIS = 1.0      #FIXME
                     dualField = True
+                    
+                    # test distance in dual field mode
+                    isUT = (BASELINE[0] == "U") 
+                    if isUT:
+                        SCtoREFmaxDist = 2000
+                        SCtoREFminDist = 400                        
+                    else:
+                        SCtoREFminDist = 1500
+                        SCtoREFmaxDist = 4000
+                    #compute x,y between science and ref beams:
+                    diff = getSkyDiff(SCRA, SCDEC, FTRA, FTDEC)
+                    if np.abs(diff[0]) < SCtoREFminDist:
+                        raise ValueError ("Dual-Field distance of two stars is  < " + str(SCtoREFminDist) + " mas, Please Correct.")
+                    elif  np.abs(diff[0]) > SCtoREFmaxDist:
+                        raise ValueError ("Dual-Field distance of two stars is  > " + str(SCtoREFmaxDist) + " mas, Please Correct.")                      
 
                 #AO target
                 aoTarget = ob.get(observationConfiguration, "AOTarget")
                 if aoTarget != None:
                     AONAME = aoTarget.name
                     COU_AG_GSSOURCE = 'SETUPFILE' #since we have an AO
-                    AORA, AODEC,  = self.getCoords(aoTarget, requirePrecision=False)                        
+                    # TODO check if AO coords should be required by template 
+                    # AORA, AODEC  = self.getCoords(aoTarget, requirePrecision=False)                        
                     COU_AG_PMA, COU_AG_PMD = self.getPMCoords(aoTarget)
 
                 #Guide Star
@@ -119,112 +143,40 @@ class Gravity(VltiInstrument):
                 except:
                     LSTINTERVAL = None
 
+                    
                 #then call the ob-creation using the API. 
                 # TODO run this code in a second loop after global check ?
-                createGravityOB(ui, self.facility.username, api, containerId, OBJTYPE, NAME, BASELINE, instrumentMode, SCRA, SCDEC, PMRA, PMDEC, SEQ_INS_SOBJ_MAG, SEQ_FI_HMAG, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, COU_AG_PMA, COU_AG_PMD, dualField, FTRA, FTDEC, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
-                ui.addToLog("Processed: " + NAME)
+                if dryMode:
+                    ui.addToLog(NAME+ " ready for p2 upload")
+                else:
+                    createGravityOB(ui, self.facility.a2p2client.getUsername(), api, containerId, OBJTYPE, NAME, BASELINE, instrumentMode, SCRA, SCDEC, PMRA, PMDEC, SEQ_INS_SOBJ_MAG, SEQ_FI_HMAG, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, COU_AG_PMA, COU_AG_PMD, dualField, FTRA, FTDEC, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
+                    ui.addToLog(NAME+ " submitted on p2")
             #endfor
             if doFolder:
                 containerId = parentContainerId
                 doFolder = False
-                
-        except Exception as e:
-            traceback.print_exc()
-            trace = traceback.format_exc()
-            ui.ShowErrorMessage("General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s " % (trace))
+        
+        except ValueError as e:
+            errors.append(e)
+            ui.ShowErrorMessage("Value error :\n %s " % (e))
             ui.setProgress(0)
+        except Exception as e:
+            errors.append(e)
+            traceback.print_exc()
+            trace = traceback.format_exc(limit=1)
+            ui.ShowErrorMessage("General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s " % (trace))            
+        
+        return len(errors)==0
 
-# here dit must be a string since this is what p2 expects. NOT an integer or real/double.
-def getDit(mag, spec, pol, tel, mode):
-    string_dit = "1"
+    def submitOB(self, ob, p2container):
+        self.checkOB(ob, p2container, False)
 
-    if mode == 1: #Dual
-        if tel == 1:
-            mag -= 3.7 #UT, DUAL
-        else:
-            mag -= 0.7 #AT, DUAL
-    elif tel == 1:
-        mag -= 3.0 #UT, SINGLE
 
-    if spec == 2: #HR
-        if pol == 1: #SPLIT
-            if mag > 1:
-                string_dit = "30"
-            elif mag > 0:
-                string_dit = "10"
-            elif mag > -0.5:
-                string_dit = "5"
-            else:
-                string_dit = "3"
-        else: #COMB
-            if mag > 2:
-                string_dit = "30"
-            elif mag > 0.5:
-                string_dit = "10"
-            elif mag > -0.5:
-                string_dit = "5"
-            else:
-                string_dit = "1"
-    elif spec == 1: #MR
-        if pol == 1: #SPLIT
-            if mag > 4:
-                string_dit = "30"
-            elif mag > 3:
-                string_dit = "10"
-            elif mag > 2.5:
-                string_dit = "5"
-            elif mag > 1.5:
-                string_dit = "3"
-            elif mag > 0.0:
-                string_dit = "1"
-            else:
-                string_dit = "0.3"
-        else: #COMB
-            if mag > 5:
-                string_dit = "30"
-            elif mag > 3.5:
-                string_dit = "10"
-            elif mag > 3.0:
-                string_dit = "5"
-            elif mag > 2.5:
-                string_dit = "3"
-            elif mag > 1.0:
-                string_dit = "1"
-            else:
-                string_dit = "0.3"
-    elif spec == 0: #LR FIXME VALUES ARE NOT GIVEN!!!!!!!!
-        if pol == 1: #SPLIT
-            if mag > 9:
-                string_dit = "30"
-            elif mag > 7:
-                string_dit = "10"
-            elif mag > 6.5:
-                string_dit = "5"
-            elif mag > 5.5:
-                string_dit = "3"
-            elif mag > 4.0:
-                string_dit = "1"
-            else:
-                string_dit = "0.3"
-        else: #COMB
-            if mag > 10:
-                string_dit = "30"
-            elif mag > 9:
-                string_dit = "10"
-            elif mag > 7.5:
-                string_dit = "5"
-            elif mag > 6.5:
-                string_dit = "3"
-            elif mag > 5.0:
-                string_dit = "1"
-            else:
-                string_dit = "0.3"
-    return string_dit
-
-#define function creating the OB:
-def createGravityOB(ui, username, api, containerId, OBJTYPE, NAME, BASELINE, instrumentMode, SCRA, SCDEC, PMRA, PMDEC, SEQ_INS_SOBJ_MAG, SEQ_FI_HMAG, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, COU_AG_PMA, COU_AG_PMD, dualField, FTRA, FTDEC, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
-
+def createGravityOB(ui, username, api, containerId, OBJTYPE, NAME, BASELINE, instrumentMode, SCRA, SCDEC, PMRA, PMDEC, SEQ_INS_SOBJ_MAG, SEQ_FI_HMAG,
+                    DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, COU_AG_PMA, COU_AG_PMD, dualField, FTRA, FTDEC, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG,
+                    SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
     ui.setProgress(0.1)
+    
     # UT or AT?
     isUT = (BASELINE[0] == "U")
     if isUT:
@@ -246,18 +198,11 @@ def createGravityOB(ui, username, api, containerId, OBJTYPE, NAME, BASELINE, ins
 
     VISIBILITY = 1.0
     dualmode = 0
-    #if Dualfield and offset between fields is bad, complain and do Nothing
-    diff = [0, 0]
     if dualField:
         dualmode = 1
         #compute x,y between science and ref beams:
         diff = getSkyDiff(SCRA, SCDEC, FTRA, FTDEC)
-        if np.abs(diff[0]) < SCtoREFminDist:
-            ui.ShowErrorMessage("Dual-Field distance of two stars is  < " + str(SCtoREFminDist) + " mas, Please Correct.")
-            return
-        elif  np.abs(diff[0]) > SCtoREFmaxDist:
-            ui.ShowErrorMessage("Dual-Field distance of two stars is  > " + str(SCtoREFmaxDist) + " mas, Please Correct.")
-            return
+        
 
     if instrumentMode == 'LOW-COMBINED':
         INS_SPEC_RES = 'LOW'
@@ -288,10 +233,7 @@ def createGravityOB(ui, username, api, containerId, OBJTYPE, NAME, BASELINE, ins
         INS_SPEC_RES = 'HIGH'
         INS_FT_POL = 'IN'
         INS_SPEC_POL = 'IN'
-        string_dit = getDit(SEQ_INS_SOBJ_MAG, 2, 1, tel, dualmode)
-    else:
-        ui.ShowErrorMessage("Invalid Instrument Mode, Please Correct.")
-        return
+        string_dit = getDit(SEQ_INS_SOBJ_MAG, 2, 1, tel, dualmode)    
 
     #compute ndit, nexp
     dit = float(string_dit)
@@ -332,7 +274,7 @@ def createGravityOB(ui, username, api, containerId, OBJTYPE, NAME, BASELINE, ins
 
     #we use obId to populate OB
     ob['obsDescription']['name'] = OBS_DESCR[0:min(len(OBS_DESCR), 31)]
-    ob['obsDescription']['userComments'] = 'Generated by ' + username + ' using ASPRO 2 (c) JMMC'
+    ob['obsDescription']['userComments'] = 'Generated by ' + username + ' using ASPRO 2 (c) JMMC on '+ datetime.datetime.now().isoformat()
     #ob['obsDescription']['InstrumentComments'] = 'AO-B1-C2-E3' #should be a list of alternative quadruplets!
 
     ob['target']['name'] = NAME.replace(' ', '_')
@@ -483,9 +425,215 @@ def createGravityOB(ui, username, api, containerId, OBJTYPE, NAME, BASELINE, ins
         #   ob, obVersion = api.getOB(obId)
         #   python3: print('Status of verified OB', obId, 'is now', ob['obStatus'])
 
-    def getSkyDiff(ra, dec, ftra, ftdec):
-        science = SkyCoord(ra, dec, frame='icrs', unit='deg')
-        ft = SkyCoord(ftra, ftdec, frame='icrs', unit='deg')
-        ra_offset = (science.ra - ft.ra) * np.cos(ft.dec.to('radian'))
-        dec_offset = (science.dec - ft.dec)
-        return [ra_offset.deg * 3600 * 1000, dec_offset.deg * 3600 * 1000] #in mas
+# here dit must be a string since this is what p2 expects. NOT an integer or real/double.
+def getDit(mag, spec, pol, tel, mode):
+    string_dit = "1"
+
+    if mode == 1: #Dual
+        if tel == 1:
+            mag -= 3.7 #UT, DUAL
+        else:
+            mag -= 0.7 #AT, DUAL
+    elif tel == 1:
+        mag -= 3.0 #UT, SINGLE
+
+    if spec == 2: #HR
+        if pol == 1: #SPLIT
+            if mag > 1:
+                string_dit = "30"
+            elif mag > 0:
+                string_dit = "10"
+            elif mag > -0.5:
+                string_dit = "5"
+            else:
+                string_dit = "3"
+        else: #COMB
+            if mag > 2:
+                string_dit = "30"
+            elif mag > 0.5:
+                string_dit = "10"
+            elif mag > -0.5:
+                string_dit = "5"
+            else:
+                string_dit = "1"
+    elif spec == 1: #MR
+        if pol == 1: #SPLIT
+            if mag > 4:
+                string_dit = "30"
+            elif mag > 3:
+                string_dit = "10"
+            elif mag > 2.5:
+                string_dit = "5"
+            elif mag > 1.5:
+                string_dit = "3"
+            elif mag > 0.0:
+                string_dit = "1"
+            else:
+                string_dit = "0.3"
+        else: #COMB
+            if mag > 5:
+                string_dit = "30"
+            elif mag > 3.5:
+                string_dit = "10"
+            elif mag > 3.0:
+                string_dit = "5"
+            elif mag > 2.5:
+                string_dit = "3"
+            elif mag > 1.0:
+                string_dit = "1"
+            else:
+                string_dit = "0.3"
+    elif spec == 0: #LR FIXME VALUES ARE NOT GIVEN!!!!!!!!
+        if pol == 1: #SPLIT
+            if mag > 9:
+                string_dit = "30"
+            elif mag > 7:
+                string_dit = "10"
+            elif mag > 6.5:
+                string_dit = "5"
+            elif mag > 5.5:
+                string_dit = "3"
+            elif mag > 4.0:
+                string_dit = "1"
+            else:
+                string_dit = "0.3"
+        else: #COMB
+            if mag > 10:
+                string_dit = "30"
+            elif mag > 9:
+                string_dit = "10"
+            elif mag > 7.5:
+                string_dit = "5"
+            elif mag > 6.5:
+                string_dit = "3"
+            elif mag > 5.0:
+                string_dit = "1"
+            else:
+                string_dit = "0.3"
+    return string_dit
+
+import collections
+import json
+
+"""
+# -- example:
+# -- https://www.eso.org/sci/facilities/paranal/instruments/gravity/doc/Gravity_TemplateManual.pdf
+import gravdit
+gravdit.printDitTable()
+print('')
+gravdit.printRangeTable()
+"""
+
+# https://www.eso.org/sci/facilities/paranal/instruments/gravity/doc/Gravity_TemplateManual.pdf
+# -- single field, changed keywords to have same as templates!
+ditTable = {'AT':{
+                    'MED':{'OUT':{'MAG':[-1, 0, 2, 3, 4, 5, 9],
+                                  'DIT':[0.3, 1, 3, 5, 10, 30]},
+                          'IN':{'MAG':[-2, 0, 1.5, 2.5, 3.5, 4.5, 6],
+                                'DIT':[0.3, 1, 3, 5, 10, 30]}},
+                    'HIGH':{'OUT':{'MAG':[-2, 0, 2, 4, 6],
+                                   'DIT':[1, 5, 10, 30]},
+                          'IN':{'MAG':[-2, 0, 1.5, 3, 4.5],
+                                'DIT':[3, 5, 10, 30]}},
+                    'Kdf':0.7,}
+            }
+            
+## -- dump / load file as Json
+#filename = 'gravi_ditTable.json'
+#with open(filename, 'w') as f:
+#    tmp = json.dumps(ditTable, indent=1)
+#    f.write(tmp)
+#with open(filename) as f:
+#    ditTable = json.load(f)
+
+rangeTable = {}
+#  keys must be a string listing the names of templates, coma separated
+k = 'GRAVITY_gen_acq.tsf'
+# using collections.OrderedDict to keep the order of keys:
+rangeTable[k] = collections.OrderedDict({})
+rangeTable[k]['SEQ.FI.HMAG']={'min':-10., 'max':20., 'default':0.0}
+rangeTable[k]['SEQ.FT.ROBJ.MAG']={'min':-10., 'max':30., 'default':0.0}
+rangeTable[k]['TEL.TARG.PMA']={'min':-10., 'max':10., 'default':0.0}
+rangeTable[k]['TEL.TARG.PMD']={'min':-10., 'max':10., 'default':0.0}
+rangeTable[k]['TEL.TARG.PARALLAX']={'min':-20., 'max':20, 'default':0.0}
+rangeTable[k]['TEL.TARG.ADDVELALPHA']={'min':-15., 'max':15., 'default':0.0}
+rangeTable[k]['TEL.TARG.ADDVELDELTA']={'min':-15., 'max':15., 'default':0.0}
+rangeTable[k]['SEQ.COU.AG.GSSOURCE']={'list':['SETUPFILE', 'SCIENCE'], 'default':'SCIENCE'}
+rangeTable[k]['SEQ.COU.AG.ALPHA']={'default':0.0}
+rangeTable[k]['SEQ.COU.AG.DELTA']={'default':0.0}
+rangeTable[k]['SEQ.COU.AG.PMA']={'min':-10., 'max':10., 'default':0.0}
+rangeTable[k]['SEQ.COU.AG.PMD']={'min':-10., 'max':10., 'default':0.0}
+rangeTable[k]['SEQ.COU.GS.MAG']={'min':0., 'max':25., 'default':0.0}
+rangeTable[k]['INS.FT.POL']={'list':['IN', 'OUT'], 'default':'IN'}
+rangeTable[k]['INS.SPEC.POL']={'list':['IN', 'OUT'], 'default':'IN'}
+rangeTable[k]['INS.SPEC.RES']={'list':['MED', 'HIGH'], 'default':'MED'}
+rangeTable[k]['SEQ.FT.ROBJ.DIAMETER']={'min':0, 'max':300, 'default':0.}
+k = 'GRAVITY_single_obs_exp.tsf,GRAVITY_single_obs_calibrator.tsf,'+\
+     'GRAVITY_dual_obs_exp.tsf,GRAVITY_dual_obs_calibrator.tsf'
+rangeTable[k] = collections.OrderedDict({})
+rangeTable[k]['DET2.DIT']={'list':[0.3, 1.0, 3.0, 5.0, 10.0, 30.0, 60.0, 100.0, 300.0], 'default':0.3}
+rangeTable[k]['DET2.NDIT.OBJECT']={'min':10, 'max':300, 'default':25}
+rangeTable[k]['DET2.NDIT.SKY']={'min':10, 'max':300, 'default':25}
+rangeTable[k]['SEQ.SKY.X']={'min':100., 'max':2000., 'default':1000.}
+rangeTable[k]['SEQ.SKY.Y']={'min':100., 'max':2000., 'default':1000.}
+rangeTable[k]['SEQ.OBS.SEQ']={'min':100., 'max':2000., 'default':1000.}
+
+## -- dump / load file as Json
+#filename = 'gravi_rangeTable.json'
+#with open(filename, 'w') as f:
+#    tmp = json.dumps(rangeTable, indent=1)
+#    f.write(tmp)
+#with open(filename) as f:
+#    rangeTable = json.load(f, object_pairs_hook=collections.OrderedDict)
+
+def printDitTable():
+    global ditTable
+    print('    Mode     |Spec |  Pol  |Tel |       K       | DIT(s)')
+    print('--------------------------------------------------------')
+    for tel in ['AT']:
+        for spec in ['MED', 'HIGH']:
+            for pol in ['OUT', 'IN']:
+                for i in range(len(ditTable[tel][spec][pol]['DIT'])):
+                    print('Single Field | %4s | %3s | %2s |'%(spec, pol, tel), end='')
+                    print(' %4.1f <K<= %3.1f | %4.1f'%(ditTable[tel][spec][pol]['MAG'][i],
+                                                 ditTable[tel][spec][pol]['MAG'][i+1],
+                                                 ditTable[tel][spec][pol]['DIT'][i]))
+        print(' Dual Field  |  all | all | %2s | Kdf = K - %.1f |  -'%(tel,ditTable[tel]['Kdf']))
+
+def getDit(tel, spec, pol, K, dualFeed=False):
+    """
+    finds DIT according to ditTable and K magnitude K
+
+    'tel' in ditTable.keys()
+    'spec' in ditTable[tel].keys()
+    'pol' in ditTable[tel][spec].keys()
+
+    * does not manage out of range (returns None) *
+    """
+    global ditTable
+    mags = ditTable[tel][spec][pol]['MAG']
+    dits = ditTable[tel][spec][pol]['DIT']
+    if dualFeed:
+        dK = ditTable[tel]['Kdf']
+    else:
+        dK = 0.0
+    for i,d in enumerate(dits):
+        if mags[i]<(K-dK) and (K-dK)<=mags[i+1]:
+            return d
+    return None
+
+def printRangeTable():
+    global rangeTable
+    for l in rangeTable.keys():
+        print(l)
+        for k in rangeTable[l].keys():
+            print(' ', k, ': ', end='')
+            if 'min' in rangeTable[l][k].keys() and 'max' in rangeTable[l][k].keys():
+                print(rangeTable[l][k]['min'], '...', rangeTable[l][k]['max'], end='')
+            elif 'list' in rangeTable[l][k].keys():
+                print(rangeTable[l][k]['list'], end='')
+            if 'default' in rangeTable[l][k].keys():
+                print(' (', rangeTable[l][k]['default'], ')')
+            else:
+                print(' -no default-')
+    return
