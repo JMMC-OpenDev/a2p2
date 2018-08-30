@@ -51,7 +51,13 @@ class VltiInstrument(Instrument):
         PMRA = self.get(target, "PMRA", defaultPMRA) 
         PMDEC = self.get(target, "PMDEC", defaultPMDEC)
         return float(PMRA), float(PMDEC)
-        
+    
+    def getSkyDiff(ra, dec, ftra, ftdec):
+        science = SkyCoord(ra, dec, frame='icrs', unit='deg')
+        ft = SkyCoord(ftra, ftdec, frame='icrs', unit='deg')
+        ra_offset = (science.ra - ft.ra) * np.cos(ft.dec.to('radian'))
+        dec_offset = (science.dec - ft.dec)
+        return [ra_offset.deg * 3600 * 1000, dec_offset.deg * 3600 * 1000] #in mas
         
         
         
