@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 from sys import platform
 
 with open('README.rst') as README:
@@ -37,7 +37,8 @@ setup(
       'Programming Language :: Python :: 3.6',
       ],
       license='OSI Approved :: GNU General Public License v3 (GPLv3)',
-      packages=['a2p2', 'a2p2.chara', 'a2p2.vlti'],
+      packages=find_packages(),
+      include_package_data=True,
       scripts=['scripts/a2p2'],
       keywords='observation preparation tool optical-interferometry p2 samp'
       )
