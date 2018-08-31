@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import print_function
 
 __all__ = []
 
@@ -26,13 +25,16 @@ Please define Gravity instrument help in a2p2/vlti/gravity.py
 class Gravity(VltiInstrument):
     def  __init__(self, facility):
         VltiInstrument.__init__(self, facility, "GRAVITY")
+        
+        # TODO extract from conf file
         self.insmodes=[ 'LOW-COMBINED', 'LOW-SPLIT', 'MEDIUM-COMBINED' ,'MEDIUM-SPLIT', 'MED', 'HIGH-COMBINED', 'HIGH-SPLIT']                
     
     # mainly corresponds to a refactoring of old utils.processXmlMessage
     def checkOB(self, ob, p2container, dryMode=True): 
         api = self.facility.getAPI()
         ui = self.ui
-
+        rangeTable = self.getRangeTable()
+        
         errors=[]
         
         currentInstrument = p2container.instrument
@@ -148,6 +150,8 @@ class Gravity(VltiInstrument):
                 # TODO run this code in a second loop after global check ?
                 if dryMode:
                     ui.addToLog(NAME+ " ready for p2 upload")
+                    # just try to get ditTable
+                    ditTable = self.getDitTable()
                 else:
                     createGravityOB(ui, self.facility.a2p2client.getUsername(), api, containerId, OBJTYPE, NAME, BASELINE, instrumentMode, SCRA, SCDEC, PMRA, PMDEC, SEQ_INS_SOBJ_MAG, SEQ_FI_HMAG, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, COU_AG_PMA, COU_AG_PMD, dualField, FTRA, FTDEC, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
                     ui.addToLog(NAME+ " submitted on p2")
@@ -202,8 +206,9 @@ def createGravityOB(ui, username, api, containerId, OBJTYPE, NAME, BASELINE, ins
         dualmode = 1
         #compute x,y between science and ref beams:
         diff = getSkyDiff(SCRA, SCDEC, FTRA, FTDEC)
-        
-
+    
+    # self.getRange("GRAVITY_gen_acq.tsf", self.KW_INS_SPEC_RES)    
+    
     if instrumentMode == 'LOW-COMBINED':
         INS_SPEC_RES = 'LOW'
         INS_FT_POL = 'OUT'
@@ -511,129 +516,3 @@ def getDit(mag, spec, pol, tel, mode):
             else:
                 string_dit = "0.3"
     return string_dit
-
-import collections
-import json
-
-"""
-# -- example:
-# -- https://www.eso.org/sci/facilities/paranal/instruments/gravity/doc/Gravity_TemplateManual.pdf
-import gravdit
-gravdit.printDitTable()
-print('')
-gravdit.printRangeTable()
-"""
-
-# https://www.eso.org/sci/facilities/paranal/instruments/gravity/doc/Gravity_TemplateManual.pdf
-# -- single field, changed keywords to have same as templates!
-ditTable = {'AT':{
-                    'MED':{'OUT':{'MAG':[-1, 0, 2, 3, 4, 5, 9],
-                                  'DIT':[0.3, 1, 3, 5, 10, 30]},
-                          'IN':{'MAG':[-2, 0, 1.5, 2.5, 3.5, 4.5, 6],
-                                'DIT':[0.3, 1, 3, 5, 10, 30]}},
-                    'HIGH':{'OUT':{'MAG':[-2, 0, 2, 4, 6],
-                                   'DIT':[1, 5, 10, 30]},
-                          'IN':{'MAG':[-2, 0, 1.5, 3, 4.5],
-                                'DIT':[3, 5, 10, 30]}},
-                    'Kdf':0.7,}
-            }
-            
-## -- dump / load file as Json
-#filename = 'gravi_ditTable.json'
-#with open(filename, 'w') as f:
-#    tmp = json.dumps(ditTable, indent=1)
-#    f.write(tmp)
-#with open(filename) as f:
-#    ditTable = json.load(f)
-
-rangeTable = {}
-#  keys must be a string listing the names of templates, coma separated
-k = 'GRAVITY_gen_acq.tsf'
-# using collections.OrderedDict to keep the order of keys:
-rangeTable[k] = collections.OrderedDict({})
-rangeTable[k]['SEQ.FI.HMAG']={'min':-10., 'max':20., 'default':0.0}
-rangeTable[k]['SEQ.FT.ROBJ.MAG']={'min':-10., 'max':30., 'default':0.0}
-rangeTable[k]['TEL.TARG.PMA']={'min':-10., 'max':10., 'default':0.0}
-rangeTable[k]['TEL.TARG.PMD']={'min':-10., 'max':10., 'default':0.0}
-rangeTable[k]['TEL.TARG.PARALLAX']={'min':-20., 'max':20, 'default':0.0}
-rangeTable[k]['TEL.TARG.ADDVELALPHA']={'min':-15., 'max':15., 'default':0.0}
-rangeTable[k]['TEL.TARG.ADDVELDELTA']={'min':-15., 'max':15., 'default':0.0}
-rangeTable[k]['SEQ.COU.AG.GSSOURCE']={'list':['SETUPFILE', 'SCIENCE'], 'default':'SCIENCE'}
-rangeTable[k]['SEQ.COU.AG.ALPHA']={'default':0.0}
-rangeTable[k]['SEQ.COU.AG.DELTA']={'default':0.0}
-rangeTable[k]['SEQ.COU.AG.PMA']={'min':-10., 'max':10., 'default':0.0}
-rangeTable[k]['SEQ.COU.AG.PMD']={'min':-10., 'max':10., 'default':0.0}
-rangeTable[k]['SEQ.COU.GS.MAG']={'min':0., 'max':25., 'default':0.0}
-rangeTable[k]['INS.FT.POL']={'list':['IN', 'OUT'], 'default':'IN'}
-rangeTable[k]['INS.SPEC.POL']={'list':['IN', 'OUT'], 'default':'IN'}
-rangeTable[k]['INS.SPEC.RES']={'list':['MED', 'HIGH'], 'default':'MED'}
-rangeTable[k]['SEQ.FT.ROBJ.DIAMETER']={'min':0, 'max':300, 'default':0.}
-k = 'GRAVITY_single_obs_exp.tsf,GRAVITY_single_obs_calibrator.tsf,'+\
-     'GRAVITY_dual_obs_exp.tsf,GRAVITY_dual_obs_calibrator.tsf'
-rangeTable[k] = collections.OrderedDict({})
-rangeTable[k]['DET2.DIT']={'list':[0.3, 1.0, 3.0, 5.0, 10.0, 30.0, 60.0, 100.0, 300.0], 'default':0.3}
-rangeTable[k]['DET2.NDIT.OBJECT']={'min':10, 'max':300, 'default':25}
-rangeTable[k]['DET2.NDIT.SKY']={'min':10, 'max':300, 'default':25}
-rangeTable[k]['SEQ.SKY.X']={'min':100., 'max':2000., 'default':1000.}
-rangeTable[k]['SEQ.SKY.Y']={'min':100., 'max':2000., 'default':1000.}
-rangeTable[k]['SEQ.OBS.SEQ']={'min':100., 'max':2000., 'default':1000.}
-
-## -- dump / load file as Json
-#filename = 'gravi_rangeTable.json'
-#with open(filename, 'w') as f:
-#    tmp = json.dumps(rangeTable, indent=1)
-#    f.write(tmp)
-#with open(filename) as f:
-#    rangeTable = json.load(f, object_pairs_hook=collections.OrderedDict)
-
-def printDitTable():
-    global ditTable
-    print('    Mode     |Spec |  Pol  |Tel |       K       | DIT(s)')
-    print('--------------------------------------------------------')
-    for tel in ['AT']:
-        for spec in ['MED', 'HIGH']:
-            for pol in ['OUT', 'IN']:
-                for i in range(len(ditTable[tel][spec][pol]['DIT'])):
-                    print('Single Field | %4s | %3s | %2s |'%(spec, pol, tel), end='')
-                    print(' %4.1f <K<= %3.1f | %4.1f'%(ditTable[tel][spec][pol]['MAG'][i],
-                                                 ditTable[tel][spec][pol]['MAG'][i+1],
-                                                 ditTable[tel][spec][pol]['DIT'][i]))
-        print(' Dual Field  |  all | all | %2s | Kdf = K - %.1f |  -'%(tel,ditTable[tel]['Kdf']))
-
-def getDit(tel, spec, pol, K, dualFeed=False):
-    """
-    finds DIT according to ditTable and K magnitude K
-
-    'tel' in ditTable.keys()
-    'spec' in ditTable[tel].keys()
-    'pol' in ditTable[tel][spec].keys()
-
-    * does not manage out of range (returns None) *
-    """
-    global ditTable
-    mags = ditTable[tel][spec][pol]['MAG']
-    dits = ditTable[tel][spec][pol]['DIT']
-    if dualFeed:
-        dK = ditTable[tel]['Kdf']
-    else:
-        dK = 0.0
-    for i,d in enumerate(dits):
-        if mags[i]<(K-dK) and (K-dK)<=mags[i+1]:
-            return d
-    return None
-
-def printRangeTable():
-    global rangeTable
-    for l in rangeTable.keys():
-        print(l)
-        for k in rangeTable[l].keys():
-            print(' ', k, ': ', end='')
-            if 'min' in rangeTable[l][k].keys() and 'max' in rangeTable[l][k].keys():
-                print(rangeTable[l][k]['min'], '...', rangeTable[l][k]['max'], end='')
-            elif 'list' in rangeTable[l][k].keys():
-                print(rangeTable[l][k]['list'], end='')
-            if 'default' in rangeTable[l][k].keys():
-                print(' (', rangeTable[l][k]['default'], ')')
-            else:
-                print(' -no default-')
-    return
