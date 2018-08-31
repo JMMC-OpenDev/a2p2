@@ -9,7 +9,7 @@ from a2p2.apis import Instrument
 from a2p2.vlti.gui import VltiUI
 
 
-
+# TODO handle a period subdirectory
 CONFDIR="conf"
 
 # Look for configuration files in the same level directory as this module/conf/
@@ -49,10 +49,15 @@ class VltiFacility(Facility):
         Facility.__init__(self, a2p2client, "VLTI", HELPTEXT)
         self.ui = VltiUI(self)
         
+        # Instanciate instruments
         # TODO complete list and make it more object oriented
         from a2p2.vlti.gravity import Gravity
         gravity = Gravity(self)
         # self.supportedInstrumentsByAspro = ['GRAVITY', 'MATISSE', 'AMBER', 'PIONIER']
+        
+        # complete help 
+        for i in self.getSupportedInstruments():
+            self.facilityHelp += "\n"+i.getHelp()
         
         self.connected = False
         self.containerInfo = P2Container(self)        
@@ -118,7 +123,13 @@ class VltiFacility(Facility):
             
     def getAPI(self):
         return self.api
-            
+    
+    def getConfDir(self):
+        """ 
+        returns the configuration directory with instrument's json files 
+        """
+        return CONFDIR
+        
 # TODO Move code out of this class        
 class P2Container:
     # TODO add runName field so we can show information instead of numeric projectId
