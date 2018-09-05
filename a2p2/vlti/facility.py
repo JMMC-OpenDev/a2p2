@@ -8,6 +8,8 @@ from a2p2.apis import Instrument
 
 from a2p2.vlti.gui import VltiUI
 
+import traceback
+
 
 # TODO handle a period subdirectory
 CONFDIR="conf"
@@ -74,19 +76,33 @@ class VltiFacility(Facility):
         
         # OB is checked and submitted by instrument (TODO delegate submission to facility)            
         instrument = self.getInstrument(ob.instrumentConfiguration.name)
-        validOB = instrument.checkOB(ob, self.containerInfo)            
-        
-        # performs operation
-        if not validOB:
-            self.ui.addToLog("Your OB is not valid, please check logs and fix before new submission.")
-        elif not self.isConnected():
-            self.ui.showLoginFrame(ob)
-        elif not self.isReadyToSubmit():
-             #self.a2p2client.ui.addToLog("Receive OB for '"+ob.instrumentConfiguration.name+"'")
-            self.ui.addToLog("Please select a Project Id or Folder in the above list. OBs are not shown")
-        else:
-            self.ui.addToLog("everything ready! process OB for selected container")            
-            instrument.submitOB(ob,self.containerInfo)
+        try:            
+            # run checkOB which may raise some error before connection request
+            instrument.checkOB(ob, self.containerInfo)            
+
+            # performs operation
+            if not self.isConnected():
+                self.ui.showLoginFrame(ob)
+            elif not self.isReadyToSubmit():
+                 #self.a2p2client.ui.addToLog("Receive OB for '"+ob.instrumentConfiguration.name+"'")
+                self.ui.addToLog("Please select a Project Id or Folder in the above list. OBs are not shown")
+            else:
+                self.ui.addToLog("everything ready! process OB for selected container")            
+                instrument.submitOB(ob,self.containerInfo)
+                
+        # TODO add P2Error handling P2Error(r.status_code, method, url, r.json()['error'])
+        except ValueError as e:
+            traceback.print_exc()
+            trace = traceback.format_exc(limit=1)
+#            ui.ShowErrorMessage("Value error :\n %s \n%s\n\n%s" % (e, trace, "Aborting submission to P2. Look at the whole traceback in the log."))
+            self.ui.ShowErrorMessage("Value error :\n %s \n\n%s" % (e, "Aborting submission to P2. Please check logs and fix before new submission."))
+            trace = traceback.format_exc()
+            self.ui.addToLog(trace, False)
+            self.ui.setProgress(0)
+        except Exception as e:
+            traceback.print_exc()
+            trace = traceback.format_exc(limit=3) # limit = 2 should raise errors in our codes 
+            self.ui.ShowErrorMessage("General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check logs and fix before new submission." % (trace))            
         
     def isReadyToSubmit(self):
         return self.api and self.containerInfo.isOk()

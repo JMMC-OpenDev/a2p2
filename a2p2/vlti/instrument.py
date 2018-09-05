@@ -332,40 +332,15 @@ class TSF(object):
         
     
         
-class ConstraintSet:
-    # We could image to get a checking mecanism such as TSF
-    def __init__(self):
-        self.constraints={}
-        self.constraints['name']='Aspro-created constraint'
-    
-    def setSeeing(self,value):
-        self.constraints['seeing']=value
-    
-    def setSkyTransparency(self,value):
-        self.constraints['skyTransparency'] = value
-    
-    def setBaseline(self, value):
-        self.constraints['baseline'] = value
-        
-    def setAirmass(self, value):
-        self.constraints['airmass'] = value
-        
-    def setFli(self, value):
-        self.constraints['fli'] = value
-        
-    def getDict(self):
-        return self.constraints
-    
-    def __str__(self):
-        buffer = "ConstraintSet: "
-        buffer += str(self.constraints)
-        return buffer
-
 class FixedDict(object):
     
-    def __init__(self, keys):
+    def __init__(self,  keys):
         self.myKeys = keys
         self.myValues = {}
+        
+        # Note: we could enhance code for checking + default value support such as TSF
+        # Note: keys may be synchronized with p2         
+        
         self.__initialised = True
         # after initialisation, setting attributes is the same as setting an item
     
@@ -386,19 +361,24 @@ class FixedDict(object):
         if not '_FixedDict__initialised' in self.__dict__:  # this test allows attributes to be set in the __init__ method 
             #print("set2 %s to %s"%(name, str(value)))
             return object.__setattr__(self, name, value)
-  
+ 
         # continue with keyword try
         #print("set3 %s to %s"%(name, str(value)))
         rname = name.replace('_','.') 
         if rname in self.myKeys :
             self.myValues[name] = value
         else:
-            raise ValueError("keyword %s is not part of supported ones %s "%(name, self.myKeys))    
+            raise ValueError("keyword %s is not part of supported ones %s "%(name, self.myKeys))   
+        
+    def __str__(self):
+        return "%s OB dict: %s" % ( type(self).__name__, str(self.myValues))
         
 
-class OBTarget(FixedDict):
-   
+class OBTarget(FixedDict):   
    def __init__(self):
-       FixedDict.__init__(self, ('name', 'ra', 'dec', 'properMotionRa', 'properMotionDec'))
-       # keys must be synchronized with p2 
-     
+       FixedDict.__init__(self, ('name', 'ra', 'dec', 'properMotionRa', 'properMotionDec'))       
+
+class OBConstraints(FixedDict):   
+   def __init__(self):
+       FixedDict.__init__(self, ('name', 'seeing', 'skyTransparency', 'baseline', 'airmass', 'fli'))
+
