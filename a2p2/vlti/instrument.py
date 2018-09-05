@@ -168,8 +168,9 @@ class VltiInstrument(Instrument):
         if 'list' in rangeTable[_tpl][key].keys():
             return value in rangeTable[_tpl][key]['list']
         if 'spaceseparatedlist' in rangeTable[_tpl][key].keys():
-            for e in value.split(" "):
-                if not e in rangeTable[_tpl][key]['spaceseparatedlist']:
+            ssl=rangeTable[_tpl][key]['spaceseparatedlist']
+            for e in value.strip().split(" "):                
+                if not e in ssl:
                     return False
             return True
         # no range provided in tsf file
@@ -274,20 +275,27 @@ class VltiInstrument(Instrument):
     def getAcqTemplateName(self, dualField=False, OBJTYPE=None):
         return self.getTemplateName("acq", dualField, OBJTYPE)
     
+    def showP2Response(self, response):
+        if response['observable']:
+            self.ui.ShowInfoMessage('OB ' + str(obId) + ' ' + ob['name'] + ' is OK.')
+            self.ui.addToLog('OB: ' + str(obId) + ' is ok')
+        else:
+            s = ""
+            for ss in response['messages']:
+                s += ss + '\n'
+            self.ui.ShowWarningMessage('OB ' + str(obId) + ' HAS Warnings. ESO says:\n\n' + s)
+            self.ui.addToLog('OB: ' + str(obId) + ' created with warnings')
+            # (NOTE: we need to escape things like <= in returned text)    
 
 # TemplateSignatureFile
-# new style class to get __getattr__ advantage
+# use new style class to get __getattr__ advantage
 class TSF(object): 
     def __init__(self, instrument, tpl):
         self.tpl = tpl
         self.instrument = instrument
         supportedTpl = instrument.getRangeTable().keys()
         
-
-        # set default values for every keywords
-# next 2 lines are probably unuseful
-#        if tpl not in supportedTpl:
-#            raise ValueError ("template '%s' is not in the instrument range table. Must be one of %s" % (tpl, str(supportedTpl)))
+        # init with default values for every keywords
         self.tsfParams = self.instrument.getRangeDefaults(tpl)
         
         self.__initialised = True
