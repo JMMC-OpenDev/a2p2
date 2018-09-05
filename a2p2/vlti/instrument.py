@@ -316,9 +316,9 @@ class TSF(object):
 
 
     def __setattr__(self, name, value):
-        if self.__dict__.has_key(name) :  # any normal attributes are handled normal           
+        if name in self.__dict__ :  # any normal attributes are handled normal           
             return object.__setattr__(self, name, value)
-        if not self.__dict__.has_key('_TSF__initialised'):  # this test allows attributes to be set in the __init__ method 
+        if not '_TSF__initialised' in self.__dict__ : # this test allows attributes to be set in the __init__ method 
             return object.__setattr__(self, name, value)
   
         # continue with keyword try
@@ -380,10 +380,10 @@ class FixedDict(object):
             raise AttributeError(name)
 
     def __setattr__(self, name, value):
-        if self.__dict__.has_key(name) :  # any normal attributes are handled normally
+        if name in self.__dict__ :  # any normal attributes are handled normally
             #print("set1 %s to %s"%(name, str(value)))
             return object.__setattr__(self, name, value)
-        if not self.__dict__.has_key('_FixedDict__initialised'):  # this test allows attributes to be set in the __init__ method 
+        if not '_FixedDict__initialised' in self.__dict__:  # this test allows attributes to be set in the __init__ method 
             #print("set2 %s to %s"%(name, str(value)))
             return object.__setattr__(self, name, value)
   

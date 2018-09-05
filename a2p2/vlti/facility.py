@@ -20,7 +20,7 @@ except NameError:
 if os.path.isdir(_confdir):
     CONFDIR = _confdir
 elif not os.path.isdir(CONFDIR):
-    raise RuntimeError, "can't find conf directory (%r)" % (CONFDIR,)
+    raise RuntimeError ( "can't find conf directory (%r)" % (CONFDIR,))
 
 HELPTEXT="""
 ESO's P2 repository for Observing Blocks (OBs):
