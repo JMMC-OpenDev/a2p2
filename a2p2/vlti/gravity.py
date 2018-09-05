@@ -189,14 +189,20 @@ class Gravity(VltiInstrument):
             nexp %= 40
             sequence = 'O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O'
             my_sequence = sequence[0:2 * nexp]
+            
+            obsTSF.DET2_DIT = dit
+            obsTSF.DET2_NDIT_OBJECT = ndit
+            obsTSF.DET2_NDIT_SKY =  ndit
+            obsTSF.SEQ_OBS_SEQ =  my_sequence
+            obsTSF.SEQ_SKY_X =   2000
+            obsTSF.SEQ_SKY_Y =   2000            
 
             #then call the ob-creation using the API. 
             # TODO run this code in a second loop after global check ?
             if dryMode:
-                ui.addToLog(target.name + " ready for p2 upload")  
-                ui.addToLog(str(constraints))                
+                ui.addToLog(target.name + " ready for p2 upload")                                  
             else:
-                self.createGravityOB(ui, self.facility.a2p2client.getUsername(), api, containerId, acqTSF, constraints, OBJTYPE, BASELINE, instrumentMode, target, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
+                self.createGravityOB(ui, self.facility.a2p2client.getUsername(), api, containerId, target, constraints, acqTSF, obsTSF, OBJTYPE, BASELINE, instrumentMode, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
                 ui.addToLog(target.name + " submitted on p2")
         #endfor
         if doFolder:
@@ -207,7 +213,7 @@ class Gravity(VltiInstrument):
         self.checkOB(ob, p2container, False)
 
 
-    def createGravityOB(self,ui, username, api, containerId, acqTSF, obConstraints, OBJTYPE, BASELINE, instrumentMode, obTarget, 
+    def createGravityOB(self,ui, username, api, containerId, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, BASELINE, instrumentMode, 
                         DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG,
                         SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
         ui.setProgress(0.1)
@@ -254,108 +260,54 @@ class Gravity(VltiInstrument):
             ## api.saveSiderealTimeConstraints(obId,[ {'from': lstStartSex, 'to': '00:00'},{'from': '00:00','to': lstEndSex}], stcVersion)
             ## else:
             api.saveSiderealTimeConstraints(obId, [{'from': lstStartSex, 'to': lstEndSex}], stcVersion)
-
         ui.setProgress(0.2)
 
         # then, attach acquisition template(s)
-        tpl, tplVersion = api.createTemplate(obId, self.getAcqTemplateName(dualField=dualField))
-        
+        tpl, tplVersion = api.createTemplate(obId, self.getAcqTemplateName(dualField=dualField))        
         # and put values        
+        values = {  'SEQ.INS.SOBJ.NAME': acqTSF.SEQ_INS_SOBJ_NAME,
+                    'SEQ.INS.SOBJ.MAG': acqTSF.SEQ_INS_SOBJ_MAG,
+                    'SEQ.INS.SOBJ.DIAMETER':   DIAMETER,
+                    'SEQ.INS.SOBJ.VIS':   VISIBILITY,                                                    
+                    'COU.AG.GSSOURCE':   COU_AG_GSSOURCE,
+                    'COU.AG.ALPHA':   GSRA,
+                    'COU.AG.DELTA':   GSDEC,
+                    'COU.GS.MAG':  round(COU_GS_MAG, 3),
+                    'COU.AG.PMA':  acqTSF.COU_AG_PMA,
+                    'COU.AG.PMD':  acqTSF.COU_AG_PMD,
+                    'SEQ.FI.HMAG':   acqTSF.SEQ_FI_HMAG,
+                    'TEL.TARG.PARALLAX':   0.0,
+                    'INS.SPEC.RES': acqTSF.INS_SPEC_RES,
+                    'INS.FT.POL': acqTSF.INS_FT_POL,
+                    'INS.SPEC.POL':  acqTSF.INS_SPEC_POL
+                }
         if dualField:                
-            tpl, tplVersion = api.setTemplateParams(obId, tpl, {
-                                                    'SEQ.FT.ROBJ.NAME': SEQ_FT_ROBJ_NAME,
-                                                    'SEQ.FT.ROBJ.MAG': round(SEQ_FT_ROBJ_MAG, 3),
-                                                    'SEQ.FT.ROBJ.DIAMETER': SEQ_FT_ROBJ_DIAMETER,
-                                                    'SEQ.FT.ROBJ.VIS':  SEQ_FT_ROBJ_VIS,
-                                                    'SEQ.FT.MODE':      "AUTO",
-                                                    'SEQ.INS.SOBJ.NAME': acqTSF.SEQ_INS_SOBJ_NAME,
-                                                    'SEQ.INS.SOBJ.MAG': acqTSF.SEQ_INS_SOBJ_MAG,
-                                                    'SEQ.INS.SOBJ.DIAMETER':   DIAMETER,
-                                                    'SEQ.INS.SOBJ.VIS':   VISIBILITY,
-                                                    'SEQ.INS.SOBJ.X': diff[0],
-                                                    'SEQ.INS.SOBJ.Y': diff[1],
-                                                    'SEQ.FI.HMAG':   acqTSF.SEQ_FI_HMAG,
-                                                    'TEL.TARG.PARALLAX':   0.0,
-                                                    'INS.SPEC.RES': acqTSF.INS_SPEC_RES,
-                                                    'INS.FT.POL': acqTSF.INS_FT_POL,
-                                                    'INS.SPEC.POL':  acqTSF.INS_SPEC_POL,
-                                                    'COU.AG.GSSOURCE':   COU_AG_GSSOURCE,
-                                                    'COU.AG.ALPHA':   GSRA,
-                                                    'COU.AG.DELTA':   GSDEC,
-                                                    'COU.GS.MAG':  round(COU_GS_MAG, 3),
-                                                    'COU.AG.PMA':  acqTSF.COU_AG_PMA,
-                                                    'COU.AG.PMD':  acqTSF.COU_AG_PMD
-                                                    }, tplVersion)
-        else:
-            tpl, tplVersion = api.setTemplateParams(obId, tpl, {
-                                                    'SEQ.INS.SOBJ.NAME':   acqTSF.SEQ_INS_SOBJ_NAME,
-                                                    'SEQ.INS.SOBJ.MAG':   acqTSF.SEQ_INS_SOBJ_MAG,
-                                                    'SEQ.INS.SOBJ.DIAMETER':   DIAMETER,
-                                                    'SEQ.INS.SOBJ.VIS':   VISIBILITY,
-                                                    'COU.AG.GSSOURCE':   COU_AG_GSSOURCE,
-                                                    'COU.AG.ALPHA':   GSRA,
-                                                    'COU.AG.DELTA':   GSDEC,
-                                                    'COU.GS.MAG':  round(COU_GS_MAG, 3),
-                                                    'COU.AG.PMA':  acqTSF.COU_AG_PMA,
-                                                    'COU.AG.PMD':  acqTSF.COU_AG_PMD,
-                                                    'SEQ.FI.HMAG':   acqTSF.SEQ_FI_HMAG,
-                                                    'TEL.TARG.PARALLAX':   0.0,
-                                                    'INS.SPEC.RES': acqTSF.INS_SPEC_RES,
-                                                    'INS.FT.POL': acqTSF.INS_FT_POL,
-                                                    'INS.SPEC.POL':  acqTSF.INS_SPEC_POL
-                                                    }, tplVersion)
-        
-        
-
-        templateId = tpl['templateId']
-
+            values.update({ 'SEQ.INS.SOBJ.X': diff[0],
+                            'SEQ.INS.SOBJ.Y': diff[1],                                                    
+                            'SEQ.FT.ROBJ.NAME': SEQ_FT_ROBJ_NAME,
+                            'SEQ.FT.ROBJ.MAG': round(SEQ_FT_ROBJ_MAG, 3),
+                            'SEQ.FT.ROBJ.DIAMETER': SEQ_FT_ROBJ_DIAMETER,
+                            'SEQ.FT.ROBJ.VIS':  SEQ_FT_ROBJ_VIS,
+                            'SEQ.FT.MODE':      "AUTO"})
+        tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)        
         ui.setProgress(0.3)
 
-        tpl, tplVersion = api.createTemplate(obId, self.getObsTemplateName(OBJTYPE, dualField))
-        templateId = tpl['templateId']
-
+        tpl, tplVersion = api.createTemplate(obId, self.getObsTemplateName(OBJTYPE, dualField))        
         ui.setProgress(0.4)
-
+        
         # put values. they are the same except for dual obs science (?)
+        values = obsTSF.getDict()
         if dualField and OBJTYPE == 'SCIENCE':
-            tpl, tplVersion = api.setTemplateParams(obId, tpl, {
-                                                    'DET2.DIT':  str(dit),
-                                                    'DET2.NDIT.OBJECT':  ndit,
-                                                    'DET2.NDIT.SKY':  ndit,
-                                                    'SEQ.OBSSEQ':  my_sequence,
-                                                    'SEQ.SKY.X':  2000,
-                                                    'SEQ.SKY.Y':  2000
-                                                    }, tplVersion)
-        else:
-            tpl, tplVersion = api.setTemplateParams(obId, tpl, {
-                                                    'DET2.DIT':  str(dit),
-                                                    'DET2.NDIT.OBJECT':  ndit,
-                                                    'DET2.NDIT.SKY':  ndit,
-                                                    'SEQ.OBSSEQ':  my_sequence,
-                                                    'SEQ.RELOFF.X':  "0.0",
-                                                    'SEQ.RELOFF.Y':  "0.0",
-                                                    'SEQ.SKY.X':  2000,
-                                                    'SEQ.SKY.Y':  2000
-                                                    }, tplVersion)
-
+            # not included in our general TSF
+            values.update({'SEQ.RELOFF.X' : "0.0", 'SEQ.RELOFF.Y' : "0.0"})     
+        tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)    
         ui.setProgress(0.5)
 
         #verify OB online
         response, _ = api.verifyOB(obId, True)
-
         ui.setProgress(1.0)
-
-        if response['observable']:
-            ui.ShowInfoMessage('OB ' + str(obId) + ' ' + ob['name'] + ' is OK.')
-            ui.addToLog('OB: ' + str(obId) + ' is ok')
-        else:
-            s = ""
-            for ss in response['messages']:
-                s += cgi.escape(ss) + '\n'
-            ui.ShowWarningMessage('OB ' + str(obId) + ' <b>HAS Warnings</b>. ESO says:\n\n' + s)
-            ui.addToLog('OB: ' + str(obId) + ' created with warnings')
-            # (NOTE: we need to escape things like <= in returned text)
-
-            #   # fetch OB again to confirm its status change
-            #   ob, obVersion = api.getOB(obId)
-            #   python3: print('Status of verified OB', obId, 'is now', ob['obStatus'])
+        self.showP2Response(response)
+        
+        #   # fetch OB again to confirm its status change
+        #   ob, obVersion = api.getOB(obId)
+        #   python3: print('Status of verified OB', obId, 'is now', ob['obStatus'])
