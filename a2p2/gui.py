@@ -106,7 +106,7 @@ class MainWindow():
              
     def update_status_bar(self):
         self.status_bar.set_label("SAMP","SAMP: %s" % self.a2p2client.a2p2SampClient.get_status())
-        self.status_bar.set_label("API","%s" % self.a2p2client.apiManager.get_status())
+        self.status_bar.set_label("API","%s" % self.a2p2client.facilityManager.get_status())
 
     def get_api(self):
         return self.api

@@ -2,11 +2,10 @@
 
 __all__ = []
 
-# Constants
-_HR="\n---------------------------------------------------------------------------\n"
+from a2p2.instrument import Instrument
 
-# TODO rename FacilitiesManager
-class APIManager():
+
+class FacilityManager():
     """
     Manage real and fake apis.
     """
@@ -91,17 +90,3 @@ class Facility():
     def getStatus(self):
         """ Please override this method in your facility class to include status in the API entry of the main status bar. """
         return None
-
-# TODO move to a dedicated source file
-class Instrument():
-    def __init__(self, facility, insname, help="Help TBD"):
-        self.facility=facility
-        self.insname=insname
-        self.help=help
-        facility.registerInstrument(self)
-
-    def getName(self):
-        return self.insname
-
-    def getHelp(self):
-        return self.help

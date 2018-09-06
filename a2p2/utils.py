@@ -12,7 +12,7 @@ import xml.etree.ElementTree
 
 def parseXmlMessage(client, url, p2container):
     ui = client.ui
-    api = client.apiManager.getAPI()
+    api = client.facilityManager.getAPI()
 
     ui.setProgress(0)
 
@@ -37,7 +37,7 @@ def parseXmlMessage(client, url, p2container):
             ui.ShowErrorMessage("ASPRO not set for currently selected instrument: %s , expected %s" % (currentInstrument, instrument))
             return
         # FIXME: TBD CHANGE TO HAVE OTHER INSTRUMENTS THAN GRAVITY!
-        supportedInstruments = client.apiManager.getSupportedInstruments()
+        supportedInstruments = client.facilityManager.getSupportedInstruments()
         if not instrument in supportedInstruments:
             ui.ShowErrorMessage("ASPRO not set for supported instruments [%s], no action taken." % (', '.join(supportedInstruments)))
             return

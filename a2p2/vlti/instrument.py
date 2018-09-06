@@ -5,7 +5,7 @@ __all__ = []
 import os
 import json
 import collections
-from a2p2.apis import Instrument
+from a2p2.instrument import Instrument
 from a2p2.vlti.gui import VltiUI
 
 

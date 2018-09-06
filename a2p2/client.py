@@ -2,7 +2,7 @@
 
 __all__ = ['A2p2Client']
 
-from a2p2.apis import APIManager
+from a2p2.facility import FacilityManager
 from a2p2.gui import MainWindow
 from a2p2.samp import A2p2SampClient
 from a2p2.ob import OB
@@ -42,7 +42,7 @@ class A2p2Client():
         self.ui = MainWindow(self)
         # Instantiate the samp client and connect to the hub later
         self.a2p2SampClient = A2p2SampClient()       
-        self.apiManager = APIManager(self)        
+        self.facilityManager = FacilityManager(self)        
             
 
         pass
@@ -121,7 +121,7 @@ class A2p2Client():
                 if self.a2p2SampClient.has_message():                    
                     try:                        
                         ob = OB(self.a2p2SampClient.get_ob_url())
-                        self.apiManager.processOB(ob)
+                        self.facilityManager.processOB(ob)
                     except:
                         self.ui.addToLog("Exception during ob creation: "+traceback.format_exc(), False)
                         self.ui.addToLog("Can't process last OB")

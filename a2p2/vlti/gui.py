@@ -16,9 +16,6 @@ else:
    from tkinter.messagebox import *
    import tkinter.ttk as ttk
 
-# Constants
-_HR="\n----------------------------------------------\n"
-
 class VltiUI(FacilityUI):
 
     def __init__(self, a2p2client):

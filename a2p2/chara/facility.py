@@ -2,7 +2,7 @@
 
 __all__ = []
 
-from a2p2.apis import Facility
+from a2p2.facility import Facility
 from a2p2.chara.gui import CharaUI
 
 HELPTEXT="TODO update this HELP message in a2p2/chara/facility.py"

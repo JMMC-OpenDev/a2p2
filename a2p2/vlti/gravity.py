@@ -2,7 +2,7 @@
 
 __all__ = []
 
-from a2p2.apis import Instrument
+from a2p2.instrument import Instrument
 from a2p2.vlti.gui import VltiUI
 from a2p2.vlti.instrument import VltiInstrument
 from a2p2.vlti.instrument import TSF
