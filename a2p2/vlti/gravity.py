@@ -74,8 +74,8 @@ class Gravity(VltiInstrument):
             scienceTarget = observationConfiguration.SCTarget
 
             # define target
-            obTarget.name = scienceTarget.name.strip()
-            acqTSF.SEQ_INS_SOBJ_NAME = obTarget.name
+            acqTSF.SEQ_INS_SOBJ_NAME = scienceTarget.name.strip()
+            obTarget.name = acqTSF.SEQ_INS_SOBJ_NAME.replace(' ', '_') # allowed characters: letters, digits, + - _ . and no spaces
             obTarget.ra, obTarget.dec = self.getCoords(scienceTarget)
             obTarget.properMotionRa , obTarget.properMotionDec = self.getPMCoords(scienceTarget)
 
@@ -186,10 +186,10 @@ class Gravity(VltiInstrument):
                 ndit = int(ndit)
                 if ndit < 10:
                     ndit = 10
-                    ui.addToLog("**Warning**, OB NDIT has been set to min value=10, but OB will take longer than 1800 s")
+                    ui.addToLog("**Warning**, OB NDIT has been set to min value=%d, but OB will take longer than 1800 s" % ( ndit ) )
             nexp %= 40
             sequence = 'O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O'
-            my_sequence = sequence[0:2 * nexp]
+            my_sequence = sequence[0:1 + 2 * nexp]
             # and store computed values in obsTSF
             obsTSF.DET2_DIT = dit
             obsTSF.DET2_NDIT_OBJECT = ndit
@@ -223,7 +223,7 @@ class Gravity(VltiInstrument):
 
         #everything seems OK
         #create new OB in container:
-        goodName = re.sub('[^A-Za-z0-9]+', '_', obTarget.name)
+        goodName = re.sub('[^A-Za-z0-9]+', '_', acqTSF.SEQ_INS_SOBJ_NAME)
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_GRAVITY_' + obConstraints.baseline.replace('-', '') + '_' + instrumentMode
 
         ob, obVersion = api.createOB(containerId, OBS_DESCR)
