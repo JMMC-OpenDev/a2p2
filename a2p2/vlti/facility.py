@@ -74,7 +74,7 @@ class VltiFacility(Facility):
         # show ob dict for debug
         self.ui.addToLog(str(ob), False)
         
-        # OB is checked and submitted by instrument (TODO delegate submission to facility)            
+        # OB is checked and submitted by instrument             
         instrument = self.getInstrument(ob.instrumentConfiguration.name)
         try:            
             # run checkOB which may raise some error before connection request
