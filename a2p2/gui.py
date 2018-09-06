@@ -24,10 +24,11 @@ class MainWindow():
     def __init__(self, a2p2client):
                 
         self.a2p2client = a2p2client
-
+        
         self.requestAbort = False
         
-        self.window=Tk()        
+        self.window=Tk()
+        self.window.protocol("WM_DELETE_WINDOW", self._requestAbort)
         self.window.title("A2P2 v"+ __version__)
 
         self.notebook = ttk.Notebook(self.window)
@@ -65,8 +66,11 @@ class MainWindow():
         self.status_bar.pack(side=BOTTOM,  fill=X)
         self.progress_value=self.status_bar.progress_value
     
-    def __del__(self):
-      self.window.destroy()
+    def __del__(self):        
+        self.window.destroy()
+        
+    def _requestAbort(self):
+        self.requestAbort=True
     
     def addHelp(self, tabname, txt):
         frame = Frame(self.helptabs)
@@ -89,7 +93,7 @@ class MainWindow():
         self.notebook.select(self.tabIdx[facilityUI.facility.facilityName])
 
     def quitAfterRunOnce(self):
-      self.window.quit()
+        self.window.quit()
 
     def loop(self):
         self.window.after(50, self.quitAfterRunOnce)
@@ -128,9 +132,6 @@ class MainWindow():
         showinfo("Info",text)
         self.addToLog("Info message")
         self.addToLog(text,False)
-
-    def on_buttonhelp_clicked(self):
-         self.ShowInfoMessage(self.helptext.get("1.0",END))
 
     def setProgress(self,perc):
         if perc > 1:
