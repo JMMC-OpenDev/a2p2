@@ -58,9 +58,10 @@ class Gravity(VltiInstrument):
             # create keywords storage objects
             acqTSF = TSF(self,"GRAVITY_gen_acq.tsf" )
             obsTSF = TSF(self,"GRAVITY_single_obs_exp.tsf") # alias for ,GRAVITY_single_obs_calibrator.tsf,GRAVITY_dual_obs_exp.tsf,GRAVITY_dual_obs_calibrator.tsf")                            
-            target = OBTarget()
-            constraints = OBConstraints()
-
+            obTarget = OBTarget()
+            obconstraints = OBConstraints()
+            
+            # set common properties
             acqTSF.INS_SPEC_RES = ins_spec_res                   
             acqTSF.INS_FT_POL = ins_pol
             acqTSF.INS_SPEC_POL = ins_pol
@@ -72,10 +73,11 @@ class Gravity(VltiInstrument):
 
             scienceTarget = observationConfiguration.SCTarget
 
-            target.name = scienceTarget.name.strip()
-            acqTSF.SEQ_INS_SOBJ_NAME = target.name
-            target.ra, target.dec = self.getCoords(scienceTarget)
-            target.properMotionRa , target.properMotionDec = self.getPMCoords(scienceTarget)
+            # define target
+            obTarget.name = scienceTarget.name.strip()
+            acqTSF.SEQ_INS_SOBJ_NAME = obTarget.name
+            obTarget.ra, obTarget.dec = self.getCoords(scienceTarget)
+            obTarget.properMotionRa , obTarget.properMotionDec = self.getPMCoords(scienceTarget)
 
             # define some default values                 
             DIAMETER = float(self.get(scienceTarget, "DIAMETER", 0.0))
@@ -93,8 +95,7 @@ class Gravity(VltiInstrument):
             dualField = False
 
             # initialize FT variables (must exist)
-            FTRA = ""
-            FTDEC = ""
+            # TODO remove next lines using a dual_acq TSF that would handle them
             SEQ_FT_ROBJ_NAME = ""
             SEQ_FT_ROBJ_MAG = -99.99
             SEQ_FT_ROBJ_DIAMETER = -1.0
@@ -120,7 +121,7 @@ class Gravity(VltiInstrument):
                     SCtoREFminDist = 1500
                     SCtoREFmaxDist = 4000
                 #compute x,y between science and ref beams:
-                diff = getSkyDiff(target.ra, target.dec, FTRA, FTDEC)
+                diff = getSkyDiff(obTarget.ra, obTarget.dec, FTRA, FTDEC)
                 if np.abs(diff[0]) < SCtoREFminDist:
                     raise ValueError ("Dual-Field distance of two stars is  < " + str(SCtoREFminDist) + " mas, Please Correct.")
                 elif  np.abs(diff[0]) > SCtoREFmaxDist:
@@ -151,16 +152,16 @@ class Gravity(VltiInstrument):
                 LSTINTERVAL = None
 
             #Constraints                
-            constraints.name = 'Aspro-created constraints'
+            obconstraints.name = 'Aspro-created constraints'
             skyTransparencyMagLimits = {"AT":3, "UT":5}                
             if acqTSF.SEQ_INS_SOBJ_MAG  < skyTransparencyMagLimits[tel]:
-                constraints.skyTransparency = 'Variable, thin cirrus'
+                obconstraints.skyTransparency = 'Variable, thin cirrus'
             else:
-                constraints.skyTransparency = 'Clear'
+                obconstraints.skyTransparency = 'Clear'
             #FIXME: error (OB): "Phase 2 constraints must closely follow what was requested in the Phase 1 proposal.
             #                    The seeing value allowed for this OB is >= java0x0 arcsec."
-            constraints.seeing = 1.0
-            constraints.baseline =  BASELINE.replace(' ', '-')
+            obconstraints.seeing = 1.0
+            obconstraints.baseline =  BASELINE.replace(' ', '-')
             # FIXME: default values NOT IN ASPRO!
             #constaints.airmass = 5.0 
             #constaints.fli = 1           
@@ -189,7 +190,7 @@ class Gravity(VltiInstrument):
             nexp %= 40
             sequence = 'O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O'
             my_sequence = sequence[0:2 * nexp]
-            
+            # and store computed values in obsTSF
             obsTSF.DET2_DIT = dit
             obsTSF.DET2_NDIT_OBJECT = ndit
             obsTSF.DET2_NDIT_SKY =  ndit
@@ -197,13 +198,12 @@ class Gravity(VltiInstrument):
             obsTSF.SEQ_SKY_X =   2000
             obsTSF.SEQ_SKY_Y =   2000            
 
-            #then call the ob-creation using the API. 
-            # TODO run this code in a second loop after global check ?
+            #then call the ob-creation using the API.
             if dryMode:
-                ui.addToLog(target.name + " ready for p2 upload")                                  
+                ui.addToLog(obTarget.name + " ready for p2 upload")                                  
             else:
-                self.createGravityOB(ui, self.facility.a2p2client.getUsername(), api, containerId, target, constraints, acqTSF, obsTSF, OBJTYPE, BASELINE, instrumentMode, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
-                ui.addToLog(target.name + " submitted on p2")
+                self.createGravityOB(ui, self.facility.a2p2client.getUsername(), api, containerId, obTarget, obconstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
+                ui.addToLog(obTarget.name + " submitted on p2")
         #endfor
         if doFolder:
             containerId = parentContainerId
@@ -213,7 +213,7 @@ class Gravity(VltiInstrument):
         self.checkOB(ob, p2container, False)
 
 
-    def createGravityOB(self,ui, username, api, containerId, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, BASELINE, instrumentMode, 
+    def createGravityOB(self,ui, username, api, containerId, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode, 
                         DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG,
                         SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
         ui.setProgress(0.1)
@@ -224,7 +224,7 @@ class Gravity(VltiInstrument):
         #everything seems OK
         #create new OB in container:
         goodName = re.sub('[^A-Za-z0-9]+', '_', obTarget.name)
-        OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_GRAVITY_' + BASELINE.replace(' ', '') + '_' + instrumentMode
+        OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_GRAVITY_' + obConstraints.baseline.replace('-', '') + '_' + instrumentMode
 
         ob, obVersion = api.createOB(containerId, OBS_DESCR)
         obId = ob['obId']
@@ -264,23 +264,18 @@ class Gravity(VltiInstrument):
 
         # then, attach acquisition template(s)
         tpl, tplVersion = api.createTemplate(obId, self.getAcqTemplateName(dualField=dualField))        
-        # and put values        
-        values = {  'SEQ.INS.SOBJ.NAME': acqTSF.SEQ_INS_SOBJ_NAME,
-                    'SEQ.INS.SOBJ.MAG': acqTSF.SEQ_INS_SOBJ_MAG,
+        # and put values 
+        # start with acqTSF ones and complete manually missing ones
+        values = acqTSF.getDict()
+        values.update({  
                     'SEQ.INS.SOBJ.DIAMETER':   DIAMETER,
                     'SEQ.INS.SOBJ.VIS':   VISIBILITY,                                                    
                     'COU.AG.GSSOURCE':   COU_AG_GSSOURCE,
                     'COU.AG.ALPHA':   GSRA,
                     'COU.AG.DELTA':   GSDEC,
                     'COU.GS.MAG':  round(COU_GS_MAG, 3),
-                    'COU.AG.PMA':  acqTSF.COU_AG_PMA,
-                    'COU.AG.PMD':  acqTSF.COU_AG_PMD,
-                    'SEQ.FI.HMAG':   acqTSF.SEQ_FI_HMAG,
-                    'TEL.TARG.PARALLAX':   0.0,
-                    'INS.SPEC.RES': acqTSF.INS_SPEC_RES,
-                    'INS.FT.POL': acqTSF.INS_FT_POL,
-                    'INS.SPEC.POL':  acqTSF.INS_SPEC_POL
-                }
+                    'TEL.TARG.PARALLAX':   0.0
+                })
         if dualField:                
             values.update({ 'SEQ.INS.SOBJ.X': diff[0],
                             'SEQ.INS.SOBJ.Y': diff[1],                                                    
