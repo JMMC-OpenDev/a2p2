@@ -194,7 +194,7 @@ class Gravity(VltiInstrument):
             obsTSF.DET2_DIT = dit
             obsTSF.DET2_NDIT_OBJECT = ndit
             obsTSF.DET2_NDIT_SKY =  ndit
-            obsTSF.SEQ_OBS_SEQ =  my_sequence
+            obsTSF.SEQ_OBSSEQ =  my_sequence
             obsTSF.SEQ_SKY_X =   2000
             obsTSF.SEQ_SKY_Y =   2000            
 

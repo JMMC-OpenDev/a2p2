@@ -29,6 +29,6 @@
 	"DET2.NDIT.SKY":        {   "min": 10.0,   "max": 300.0,                                                                    "default":   25.0  },
 	"SEQ.SKY.X":            {   "min":100.0,   "max":2000.0,                                                                    "default": 1000.0  },
 	"SEQ.SKY.Y":            {   "min":100.0,   "max":2000.0,                                                                    "default": 1000.0  },
-	"SEQ.OBS.SEQ":          {   "spaceseparatedlist": [    "O",    "S" ],                                                       "default": "O S"  }
+	"SEQ.OBSSEQ":          {   "spaceseparatedlist": [    "O",    "S" ],                                                       "default": "O S"  }
     }
 }
