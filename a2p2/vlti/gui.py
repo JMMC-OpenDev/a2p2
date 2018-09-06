@@ -49,7 +49,6 @@ class VltiUI(FacilityUI):
     def fillTree(self, runs):        
         if len(runs) == 0:
             self.ShowErrorMessage("No Runs defined, impossible to program ESO's P2 interface.")
-            self.requestAbort = True
             return
 
         for i in range(len(runs)):
