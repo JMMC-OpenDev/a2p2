@@ -334,8 +334,9 @@ class TSF(object):
         self.set(rname,value)
         
     def __str__(self):
-        buffer = "TemplateSignatureFile: "
-        buffer += str(self.tsfParams)
+        buffer = "TSF values (%s) : \n"
+        for e in self.tsfParams:
+            buffer += "    %30s : %s\n"%(e, str(self.tsfParams[e]))
         return buffer
         
     
@@ -379,7 +380,10 @@ class FixedDict(object):
             raise ValueError("keyword %s is not part of supported ones %s "%(name, self.myKeys))   
         
     def __str__(self):
-        return "%s OB dict: %s" % ( type(self).__name__, str(self.myValues))
+        buffer = "%s values:\n" % ( type(self).__name__ )
+        for e in self.myValues:
+            buffer += "    %30s : %s\n"%(e, str(self.myValues[e]))
+        return buffer
         
 
 class OBTarget(FixedDict):   
