@@ -275,7 +275,7 @@ class VltiInstrument(Instrument):
     def getAcqTemplateName(self, dualField=False, OBJTYPE=None):
         return self.getTemplateName("acq", dualField, OBJTYPE)
     
-    def showP2Response(self, response):
+    def showP2Response(self, response, obId):
         if response['observable']:
             self.ui.ShowInfoMessage('OB ' + str(obId) + ' ' + ob['name'] + ' is OK.')
             self.ui.addToLog('OB: ' + str(obId) + ' is ok')
