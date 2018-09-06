@@ -113,8 +113,8 @@ class MainWindow():
 
     def addToLog(self,text, displayString=True):
         if displayString:
-            self.log_string.set(text)
-        self.logtext.insert(END, "\n"+text)
+            self.log_string.set(str(text))
+        self.logtext.insert(END, "\n"+str(text))
         self.logtext.see(END)
         self.showFrameToFront()
   
