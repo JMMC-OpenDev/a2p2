@@ -59,7 +59,7 @@ class Gravity(VltiInstrument):
             acqTSF = TSF(self,"GRAVITY_gen_acq.tsf" )
             obsTSF = TSF(self,"GRAVITY_single_obs_exp.tsf") # alias for ,GRAVITY_single_obs_calibrator.tsf,GRAVITY_dual_obs_exp.tsf,GRAVITY_dual_obs_calibrator.tsf")                            
             obTarget = OBTarget()
-            obconstraints = OBConstraints()
+            obConstraints = OBConstraints()
             
             # set common properties
             acqTSF.INS_SPEC_RES = ins_spec_res                   
@@ -152,16 +152,16 @@ class Gravity(VltiInstrument):
                 LSTINTERVAL = None
 
             #Constraints                
-            obconstraints.name = 'Aspro-created constraints'
+            obConstraints.name = 'Aspro-created constraints'
             skyTransparencyMagLimits = {"AT":3, "UT":5}                
             if acqTSF.SEQ_INS_SOBJ_MAG  < skyTransparencyMagLimits[tel]:
-                obconstraints.skyTransparency = 'Variable, thin cirrus'
+                obConstraints.skyTransparency = 'Variable, thin cirrus'
             else:
-                obconstraints.skyTransparency = 'Clear'
+                obConstraints.skyTransparency = 'Clear'
             #FIXME: error (OB): "Phase 2 constraints must closely follow what was requested in the Phase 1 proposal.
             #                    The seeing value allowed for this OB is >= java0x0 arcsec."
-            obconstraints.seeing = 1.0
-            obconstraints.baseline =  BASELINE.replace(' ', '-')
+            obConstraints.seeing = 1.0
+            obConstraints.baseline =  BASELINE.replace(' ', '-')
             # FIXME: default values NOT IN ASPRO!
             #constaints.airmass = 5.0 
             #constaints.fli = 1           
@@ -189,7 +189,7 @@ class Gravity(VltiInstrument):
                     ui.addToLog("**Warning**, OB NDIT has been set to min value=%d, but OB will take longer than 1800 s" % ( ndit ) )
             nexp %= 40
             sequence = 'O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O'
-            my_sequence = sequence[0:1 + 2 * nexp]
+            my_sequence = sequence[0:2 * nexp]
             # and store computed values in obsTSF
             obsTSF.DET2_DIT = dit
             obsTSF.DET2_NDIT_OBJECT = ndit
@@ -200,9 +200,14 @@ class Gravity(VltiInstrument):
 
             #then call the ob-creation using the API.
             if dryMode:
-                ui.addToLog(obTarget.name + " ready for p2 upload")                                  
+                ui.addToLog(obTarget.name + " ready for p2 upload (details logged)")  
+                ui.addToLog(obTarget, False)
+                ui.addToLog(obConstraints, False)
+                ui.addToLog(acqTSF, False)
+                ui.addToLog(obsTSF, False)
+                
             else:
-                self.createGravityOB(ui, self.facility.a2p2client.getUsername(), api, containerId, obTarget, obconstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
+                self.createGravityOB(ui, self.facility.a2p2client.getUsername(), api, containerId, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode, DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
         #endfor
         if doFolder:
