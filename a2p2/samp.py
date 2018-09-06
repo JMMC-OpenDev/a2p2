@@ -43,10 +43,6 @@ class A2p2SampClient():
         # Listen for any instructions to load a table
         self.sampClient.bind_receive_call("ob.load.data", self.r.receive_call)
         self.sampClient.bind_receive_notification("ob.load.data", self.r.receive_notification)
-        # TODO fix next call which thwrows an execption
-        # <class 'astropy.samp.errors.SAMPProxyError'>,
-        # <Fault 1: 'java.lang.IllegalArgumentException: Bad arguments: samp.hub.notifyAll[string, map] got [string, string]'>
-        self.sampClient.notify_all("hello")
 
     def disconnect(self):
         self.sampClient.disconnect()

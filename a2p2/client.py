@@ -7,12 +7,9 @@ from a2p2.gui import MainWindow
 from a2p2.samp import A2p2SampClient
 from a2p2.ob import OB
 from a2p2 import __version__
-import logging
 import sys
 import time
 import traceback
-
-logLevel = logging.ERROR
 
 class A2p2Client():
     """Transmit your Aspro2 observation to remote Observatory scheduling database.
@@ -22,18 +19,7 @@ class A2p2Client():
            ..."""
     def __init__(self, fakeAPI=False):
         """Create the A2p2 client."""
-        logger = logging.getLogger()
-        logger.setLevel(logLevel)
-    #        logging.basicConfig(level=logging.DEBUG,
-    #                            format=('%(filename)s: '
-    #                            '%(levelname)s: '
-    #                            '%(funcName)s(): '
-    #                            '%(lineno)d:\t'
-    #                            '%(message)s')
-    #                            )
-
-        # finish logging
-
+        
         self.username = None
         self.apiName = ""
         if fakeAPI:
@@ -102,6 +88,7 @@ class A2p2Client():
         delay = 0.1
         each = 10
         loop_cnt = 0
+        warnForAspro=True
 
         while loop_cnt >= 0:
             try:
@@ -110,19 +97,20 @@ class A2p2Client():
 
                 self.ui.loop()
 
-                if not self.a2p2SampClient.is_connected() and loop_cnt % each == 0:
-                    loop_cnt = 0
+                if not self.a2p2SampClient.is_connected() and loop_cnt % each == 0:                    
                     try:
                         self.a2p2SampClient.connect()
                     except:
-                        logging.debug("except %s", sys.exc_info())
-                        pass # TODO raise other exception excepted
+                        if warnForAspro:
+                            warnForAspro=False
+                            self.ui.addToLog("\nPlease launch Aspro2 to submit your OBs.")
+                        pass # TODO test for other exception than SAMPHubError(u'Unable to find a running SAMP Hub.',)
 
                 if self.a2p2SampClient.has_message():                    
                     try:                        
                         ob = OB(self.a2p2SampClient.get_ob_url())
                         self.facilityManager.processOB(ob)
-                    except:
+                    except:                        
                         self.ui.addToLog("Exception during ob creation: "+traceback.format_exc(), False)
                         self.ui.addToLog("Can't process last OB")
                     
