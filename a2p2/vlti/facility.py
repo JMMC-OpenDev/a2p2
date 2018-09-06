@@ -101,8 +101,11 @@ class VltiFacility(Facility):
             self.ui.setProgress(0)
         except Exception as e:
             traceback.print_exc()
-            trace = traceback.format_exc(limit=3) # limit = 2 should raise errors in our codes 
-            self.ui.ShowErrorMessage("General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check logs and fix before new submission." % (trace))            
+            trace = traceback.format_exc(limit=1) # limit = 2 should raise errors in our codes 
+            self.ui.ShowErrorMessage("General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check logs and fix before new submission." % (trace))
+            trace = traceback.format_exc()
+            self.ui.addToLog(trace, False)
+            self.ui.setProgress(0)
         
     def isReadyToSubmit(self):
         return self.api and self.containerInfo.isOk()
