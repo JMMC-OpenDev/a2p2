@@ -306,7 +306,7 @@ class Gravity(VltiInstrument):
         #verify OB online
         response, _ = api.verifyOB(obId, True)
         ui.setProgress(1.0)
-        self.showP2Response(response, obId)
+        self.showP2Response(response, ob, obId)
         
         #   # fetch OB again to confirm its status change
         #   ob, obVersion = api.getOB(obId)

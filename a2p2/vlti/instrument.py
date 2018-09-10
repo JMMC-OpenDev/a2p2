@@ -275,17 +275,14 @@ class VltiInstrument(Instrument):
     def getAcqTemplateName(self, dualField=False, OBJTYPE=None):
         return self.getTemplateName("acq", dualField, OBJTYPE)
     
-    def showP2Response(self, response, obId):
+    def showP2Response(self, response, ob, obId):
         if response['observable']:
-            self.ui.ShowInfoMessage('OB ' + str(obId) + ' ' + ob['name'] + ' is OK.')
-            self.ui.addToLog('OB: ' + str(obId) + ' is ok')
+            msg='OB ' + str(obId) + ' submitted successfully on P2\n' + ob['name'] + ' is OK.'
         else:
-            s = ""
-            for ss in response['messages']:
-                s += ss + '\n'
-            self.ui.ShowWarningMessage('OB ' + str(obId) + ' HAS Warnings. ESO says:\n\n' + s)
-            self.ui.addToLog('OB: ' + str(obId) + ' created with warnings')
-            # (NOTE: we need to escape things like <= in returned text)    
+            msg='OB ' + str(obId) + ' submitted successfully on P2\n' + ob['name'] + ' has WARNING.\n see LOG for details.'        
+        self.ui.addToLog('\n')
+        self.ui.ShowInfoMessage(msg)    
+        self.ui.addToLog('\n'.join(response['messages']) +'\n\n')
 
 # TemplateSignatureFile
 # use new style class to get __getattr__ advantage
