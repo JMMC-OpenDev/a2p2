@@ -16,7 +16,7 @@ Installation
 
 The package is uploaded to `PyPI`_, so you can install the package using pip:
 
-    ``pip install a2p2``
+    ``pip install [--user] a2p2 ``
 
 You can also build and install from sources:
 
@@ -24,7 +24,7 @@ You can also build and install from sources:
 
     ``cd a2p2``
 
-    ``pip install .``
+    ``pip install [--user] .``
 
 Usage
 -----
