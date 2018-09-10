@@ -95,14 +95,14 @@ class VltiFacility(Facility):
             traceback.print_exc()
             trace = traceback.format_exc(limit=1)
 #            ui.ShowErrorMessage("Value error :\n %s \n%s\n\n%s" % (e, trace, "Aborting submission to P2. Look at the whole traceback in the log."))
-            self.ui.ShowErrorMessage("Value error :\n %s \n\n%s" % (e, "Aborting submission to P2. Please check logs and fix before new submission."))
+            self.ui.ShowErrorMessage("Value error :\n %s \n\n%s" % (e, "Aborting submission to P2. Please check LOG and fix before new submission."))
             trace = traceback.format_exc()
             self.ui.addToLog(trace, False)
             self.ui.setProgress(0)
         except Exception as e:
             traceback.print_exc()
             trace = traceback.format_exc(limit=1) # limit = 2 should raise errors in our codes 
-            self.ui.ShowErrorMessage("General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check logs and fix before new submission." % (trace))
+            self.ui.ShowErrorMessage("General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check LOG and fix before new submission." % (trace))
             trace = traceback.format_exc()
             self.ui.addToLog(trace, False)
             self.ui.setProgress(0)
@@ -137,7 +137,7 @@ class VltiFacility(Facility):
             self.username=username
             self.ui.showTreeFrame(ob)
         except:
-            self.ui.addToLog("Can't connect to P2 (see Logs).")
+            self.ui.addToLog("Can't connect to P2 (see LOG).")
             trace = traceback.format_exc()
             self.ui.addToLog(trace, False)
             
