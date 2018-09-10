@@ -9,6 +9,9 @@ import re
 import traceback
 import xml.etree.ElementTree
 
+#
+# This code is dead code but still leave the time we validate the new vlti directory code.
+# 
 
 def parseXmlMessage(client, url, p2container):
     ui = client.ui
