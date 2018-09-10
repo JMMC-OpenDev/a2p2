@@ -36,7 +36,7 @@ class VltiUI(FacilityUI):
                  
     def showLoginFrame(self, ob):
         self.ob=ob
-        self.addToLog("Please Log In ESO USER PORTAL to process %s OB"%(ob.instrumentConfiguration.name))
+        self.addToLog("Sorry, your %s OB can't be submitted, please log in first, select container and send OB again from Aspro2."%(ob.instrumentConfiguration.name))
         self.loginFrame.tkraise()
     
     def showTreeFrame(self, ob):
@@ -148,7 +148,7 @@ class LoginFrame(Frame):
         password = 'tutorial'
         self.login = [username, password]        
         
-        self.loginframe  = LabelFrame(self, text="login")
+        self.loginframe  = LabelFrame(self, text="login (ESO USER PORTAL or demo account)")
 
         self.username_label = Label(self.loginframe, text="USERNAME")
         self.username_label.pack()
