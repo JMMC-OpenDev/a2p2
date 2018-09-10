@@ -137,8 +137,9 @@ class VltiFacility(Facility):
             self.username=username
             self.ui.showTreeFrame(ob)
         except:
-            self.ui.addToLog("Can't connect to P2")
-            # TODO show an error frame
+            self.ui.addToLog("Can't connect to P2 (see Logs).")
+            trace = traceback.format_exc()
+            self.ui.addToLog(trace, False)
             
     def getAPI(self):
         return self.api
