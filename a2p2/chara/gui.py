@@ -28,7 +28,7 @@ class CharaUI(FacilityUI):
         scroll = Scrollbar(self, command=self.text.yview)
         self.text.configure(yscrollcommand=scroll.set)
         scroll.pack(side=RIGHT, fill=Y)
-        self.text.pack(side=LEFT, fill=BOTH)
+        self.text.pack(side=LEFT, fill=BOTH, expand=True)
         # more control could be added in the futur in this area for CHARA specific
         
         # avoid repeat of baseline on successive schedules

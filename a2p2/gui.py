@@ -35,12 +35,13 @@ class MainWindow():
 
         self.logFrame = Frame(self.notebook)
         
-        self.logtext = Text(self.logFrame, width=120)
+        self.logtext = Text(self.logFrame)
         scroll = Scrollbar(self.logFrame, command=self.logtext.yview)
         self.logtext.configure(yscrollcommand=scroll.set)
         scroll.pack(side=RIGHT, fill=Y)
-        self.logtext.pack(side=LEFT, fill=BOTH)
-        self.logFrame.pack(fill=BOTH)
+        self.logtext.pack(side=LEFT, fill=BOTH, expand=True)
+        self.logFrame.pack(side=TOP, fill=BOTH, expand=True)
+        
         
         self.helpFrame = Frame(self.notebook)        
         self.helptabs = ttk.Notebook(self.helpFrame)        
@@ -85,8 +86,8 @@ class MainWindow():
         helpscroll = Scrollbar(frame, command=widget.yview)
         widget.configure(yscrollcommand=helpscroll.set)
         helpscroll.pack(side=RIGHT, fill=Y)
-        widget.pack(side=LEFT, fill=BOTH)
-        frame.pack(fill=BOTH)
+        widget.pack(side=LEFT, fill=BOTH, expand=True)
+        frame.pack(side=TOP, fill=BOTH, expand=True)
         self.helptabs.add(frame,text=tabname)                
         widget.insert(END,txt)  
 
