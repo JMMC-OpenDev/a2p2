@@ -29,7 +29,7 @@ class MainWindow():
         
         self.window=Tk()
         self.window.protocol("WM_DELETE_WINDOW", self._requestAbort)
-        self.window.title("A2P2 v"+ __version__)
+        
 
         self.notebook = ttk.Notebook(self.window)
 
@@ -68,6 +68,13 @@ class MainWindow():
     
     def __del__(self):        
         self.window.destroy()
+        
+    def setSampId(self, id):
+        if id :
+            self.window.title("A2P2 v%s [%s]"% (__version__, id) )
+        else:
+            self.window.title("A2P2 v"+ __version__)
+        
         
     def _requestAbort(self):
         self.requestAbort=True

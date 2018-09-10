@@ -63,6 +63,9 @@ class A2p2SampClient():
         else:
             return "not connected"
 
+    def get_public_id(self):
+        return self.sampClient.get_public_id()
+
 
     def has_message(self):
         return self.is_connected() and self.r.received

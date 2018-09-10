@@ -100,7 +100,9 @@ class A2p2Client():
                 if not self.a2p2SampClient.is_connected() and loop_cnt % each == 0:                    
                     try:
                         self.a2p2SampClient.connect()
+                        self.ui.setSampId(self.a2p2SampClient.get_public_id())                        
                     except:
+                        self.ui.setSampId(None)
                         if warnForAspro:
                             warnForAspro=False
                             self.ui.addToLog("\nPlease launch Aspro2 to submit your OBs.")
