@@ -114,7 +114,7 @@ class VltiInstrument(Instrument):
         'spec' in ditTable[tel].keys()
         'pol' in ditTable[tel][spec].keys()
 
-        * does not manage out of range (returns None) *        
+        * a ValueError is thrown for out of range values *        
         """
         #TODO add LOW mode  as new 'spec' entry for Gravity   
         if spec == "LOW":
@@ -130,11 +130,13 @@ class VltiInstrument(Instrument):
             dK = 0.0
         if tel == "UT":
             dK += ditTable["AT"]['Kut']
-            
+#TODO
+#        min=1000
+#        max=-1000
         for i,d in enumerate(dits):
             if mags[i]<(K-dK) and (K-dK)<=mags[i+1]:
                 return d
-        return None
+        raise ValueError("K mag (%f) is out of ranges" % K)
     
     def getRangeTable(self):        
         if self.rangeTable:
