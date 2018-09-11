@@ -41,7 +41,7 @@ class Gravity(VltiInstrument):
         if "COMBINED" in instrumentMode:
             ins_pol="OUT"
         else:    
-            inspol = 'IN'
+            ins_pol = 'IN'
 
         #if we have more than 1 obs, then better put it in a subfolder waiting for the existence of a block sequence not yet implemented in P2
         obsconflist = ob.observationConfiguration
