@@ -1,12 +1,14 @@
 a2p2 |A2P2Badge| 
 ================
 
-**Move your Aspro2 observation details to an observatory proposal database**
+**Move your Aspro2 observation details to an observatory proposal database.**
 
 Description
 -----------
 
-Prepare your observations within Aspro2_ and run a2p2_ to submit your OB.
+Prepare your observations within Aspro2_ ( V0.9.9.3+ ) and run a2p2_ to submit your OB.
+
+Once setup ready, select your target and use Interop Menu 
 
 You will need an account to perform operation on ESO database through P2_.
 
@@ -16,37 +18,35 @@ Installation
 
 The package is uploaded to `PyPI`_, so you can install the package using pip:
 
-    ``pip install [--user] -U a2p2 ``
+    ``pip install [--user] -U a2p2``
 
 You can also build and install from sources:
 
     ``git clone https://github.com/JMMC-OpenDev/a2p2.git``
-
     ``cd a2p2``
-
     ``pip install [--user] .``
 
 Usage
 -----
 
-**a2p2 [-h] [-f] [-u USERNAME] [-v]**
+**a2p2 [-h] [-u USERNAME] [-v]**
 
 
 optional arguments:
  -h, --help                        show this help message and exit
- -f, --fakeapi                     fake API to avoid remote connection (dev. only).
- -u USERNAME, --username USERNAME  use another user login in history's comments.
+ -u USERNAME, --username USERNAME  use another user login in history's comments. 
  -v, --verbose                     Verbose
 
 A GUI is provided using tkinter. 
 
 Once Aspro2_ is running and a2p2_ is connected to an OB submission service (using P2API_) :
  * select your target 
- * enter the Aspro2'menu ``interop`` / ``Send Obs. Block(s)`` 
+ * enter the Aspro2's menu ``Interop/Send Obs. block(s) to A2p2`` 
 
 After few seconds, you shoud get a report of your new submission.
 
-Each facilities get it's own code directory to manage specific GUI and specific OB processing.
+Each facilities get it's own code directory to manage specific GUI and specific OB processing. You can get associated inline help in the **HELP** tab. 
+
 
 License
 -------
