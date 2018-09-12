@@ -27,11 +27,6 @@ elif not os.path.isdir(CONFDIR):
 HELPTEXT="""
 ESO's P2 repository for Observing Blocks (OBs):
 
-Login:
-You must log in to the ESO User Portal using your identifiers to access the P2 repository. Please check on the ESO website in case of doubt.
-
-Select Run ID:
-After successful login, you are presented with the Runs compatible with Aspro's known instruments. Select the Run, and eventually the subfolder of this Run, where you want to create the OB. Each Run corresponds to a specific instrument. This instrument must be the same as the one selected in ASPRO.
 
 Send configuration from Aspro:
 - In ASPRO, have an object, or an object selected, and check that all important informations (magnitudes, but also Instrument and Fringe Tracker Modes, eventually hour angles), are correctly set.
@@ -40,8 +35,9 @@ Send configuration from Aspro:
 - If the source had one or more calibrators, blocks are created for them too.
 - For each block submitted, a report is produced. Warnings are usually not significant.
 - For more than 1 object sent, a <b>folder</b> containing the two or more blocks is created. In the absence of availability of grouping OBs (like for CAL-SCI-CAL) provided by ESO, this is the closets we can do.
-- All the new OBs and folders will be available on p2web at https://eso.org/p2 
+- All the new OBs and folders will be available on p2web at https://www.eso.org/p2 
 
+On your first valid VLTI's OB, A2p2 will ask for your ESO User Portal credentials to interact with P2 using it's API. You can follow actions and organize more in details your OB on https://www.eso.org/p2 . Please use prefilled values of the login panel for testing purpose and follow ESO database from https://www.eso.org/p2demo/
 """
 HELPTEXT+="Config files loaded from "+CONFDIR
 
