@@ -18,13 +18,17 @@ Installation
 
 The package is uploaded to `PyPI`_, so you can install the package using pip:
 
-    ``pip install [--user] -U a2p2``
+   ``pip install [--user] -U a2p2``
 
-You can also build and install from sources:
+You can also build and install from sources using git:
 
-    ``git clone https://github.com/JMMC-OpenDev/a2p2.git
-cd a2p2
-pip install [--user] .``
+    ``git clone https://github.com/JMMC-OpenDev/a2p2.git``
+    
+    ``pip install [--user] ./a2p2``
+
+Or select a tagged version and download tagged zip version:
+    
+  ``pip install [--user] ./{unzipped-directory}``
 
 Usage
 -----
