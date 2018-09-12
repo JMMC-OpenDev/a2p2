@@ -22,9 +22,9 @@ The package is uploaded to `PyPI`_, so you can install the package using pip:
 
 You can also build and install from sources:
 
-    ``git clone https://github.com/JMMC-OpenDev/a2p2.git``
-    ``cd a2p2``
-    ``pip install [--user] .``
+    ``git clone https://github.com/JMMC-OpenDev/a2p2.git
+cd a2p2
+pip install [--user] .``
 
 Usage
 -----
