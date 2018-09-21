@@ -31,7 +31,13 @@ class Gravity(VltiInstrument):
         
         instrumentConfiguration = ob.instrumentConfiguration
         BASELINE = ob.interferometerConfiguration.stations
-        tel = BASELINE[0]+'T'
+        # Compute tel = UT or AT
+        # TODO move code into common part
+        if "U" in BASELINE:
+            tel = "UT"
+        else:
+            tel = "AT"
+
         instrumentMode = instrumentConfiguration.instrumentMode
 
         # Retrieve SPEC and POL info from instrumentMode
