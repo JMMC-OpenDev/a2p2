@@ -9,7 +9,7 @@ import re
 import traceback
 import xml.etree.ElementTree as ET
 import json
-from collections import defaultdict,namedtuple,Iterable
+from collections import defaultdict,namedtuple,Iterable,OrderedDict
 
 
 # https://stackoverflow.com/questions/2148119/how-to-convert-an-xml-string-to-a-dictionary-in-python
@@ -67,14 +67,16 @@ class OB():
         
     def getFluxes(self, target):
         """
-        Return flux mesurements as dict.
+        Return a flux mesurements as dict (ordered dict by BVRIJHK ).
         """
+        order="BVRIJHK"
         fluxes={}
         els=target._asdict()
         for k in els.keys():
             if k.startswith("FLUX_"):
                 fluxes[k[5:]]=els[k] # remove FLUX_ prefix for dict key
-        return fluxes
+
+        return OrderedDict(sorted(fluxes.items(), key=lambda t: order.find(t[0]))) 
     
     def get(self,obj,fieldname, defaultvalue=None):
         if fieldname in obj._fields:
