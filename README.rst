@@ -20,7 +20,7 @@ Installation
 
 The package is uploaded to `PyPI`_, so you can install the package (and/or upgrade it) using pip:
 
-   ``pip install --upgrade [--user] -U a2p2``
+   ``pip install --upgrade [--user] a2p2``
 
 
 You can also build and install from sources using git:
