@@ -10,15 +10,18 @@ Prepare your observations within Aspro2_ ( V0.9.9.3+ ) and run a2p2_ to submit y
 
 Once setup ready, select your target and use Interop Menu 
 
-You will need an account to perform operation on ESO database through P2_.
+CHARA OB are only displayed in the GUI for the first implementations.
+
+ESO OB are ready to be submitted through P2_. You can use the demo account for tests or have to provide your credential for real cases.
 
 
 Installation
 ------------
 
-The package is uploaded to `PyPI`_, so you can install the package using pip:
+The package is uploaded to `PyPI`_, so you can install the package (and/or upgrade it) using pip:
 
-   ``pip install [--user] -U a2p2``
+   ``pip install --upgrade [--user] -U a2p2``
+
 
 You can also build and install from sources using git:
 
@@ -56,10 +59,18 @@ License
 -------
 A2P2 is released under GPL license. Please have a look in the LICENSE file for any detail and feel free to fill issues.
 
+Screenshot
+-------------------
+|screenshot1|
+
+
 Interaction diagram
 -------------------
 |flowchart|
 
+.. |screenshot1| image:: https://raw.githubusercontent.com/JMMC-OpenDev/a2p2/master/doc/screenshot_demo.png
+   :alt: A2P2 screenshot
+   :target: https://raw.githubusercontent.com/JMMC-OpenDev/a2p2/master/doc/screenshot_demo.png
 .. |flowchart| image:: https://raw.githubusercontent.com/JMMC-OpenDev/a2p2/master/doc/A2P2_in_3steps.png
    :alt: A2P2 interaction diagram
    :target: https://raw.githubusercontent.com/JMMC-OpenDev/a2p2/master/doc/A2P2_in_3steps.png
