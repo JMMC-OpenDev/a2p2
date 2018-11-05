@@ -1,7 +1,7 @@
 __version__ = "0.1.4"
 
 __release_notes__ = { 
-#"0.1.5": {
+#"0.1.6": {
 #    "A2P2": [
 #        ""
 #        ],
@@ -12,6 +12,17 @@ __release_notes__ = {
 #        ""
 #        ]
 #    },
+"0.1.5": {
+    "A2P2": [
+        ""
+        ],
+    "VLTI": [
+        "bugfix for dualfield cases"
+        ],
+    "CHARA": [
+        ""
+        ]
+    },
 "0.1.4": { 
     "A2P2": [
         "fix order of returned fluxes in OB.getFluxes()"

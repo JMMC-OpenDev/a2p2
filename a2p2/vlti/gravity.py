@@ -127,7 +127,7 @@ class Gravity(VltiInstrument):
                     SCtoREFminDist = 1500
                     SCtoREFmaxDist = 4000
                 #compute x,y between science and ref beams:
-                diff = getSkyDiff(obTarget.ra, obTarget.dec, FTRA, FTDEC)
+                diff = self.getSkyDiff(obTarget.ra, obTarget.dec, FTRA, FTDEC)
                 if np.abs(diff[0]) < SCtoREFminDist:
                     raise ValueError ("Dual-Field distance of two stars is  < " + str(SCtoREFminDist) + " mas, Please Correct.")
                 elif  np.abs(diff[0]) > SCtoREFmaxDist:

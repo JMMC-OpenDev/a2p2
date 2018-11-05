@@ -5,6 +5,8 @@ __all__ = []
 import os
 import json
 import collections
+from astropy.coordinates import SkyCoord
+import numpy as np
 from a2p2.instrument import Instrument
 from a2p2.vlti.gui import VltiUI
 
@@ -251,7 +253,7 @@ class VltiInstrument(Instrument):
                 buffer += "\n"
         return buffer
                     
-    def getSkyDiff(ra, dec, ftra, ftdec):
+    def getSkyDiff(self, ra, dec, ftra, ftdec):
         science = SkyCoord(ra, dec, frame='icrs', unit='deg')
         ft = SkyCoord(ftra, ftdec, frame='icrs', unit='deg')
         ra_offset = (science.ra - ft.ra) * np.cos(ft.dec.to('radian'))
