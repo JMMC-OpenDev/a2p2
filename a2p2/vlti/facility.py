@@ -12,7 +12,7 @@ import traceback
 
 
 # TODO handle a period subdirectory
-CONFDIR="conf"
+CONFDIR = "conf"
 
 # Look for configuration files in the same level directory as this module/conf/
 try:
@@ -22,9 +22,9 @@ except NameError:
 if os.path.isdir(_confdir):
     CONFDIR = _confdir
 elif not os.path.isdir(CONFDIR):
-    raise RuntimeError ( "can't find conf directory (%r)" % (CONFDIR,))
+    raise RuntimeError("can't find conf directory (%r)" % (CONFDIR,))
 
-HELPTEXT="""
+HELPTEXT = """
 ESO's P2 repository for Observing Blocks (OBs):
 
 
@@ -39,7 +39,8 @@ Send configuration from Aspro:
 
 On your first valid VLTI's OB, A2p2 will ask for your ESO User Portal credentials to interact with P2 using it's API. You can follow actions and organize more in details your OB on https://www.eso.org/p2 . Please use prefilled values of the login panel for testing purpose and follow ESO database from https://www.eso.org/p2demo/
 """
-HELPTEXT+="Config files loaded from "+CONFDIR
+HELPTEXT += "Config files loaded from " + CONFDIR
+
 
 class VltiFacility(Facility):
 
@@ -53,15 +54,15 @@ class VltiFacility(Facility):
         gravity = Gravity(self)
         from a2p2.vlti.pionier import Pionier
         pionier = Pionier(self)
-        #from a2p2.vlti.matisse import Matisse
-        #matisse= Matisse(self)
+        # from a2p2.vlti.matisse import Matisse
+        # matisse= Matisse(self)
 
-
-        # self.supportedInstrumentsByAspro = ['GRAVITY', 'MATISSE', 'AMBER', 'PIONIER']
+        # self.supportedInstrumentsByAspro = ['GRAVITY', 'MATISSE', 'AMBER',
+        # 'PIONIER']
 
         # complete help
         for i in self.getSupportedInstruments():
-            self.facilityHelp += "\n"+i.getHelp()
+            self.facilityHelp += "\n" + i.getHelp()
 
         self.connected = False
         self.containerInfo = P2Container(self)
@@ -86,25 +87,33 @@ class VltiFacility(Facility):
             if not self.isConnected():
                 self.ui.showLoginFrame(ob)
             elif not self.isReadyToSubmit():
-                 #self.a2p2client.ui.addToLog("Receive OB for '"+ob.instrumentConfiguration.name+"'")
-                self.ui.addToLog("Please select a Project Id or Folder in the above list. OBs are not shown")
+                 # self.a2p2client.ui.addToLog("Receive OB for
+                 # '"+ob.instrumentConfiguration.name+"'")
+                self.ui.addToLog(
+                    "Please select a Project Id or Folder in the above list. OBs are not shown")
             else:
-                self.ui.addToLog("everything ready! process OB for selected container")
-                instrument.submitOB(ob,self.containerInfo)
+                self.ui.addToLog(
+                    "everything ready! process OB for selected container")
+                instrument.submitOB(ob, self.containerInfo)
 
-        # TODO add P2Error handling P2Error(r.status_code, method, url, r.json()['error'])
+        # TODO add P2Error handling P2Error(r.status_code, method, url,
+        # r.json()['error'])
         except ValueError as e:
             traceback.print_exc()
             trace = traceback.format_exc(limit=1)
-#            ui.ShowErrorMessage("Value error :\n %s \n%s\n\n%s" % (e, trace, "Aborting submission to P2. Look at the whole traceback in the log."))
-            self.ui.ShowErrorMessage("Value error :\n %s \n\n%s" % (e, "Aborting submission to P2. Please check LOG and fix before new submission."))
+# ui.ShowErrorMessage("Value error :\n %s \n%s\n\n%s" % (e, trace,
+# "Aborting submission to P2. Look at the whole traceback in the log."))
+            self.ui.ShowErrorMessage("Value error :\n %s \n\n%s" %
+                                     (e, "Aborting submission to P2. Please check LOG and fix before new submission."))
             trace = traceback.format_exc()
             self.ui.addToLog(trace, False)
             self.ui.setProgress(0)
         except Exception as e:
             traceback.print_exc()
-            trace = traceback.format_exc(limit=1) # limit = 2 should raise errors in our codes
-            self.ui.ShowErrorMessage("General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check LOG and fix before new submission." % (trace))
+            trace = traceback.format_exc(
+                limit=1)  # limit = 2 should raise errors in our codes
+            self.ui.ShowErrorMessage(
+                "General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check LOG and fix before new submission." % (trace))
             trace = traceback.format_exc()
             self.ui.addToLog(trace, False)
             self.ui.setProgress(0)
@@ -116,11 +125,11 @@ class VltiFacility(Facility):
         return self.connected
 
     def setConnected(self, flag):
-        self.connected=flag
+        self.connected = flag
 
     def getStatus(self):
         if self.isConnected():
-            return " P2API connected with "+self.username
+            return " P2API connected with " + self.username
 
     def connectAPI(self, username, password, ob):
         import p2api
@@ -136,7 +145,7 @@ class VltiFacility(Facility):
             self.ui.fillTree(runs)
 
             self.setConnected(True)
-            self.username=username
+            self.username = username
             self.ui.showTreeFrame(ob)
         except:
             self.ui.addToLog("Can't connect to P2 (see LOG).")
@@ -153,8 +162,12 @@ class VltiFacility(Facility):
         return CONFDIR
 
 # TODO Move code out of this class
+
+
 class P2Container:
-    # TODO add runName field so we can show information instead of numeric projectId
+    # TODO add runName field so we can show information instead of numeric
+    # projectId
+
     def __init__(self, facility):
         self.facility = facility
         self.projectId = None
@@ -162,13 +175,13 @@ class P2Container:
         self.instrument = None
         self.containerId = None
 
-    def store (self, projectId, instrument, containerId):
+    def store(self, projectId, instrument, containerId):
         self.projectId = projectId
         self.instrument = instrument
         self.containerId = containerId
         self.log()
 
-    def store_containerId (self, containerId):
+    def store_containerId(self, containerId):
         self.containerId = containerId
         self.log()
 
@@ -179,5 +192,6 @@ class P2Container:
         return (self.projectId != None)
 
     def __str__(self):
-#        return """projectId:'%s', instrument:'%s', containerId:'%s'""" % (self.projectId, self.instrument, self.containerId)
+# return """projectId:'%s', instrument:'%s', containerId:'%s'""" %
+# (self.projectId, self.instrument, self.containerId)
         return """instrument:'%s', containerId:'%s'""" % (self.instrument, self.containerId)

@@ -2,11 +2,13 @@
 
 __all__ = []
 
+
 class Instrument():
+
     def __init__(self, facility, insname, help="Help TBD"):
-        self.facility=facility
-        self.insname=insname
-        self.help=help
+        self.facility = facility
+        self.insname = insname
+        self.help = help
         facility.registerInstrument(self)
 
     def getName(self):

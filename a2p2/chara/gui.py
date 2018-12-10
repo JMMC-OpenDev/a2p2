@@ -8,16 +8,17 @@ import traceback
 from a2p2.gui import FacilityUI
 
 if sys.version_info[0] == 2:
-   from Tkinter import *
-   from tkMessageBox import *
-   import ttk
+    from Tkinter import *
+    from tkMessageBox import *
+    import ttk
 else:
-   from tkinter import *
-   from tkinter.messagebox import *
-   import tkinter.ttk as ttk
+    from tkinter import *
+    from tkinter.messagebox import *
+    import tkinter.ttk as ttk
 
 # Constants
-_HR="\n----------------------------------------------\n"
+_HR = "\n----------------------------------------------\n"
+
 
 class CharaUI(FacilityUI):
 
@@ -29,29 +30,29 @@ class CharaUI(FacilityUI):
         self.text.configure(yscrollcommand=scroll.set)
         scroll.pack(side=RIGHT, fill=Y)
         self.text.pack(side=LEFT, fill=BOTH, expand=True)
-        # more control could be added in the futur in this area for CHARA specific
-        
+        # more control could be added in the futur in this area for CHARA
+        # specific
+
         # avoid repeat of baseline on successive schedules
-        self.lastBaselines="-"
-      
-               
-    def get(self,obj,fieldname):
+        self.lastBaselines = "-"
+
+    def get(self, obj, fieldname):
         if fieldname in obj._fields:
-            return getattr(obj,fieldname)
+            return getattr(obj, fieldname)
         else:
             return None
-        
-    
-    def displayOB(self, ob):        
+
+    def displayOB(self, ob):
         try:
-            buffer=self.extractReport(ob)
+            buffer = self.extractReport(ob)
         except:
-            buffer="Error during report generation\n"+traceback.format_exc()+_HR+str(ob)
-        
-        self.text.insert(END, buffer)        
-    
+            buffer = "Error during report generation\n" + \
+                traceback.format_exc() + _HR + str(ob)
+
+        self.text.insert(END, buffer)
+
     def extractReport(self, ob):
-        """ We coud try to mimic the output below        
+        """ We coud try to mimic the output below
 ----------------------------------------------
 Baselines: S2(2)-E2(4)
            Ref Cart: BL 2
@@ -74,61 +75,64 @@ Cals:
 Object:
 HD 91312 (A7IV, IRx, 35pc): V=4.72, R=3.76, tht=0.58
 AO Flat Star:
-""" 
-        buffer =""
-        
+"""
+        buffer = ""
+
         # Display baselines on change
-        stations=ob.interferometerConfiguration.stations
-        if self.lastBaselines!=stations :
+        stations = ob.interferometerConfiguration.stations
+        if self.lastBaselines != stations:
             buffer += _HR
-            buffer += "Baselines: " + stations +"\n"
-            self.lastBaselines=stations
+            buffer += "Baselines: " + stations + "\n"
+            self.lastBaselines = stations
         buffer += _HR
-           
+
         # Retrieve all stars (as obsConf) and build sciences list
-        sciences=[]
-        targets={} # store  ids for futur retrieval in schedule        
+        sciences = []
+        targets = {}  # store  ids for futur retrieval in schedule
         for oc in ob.observationConfiguration:
-            targets[oc.id]=oc
+            targets[oc.id] = oc
             if "SCI" in oc.type:
-                sciences.append(oc)                        
-                
+                sciences.append(oc)
+
         # Retrieve cals from schedule
-        cals={}        
-        for schedule in ob.observationSchedule.OB:                        
-            try: # hack for single element observationSchedule
+        cals = {}
+        for schedule in ob.observationSchedule.OB:
+            try:  # hack for single element observationSchedule
                 ref = schedule.ref
             except:
                 ref = schedule
-            target=targets[ref]
+            target = targets[ref]
             if "CAL" in target.type:
-                cals[ref]=target
-            
+                cals[ref] = target
+
         # TODO check for calibrator only ?
-            
+
         for oc in sciences:
-            sct=oc.SCTarget
-            ftt=self.get(oc,"FTTarget") 
-            aot=self.get(oc,"AOTarget")
-            buffer +=  oc.observationConstraints.LSTinterval +"\n"            
+            sct = oc.SCTarget
+            ftt = self.get(oc, "FTTarget")
+            aot = self.get(oc, "AOTarget")
+            buffer += oc.observationConstraints.LSTinterval + "\n"
             buffer += "Object:\n"
-            fluxes = ", ".join([e[0]+"="+e[1] for e in ob.getFluxes(sct).items()])
+            fluxes = ", ".join([e[0] + "=" + e[1]
+                               for e in ob.getFluxes(sct).items()])
             info = sct.SPECTYP + ", " + sct.PARALLAX
-            buffer += sct.name + " (" + info + ") : "+ fluxes + "\n"
-            if ftt :
+            buffer += sct.name + " (" + info + ") : " + fluxes + "\n"
+            if ftt:
                 buffer += "Fringe Finder:\n"
-                fluxes = ", ".join([e[0]+"="+e[1] for e in ob.getFluxes(ftt).items()])
-                buffer += ftt.name + " : "+ fluxes + "\n" 
-            if aot :
+                fluxes = ", ".join([e[0] + "=" + e[1]
+                                   for e in ob.getFluxes(ftt).items()])
+                buffer += ftt.name + " : " + fluxes + "\n"
+            if aot:
                 buffer += "AO Flat Star:\n"
-                fluxes = ", ".join([e[0]+"="+e[1] for e in ob.getFluxes(aot).items()])
-                buffer += aot.name + " : "+ fluxes + "\n"     
-                
-            if len(cals)>=1:
-                buffer+= "Cals:\n"
+                fluxes = ", ".join([e[0] + "=" + e[1]
+                                   for e in ob.getFluxes(aot).items()])
+                buffer += aot.name + " : " + fluxes + "\n"
+
+            if len(cals) >= 1:
+                buffer += "Cals:\n"
                 for cal in cals:
-                    buffer+= "- "+ cal +"\n"                
+                    buffer += "- " + cal + "\n"
 
             buffer += _HR
-        
+
         return buffer
