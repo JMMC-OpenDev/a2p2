@@ -35,7 +35,7 @@ Send configuration from Aspro:
 - If the source had one or more calibrators, blocks are created for them too.
 - For each block submitted, a report is produced. Warnings are usually not significant.
 - For more than 1 object sent, a <b>folder</b> containing the two or more blocks is created. In the absence of availability of grouping OBs (like for CAL-SCI-CAL) provided by ESO, this is the closets we can do.
-- All the new OBs and folders will be available on p2web at https://www.eso.org/p2 
+- All the new OBs and folders will be available on p2web at https://www.eso.org/p2
 
 On your first valid VLTI's OB, A2p2 will ask for your ESO User Portal credentials to interact with P2 using it's API. You can follow actions and organize more in details your OB on https://www.eso.org/p2 . Please use prefilled values of the login panel for testing purpose and follow ESO database from https://www.eso.org/p2demo/
 """
@@ -46,35 +46,41 @@ class VltiFacility(Facility):
     def __init__(self, a2p2client):
         Facility.__init__(self, a2p2client, "VLTI", HELPTEXT)
         self.ui = VltiUI(self)
-        
+
         # Instanciate instruments
         # TODO complete list and make it more object oriented
         from a2p2.vlti.gravity import Gravity
         gravity = Gravity(self)
+        from a2p2.vlti.pionier import Pionier
+        pionier = Pionier(self)
+        #from a2p2.vlti.matisse import Matisse
+        #matisse= Matisse(self)
+
+
         # self.supportedInstrumentsByAspro = ['GRAVITY', 'MATISSE', 'AMBER', 'PIONIER']
-        
-        # complete help 
+
+        # complete help
         for i in self.getSupportedInstruments():
             self.facilityHelp += "\n"+i.getHelp()
-        
+
         self.connected = False
-        self.containerInfo = P2Container(self)        
-        
-        # will store later : name for status info, api 
+        self.containerInfo = P2Container(self)
+
+        # will store later : name for status info, api
         self.username = None
-        self.api = None   
-        
+        self.api = None
+
     def processOB(self, ob):
         # give focus on last updated UI
         self.a2p2client.ui.showFacilityUI(self.ui)
         # show ob dict for debug
         self.ui.addToLog(str(ob), False)
-        
-        # OB is checked and submitted by instrument             
+
+        # OB is checked and submitted by instrument
         instrument = self.getInstrument(ob.instrumentConfiguration.name)
-        try:            
+        try:
             # run checkOB which may raise some error before connection request
-            instrument.checkOB(ob, self.containerInfo)            
+            instrument.checkOB(ob, self.containerInfo)
 
             # performs operation
             if not self.isConnected():
@@ -83,9 +89,9 @@ class VltiFacility(Facility):
                  #self.a2p2client.ui.addToLog("Receive OB for '"+ob.instrumentConfiguration.name+"'")
                 self.ui.addToLog("Please select a Project Id or Folder in the above list. OBs are not shown")
             else:
-                self.ui.addToLog("everything ready! process OB for selected container")            
+                self.ui.addToLog("everything ready! process OB for selected container")
                 instrument.submitOB(ob,self.containerInfo)
-                
+
         # TODO add P2Error handling P2Error(r.status_code, method, url, r.json()['error'])
         except ValueError as e:
             traceback.print_exc()
@@ -97,25 +103,25 @@ class VltiFacility(Facility):
             self.ui.setProgress(0)
         except Exception as e:
             traceback.print_exc()
-            trace = traceback.format_exc(limit=1) # limit = 2 should raise errors in our codes 
+            trace = traceback.format_exc(limit=1) # limit = 2 should raise errors in our codes
             self.ui.ShowErrorMessage("General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check LOG and fix before new submission." % (trace))
             trace = traceback.format_exc()
             self.ui.addToLog(trace, False)
             self.ui.setProgress(0)
-        
+
     def isReadyToSubmit(self):
         return self.api and self.containerInfo.isOk()
 
     def isConnected(self):
         return self.connected
-    
+
     def setConnected(self, flag):
         self.connected=flag
 
     def getStatus(self):
         if self.isConnected():
             return " P2API connected with "+self.username
-        
+
     def connectAPI(self, username, password, ob):
         import p2api
         if username == '52052':
@@ -136,17 +142,17 @@ class VltiFacility(Facility):
             self.ui.addToLog("Can't connect to P2 (see LOG).")
             trace = traceback.format_exc()
             self.ui.addToLog(trace, False)
-            
+
     def getAPI(self):
         return self.api
-    
+
     def getConfDir(self):
-        """ 
-        returns the configuration directory with instrument's json files 
+        """
+        returns the configuration directory with instrument's json files
         """
         return CONFDIR
-        
-# TODO Move code out of this class        
+
+# TODO Move code out of this class
 class P2Container:
     # TODO add runName field so we can show information instead of numeric projectId
     def __init__(self, facility):
@@ -165,7 +171,7 @@ class P2Container:
     def store_containerId (self, containerId):
         self.containerId = containerId
         self.log()
-    
+
     def log(self):
         self.facility.ui.addToLog("*** Working with %s ***" % self)
 

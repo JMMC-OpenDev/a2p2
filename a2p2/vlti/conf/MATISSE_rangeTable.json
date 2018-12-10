@@ -1,5 +1,5 @@
 {
-    "GRAVITY_gen_acq.tsf":
+    "PIONIER_acq.tsf":
     {
 	"SEQ.FT.ROBJ.DIAMETER": {   "min":   0.0,   "max":300.0,     "default": 0.0  },
 	"SEQ.INS.SOBJ.NAME":    {    },
@@ -22,13 +22,13 @@
 	"COU.AG.PMA":           {   "min": -10.0,   "max": 10.0,     "default": 0.0  },
 	"COU.AG.PMD":           {   "min": -10.0,   "max": 10.0,     "default": 0.0  }
     },
-    "GRAVITY_single_obs_exp.tsf,GRAVITY_single_obs_calibrator.tsf,GRAVITY_dual_obs_exp.tsf,GRAVITY_dual_obs_calibrator.tsf":
+    "PIONIER_obs_calibrator.tsf,PIONIER_obs_science.tsf":
     {
 	"DET2.DIT":             {   "list": [    0.3,    1.0,    3.0,    5.0,    10.0,    30.0,    60.0,    100.0,    300.0   ],    "default": 0.3  },
         "DET2.NDIT.OBJECT":     {   "min": 10.0,   "max": 300.0,                                                                    "default":   25.0  },
 	"DET2.NDIT.SKY":        {   "min": 10.0,   "max": 300.0,                                                                    "default":   25.0  },
-	"SEQ.SKY.X":            {   "min":100.0,   "max":2000.0,                                                                    "default": 1000.0  },
-	"SEQ.SKY.Y":            {   "min":100.0,   "max":2000.0,                                                                    "default": 1000.0  },
+	"SEQ.SKY.X":            {   "min":100.0,   "max":20000.0,                                                                    "default": 1000.0  },
+	"SEQ.SKY.Y":            {   "min":100.0,   "max":20000.0,                                                                    "default": 1000.0  },
 	"SEQ.OBSSEQ":          {   "spaceseparatedlist": [    "O",    "S" ],                                                       "default": "O S"  }
     }
 }

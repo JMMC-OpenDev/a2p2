@@ -1,0 +1,27 @@
+{
+    "PIONIER_acq.tsf":
+    {
+    "TARGET.NAME":    {    },
+    "ISS.IAS.HMAG":         {"min":   -10.0,   "max": 30.0, "default": 0},
+	"INS.DISP.NAME":         {   "list": [    "FREE",     "GRISM"],      "default": "GRISM"      },
+    "TEL.COU.GSSOURCE":      {   "list": [    "SETUPFILE",    "SCIENCE"   ],      "default": "SCIENCE"  },
+    "TEL.COU.ALPHA":         {                                    "default": 0.0  },
+    "TEL.COU.DELTA":         {                                    "default": 0.0  },
+    "TEL.COU.MAG":           {   "min":   0.0,   "max": 25.0,     "default": 0.0  },
+    "TEL.COU.PMA":           {   "min": -10.0,   "max": 10.0,     "default": 0.0  },
+    "TEL.COU.PMD":           {   "min": -10.0,   "max": 10.0,     "default": 0.0  }
+    },
+    "PIONIER_obs_science.tsf, PIONIER_obs_calibrator.tsf" :
+    {
+     "SEQ.NEXPO": { "min":   0,   "max": 100, "default": 5 }
+    },
+    "PIONIER_gen_cal_kappa.tsf":
+    {
+     "SEQ.DOIT": { "list": [    true,     false],      "default": false  }
+     },
+    "PIONIER_gen_cal_dark.tsf":
+    {
+     "SEQ.DOIT": { "list": [    true,     false],      "default": true }
+     }
+
+    }
