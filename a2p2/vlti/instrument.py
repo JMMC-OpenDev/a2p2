@@ -236,13 +236,14 @@ class VltiInstrument(Instrument):
             s += "\n\nGravityDitTable:\n"
             s += Gravity.formatDitTable(self)
         # if s_name == "PIONIER":
+            # TODO 
             # from a2p2.vlti.pionier import Pionier
             # s += "\n\n PionierRangeTable: \n"
             # s += Pionier.formatRangeTable(self)
             # s += "\n\nPionierDitTable:\n"
             # s += Pionier.formatDitTable(self)
         if s_name == "MATISSE":
-            print ('MATISSE rules TBD')
+            # TODO
             # from a2p2.vlti.matisse import Matisse
             # s += "\n\n MatisseRangeTable: \n"
             # s += Matisse.formatRangeTable(self)

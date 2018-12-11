@@ -185,7 +185,6 @@ class Pionier(VltiInstrument):
         self.checkOB(ob, p2container, False)
 
     def getPionierTemplateName(self, templateType, OBJTYPE):
-        #print (self)
         objType = "calibrator"
         if OBJTYPE and "SCI" in OBJTYPE:
             objType = "science"
@@ -236,8 +235,6 @@ class Pionier(VltiInstrument):
         # by default, above 40 degree. Will generate a WAIVERABLE ERROR if not.
         if LSTINTERVAL:
             sidTCs, stcVersion = api.getSiderealTimeConstraints(obId)
-            print ("debug lst")
-            print (LSTINTERVAL)
             lsts = LSTINTERVAL.split('/')
             lstStartSex = lsts[0]
             lstEndSex = lsts[1]
