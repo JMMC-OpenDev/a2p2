@@ -99,3 +99,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+/nb-configuration.xml
+
+# Max OS X DS_Store
+.DS_Store

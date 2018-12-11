@@ -1,0 +1,9 @@
+Pypi deployement
+----------------
+Look at the a2p2/version.py then run:
+
+    ``python setup.py sdist bdist_wheel``
+
+    ``twine upload --repository-url https://test.pypi.org/legacy/ dist/*``
+
+    ``twine upload dist/*``

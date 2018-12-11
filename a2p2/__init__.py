@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-__all__ = ['utils', 'apis', 'gui', 'samp', 'client']
+__all__ = ['facility', 'instrument', 'gui', 'samp', 'client']
 
-from . import utils
-from . import apis
+from .version import __version__
+
+from . import facility
+from . import instrument
 from . import gui
 from . import samp
 from . import client

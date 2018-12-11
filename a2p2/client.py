@@ -2,61 +2,43 @@
 
 __all__ = ['A2p2Client']
 
-
-from a2p2.apis import APIManager
-from a2p2.gui import TkWindow
-from a2p2.gui import GtkWindow
-from a2p2.gui import TextWindow
+from a2p2.facility import FacilityManager
+from a2p2.gui import MainWindow
 from a2p2.samp import A2p2SampClient
-from a2p2.utils import parseXmlMessage
-import logging
+from a2p2.ob import OB
+from a2p2 import __version__
 import sys
 import time
+import traceback
 
-logLevel = logging.ERROR
 
 class A2p2Client():
+
     """Transmit your Aspro2 observation to remote Observatory scheduling database.
 
        with A2p2Client() as a2p2:
            a2p2.run()
            ..."""
+
     def __init__(self, fakeAPI=False):
         """Create the A2p2 client."""
-        logger = logging.getLogger()
-        logger.setLevel(logLevel)
-    #        logging.basicConfig(level=logging.DEBUG,
-    #                            format=('%(filename)s: '
-    #                            '%(levelname)s: '
-    #                            '%(funcName)s(): '
-    #                            '%(lineno)d:\t'
-    #                            '%(message)s')
-    #                            )
-
-        # finish logging
 
         self.username = None
-        self.apiName = None
+        self.apiName = ""
         if fakeAPI:
             self.apiName = "fakeAPI"
+
+        self.ui = MainWindow(self)
+        # Instantiate the samp client and connect to the hub later
+        self.a2p2SampClient = A2p2SampClient()
+        self.facilityManager = FacilityManager(self)
 
         pass
 
     def __enter__(self):
         """Handle starting the 'with' statements."""
-        # Instantiate the samp client and connect to the hub later
-        self.a2p2SampClient = A2p2SampClient()
 
-        # Instantiate a UI
-        try:
-          self.ui = TkWindow(self)
-        except:
-          try:
-            self.ui = GtkWindow(self)
-          except:
-            self.ui = TextWindow(self)
-
-        self.apiManager = APIManager(self.apiName, self.ui)
+        self.ui.addToLog("Welcome in the A2P2 V" + __version__)
 
         return self
 
@@ -74,8 +56,8 @@ class A2p2Client():
         # return self
 
     def __str__(self):
-        instruments     = "\n- ".join(["Supported instruments:", "TBD"])
-        apis       = "\n- ".join(["Supported APIs:", "TBD"])
+        instruments = "\n- ".join(["Supported instruments:", "TBD"])
+        apis = "\n- ".join(["Supported APIs:", "TBD"])
         return """a2p2 client\n%s\n%s\n""" % (instruments, apis)
 
     def changeSampStatus(self, connected_flag):
@@ -106,11 +88,9 @@ class A2p2Client():
 
         # We test every 1s to see if the hub has sent a message
         delay = 0.1
-        if isinstance(self.ui, TextWindow):
-            each = 1
-        else:
-            each = 10
+        each = 10
         loop_cnt = 0
+        warnForAspro = True
 
         while loop_cnt >= 0:
             try:
@@ -120,25 +100,26 @@ class A2p2Client():
                 self.ui.loop()
 
                 if not self.a2p2SampClient.is_connected() and loop_cnt % each == 0:
-                    loop_cnt = 0
                     try:
                         self.a2p2SampClient.connect()
+                        self.ui.setSampId(self.a2p2SampClient.get_public_id())
                     except:
-                        logging.debug("except %s", sys.exc_info())
-                        pass # TODO raise other exception excepted
+                        self.ui.setSampId(None)
+                        if warnForAspro:
+                            warnForAspro = False
+                            self.ui.addToLog(
+                                "\nPlease launch Aspro2 to submit your OBs.")
+                        pass  # TODO test for other exception than SAMPHubError(u'Unable to find a running SAMP Hub.',)
 
-                if self.a2p2SampClient.has_message(): # TODO implement a stack for received messages
-                    if not self.ui.is_connected():
-                        logging.debug("samp message received and api not connected")
-                        self.ui.ShowErrorMessage('a2p2 is not currently connected with ESO P2 database.')
-                    elif not self.ui.is_ready_to_submit():
-                        self.ui.ShowErrorMessage('Please select a runId ESO P2 database.')
-                        logging.debug("samp message received and api not ready to transmit")
-                    else:
-                        self.ui.addToLog('Sending request to API ...')
-                        logging.debug("samp message received and api ready to transmit")
-                        ob_url = self.a2p2SampClient.get_ob_url()
-                        parseXmlMessage(self, ob_url, self.ui.get_containerInfo())
+                if self.a2p2SampClient.has_message():
+                    try:
+                        ob = OB(self.a2p2SampClient.get_ob_url())
+                        self.facilityManager.processOB(ob)
+                    except:
+                        self.ui.addToLog(
+                            "Exception during ob creation: " + traceback.format_exc(), False)
+                        self.ui.addToLog("Can't process last OB")
+
                     # always clear previous received message
                     self.a2p2SampClient.clear_message()
 
@@ -146,4 +127,3 @@ class A2p2Client():
                     loop_cnt = -1
             except KeyboardInterrupt:
                 loop_cnt = -1
-
