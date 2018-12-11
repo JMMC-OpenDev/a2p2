@@ -106,7 +106,8 @@ class Gravity(VltiInstrument):
             GSRA = '00:00:00.000'
             GSDEC = '00:00:00.000'
             dualField = False
-
+            dualFieldDistance = 0.0 #needed as must exist for the argument list of createGravityOB
+            
             # initialize FT variables (must exist)
             # TODO remove next lines using a dual_acq TSF that would handle
             # them
@@ -137,11 +138,11 @@ class Gravity(VltiInstrument):
                     SCtoREFminDist = 0  # before P103: 1500
                     SCtoREFmaxDist = 4000
                 # compute x,y between science and ref beams:
-                diff = self.getSkyDiff(obTarget.ra, obTarget.dec, FTRA, FTDEC)
-                if np.abs(diff[0]) < SCtoREFminDist:
+                dualFieldDistance = self.getSkyDiff(obTarget.ra, obTarget.dec, FTRA, FTDEC)
+                if np.abs(dualFieldDistance[0]) < SCtoREFminDist:
                     raise ValueError("Dual-Field distance of two stars is  < " + str(
                         SCtoREFminDist) + " mas, Please Correct.")
-                elif np.abs(diff[0]) > SCtoREFmaxDist:
+                elif np.abs(dualFieldDistance[0]) > SCtoREFmaxDist:
                     raise ValueError("Dual-Field distance of two stars is  > " + str(
                         SCtoREFmaxDist) + " mas, Please Correct.")
 
@@ -235,7 +236,7 @@ class Gravity(VltiInstrument):
                 self.createGravityOB(
                     ui, self.facility.a2p2client.getUsername(
                     ), api, containerId, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-                                     DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, diff, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
+                                     DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
         # endfor
         if doFolder:
@@ -314,7 +315,7 @@ class Gravity(VltiInstrument):
 
     def createGravityOB(
         self, ui, username, api, containerId, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-                        DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, diff, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG,
+                        DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG,
                         SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
         ui.setProgress(0.1)
 
@@ -382,8 +383,8 @@ class Gravity(VltiInstrument):
                     'TEL.TARG.PARALLAX':   0.0
         })
         if dualField:
-            values.update({'SEQ.INS.SOBJ.X': diff[0],
-                           'SEQ.INS.SOBJ.Y': diff[1],
+            values.update({'SEQ.INS.SOBJ.X': dualFieldDistance[0],
+                           'SEQ.INS.SOBJ.Y': dualFieldDistance[1],
                            'SEQ.FT.ROBJ.NAME': SEQ_FT_ROBJ_NAME,
                            'SEQ.FT.ROBJ.MAG': round(SEQ_FT_ROBJ_MAG, 3),
                            'SEQ.FT.ROBJ.DIAMETER': SEQ_FT_ROBJ_DIAMETER,

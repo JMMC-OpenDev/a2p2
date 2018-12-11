@@ -213,8 +213,8 @@ class Matisse(VltiInstrument):
         # by default, above 40 degree. Will generate a WAIVERABLE ERROR if not.
         if LSTINTERVAL:
             sidTCs, stcVersion = api.getSiderealTimeConstraints(obId)
-            print ( "debug lst" )
-            print ( LSTINTERVAL )
+            print ("debug lst")
+            print (LSTINTERVAL)
             lsts = LSTINTERVAL.split('/')
             lstStartSex = lsts[0]
             lstEndSex = lsts[1]
