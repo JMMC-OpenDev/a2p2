@@ -162,7 +162,7 @@ def parseXmlMessage(client, url, p2container):
                     SEQ_FT_ROBJ_VIS = 1.0  # FIXME
                     dualField = True
                 except:
-                    # print "incomplete Fringe Tracker Target definition!"
+                    # print ("incomplete Fringe Tracker Target definition!")
                     ui.ShowErrorMessage(
                         "incomplete Fringe Tracker Target definition, OB not set!")
 
@@ -194,7 +194,7 @@ def parseXmlMessage(client, url, p2container):
                         COU_AG_PMD = float(pmdetxt.text)
 
                 except:
-                    # print "incomplete Adaptive Optics Target definition!"
+                    # print ("incomplete Adaptive Optics Target definition!")
                     ui.ShowErrorMessage(
                         "incomplete Adaptive Optics Target definition, OB not set!")
 
@@ -218,7 +218,7 @@ def parseXmlMessage(client, url, p2container):
                     # no PMRA, PMDE for GS !!
 
                 except:
-                    # print "incomplete GuideStar Target definition!"
+                    # print ("incomplete GuideStar Target definition!")
                     ui.ShowErrorMessage(
                         "incomplete GuideStar Target definition, OB not set!")
 
