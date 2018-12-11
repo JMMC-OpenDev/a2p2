@@ -1,4 +1,4 @@
-__version__ = "0.1.6"
+__version__ = "0.2.0"
 
 __release_notes__ = {
     #"0.1.6": {
@@ -12,12 +12,24 @@ __release_notes__ = {
     #        ""
     #        ]
     #    },
+     "0.2.0": {
+        "A2P2": [
+            ""
+        ],
+        "VLTI": [
+            "bug fix"
+        ],
+        "CHARA": [
+            ""
+        ]
+    },
     "0.1.6": {
         "A2P2": [
             "Major code reformating - pep8 compliant"
         ],
         "VLTI": [
-            "Add PIONIER"
+            "general config updates",
+            "add PIONIER"
         ],
         "CHARA": [
             ""
