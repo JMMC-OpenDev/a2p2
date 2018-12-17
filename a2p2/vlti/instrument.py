@@ -242,7 +242,7 @@ class VltiInstrument(Instrument):
             # s += Pionier.formatRangeTable(self)
             # s += "\n\nPionierDitTable:\n"
             # s += Pionier.formatDitTable(self)
-        if s_name == "MATISSE":
+        # if s_name == "MATISSE":
             # TODO
             # from a2p2.vlti.matisse import Matisse
             # s += "\n\n MatisseRangeTable: \n"
