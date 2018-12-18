@@ -58,6 +58,8 @@ After few seconds, you shoud get a report of your new submission.
 
 Each facilities get it's own code directory to manage specific GUI and specific OB processing. You can get associated inline help in the **HELP** tab. 
 
+Please fill an issue_ for any question, remark or enhancement request.
+
 
 License
 -------
@@ -86,3 +88,4 @@ Interaction diagram
 .. _P2API:  https://www.eso.org/copdemo/apidoc/
 .. _Aspro2: http://www.jmmc.fr/aspro2
 .. _a2p2:   http://www.jmmc.fr/a2p2
+.. _issue:  https://github.com/JMMC-OpenDev/a2p2/issues
