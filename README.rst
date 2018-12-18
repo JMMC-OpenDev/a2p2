@@ -29,9 +29,13 @@ You can also build and install from sources using git:
     
     ``pip install [--user] ./a2p2``
 
-Or select a tagged version and download tagged zip version:
-    
-  ``pip install [--user] ./{unzipped-directory}``
+Prerequisites
+-------------
+Some basic tests have been operated on windows, Linux and Mac OS.
+
+a2p2 should launch the program. You may have to run ``python a2p2`` on windows. 
+
+You may have to install some package to run tk GUI (``python-tk`` on linux).
 
 Usage
 -----
