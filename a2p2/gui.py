@@ -30,6 +30,14 @@ class MainWindow():
         self.requestAbort = False
 
         self.window = Tk()
+
+        try:
+            dpi_value = self.window.winfo_fpixels('1i')
+            # print("dpi: " + str(dpi_value));
+            self.window.tk.call('tk', 'scaling', '-displayof', '.', dpi_value / 72.0)
+        except:
+            print("Can not set tk scaling !")
+
         self.window.protocol("WM_DELETE_WINDOW", self._requestAbort)
 
         self.notebook = ttk.Notebook(self.window)
