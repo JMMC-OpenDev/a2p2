@@ -209,23 +209,8 @@ class Matisse(VltiInstrument):
 
         ob, obVersion = api.saveOB(ob, obVersion)
 
-        # LST constraints if present
-        # by default, above 40 degree. Will generate a WAIVERABLE ERROR if not.
-        if LSTINTERVAL:
-            sidTCs, stcVersion = api.getSiderealTimeConstraints(obId)
-            print ("debug lst")
-            print (LSTINTERVAL)
-            lsts = LSTINTERVAL.split('/')
-            lstStartSex = lsts[0]
-            lstEndSex = lsts[1]
-            # p2 seems happy with endlst < startlst
-            # a = SkyCoord(lstStartSex+' +0:0:0',unit=(u.hourangle,u.deg))
-            # b = SkyCoord(lstEndSex+' +0:0:0',unit=(u.hourangle,u.deg))
-            # if b.ra.deg < a.ra.deg:
-            # api.saveSiderealTimeConstraints(obId,[ {'from': lstStartSex, 'to': '00:00'},{'from': '00:00','to': lstEndSex}], stcVersion)
-            # else:
-            api.saveSiderealTimeConstraints(
-                obId, [{'from': lstStartSex, 'to': lstEndSex}], stcVersion)
+         # time constraints if present
+        self.saveSiderealTimeConstraints(api, obId, LSTINTERVAL)
         ui.setProgress(0.2)
 
         # then, attach acquisition template(s)

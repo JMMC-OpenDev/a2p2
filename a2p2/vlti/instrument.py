@@ -225,6 +225,32 @@ class VltiInstrument(Instrument):
         ra_offset = (science.ra - ft.ra) * np.cos(ft.dec.to('radian'))
         dec_offset = (science.dec - ft.dec)
         return [ra_offset.deg * 3600 * 1000, dec_offset.deg * 3600 * 1000]  # in mas
+    
+    
+    def getSiderealTimeConstraints(self, LSTINTERVAL):        
+        # by default, above 40 degree. Will generate a WAIVERABLE ERROR if not.
+        # we could warn before ?
+        intervals=[]
+        if LSTINTERVAL:                        
+            for lst in LSTINTERVAL:
+                lsts = lst.split('/')
+                # p2 seems happy with endlst < startlst
+                # a = SkyCoord(lstStartSex+' +0:0:0',unit=(u.hourangle,u.deg))
+                # b = SkyCoord(lstEndSex+' +0:0:0',unit=(u.hourangle,u.deg))
+                # if b.ra.deg < a.ra.deg:
+                # api.saveSiderealTimeConstraints(obId,[ {'from': lstStartSex, 'to': '00:00'},{'from': '00:00','to': lstEndSex}], stcVersion)
+                # else:
+                lstStartSex = lsts[0]
+                lstEndSex = lsts[1]
+                intervals.append ( {'from': lstStartSex, 'to': lstEndSex} )
+        return intervals
+    
+    def saveSiderealTimeConstraints(self, api, obId, LSTINTERVAL):
+        intervals = self.getSiderealTimeConstraints(LSTINTERVAL)
+        if intervals:
+            sidTCs, stcVersion = api.getSiderealTimeConstraints(obId)           
+            api.saveSiderealTimeConstraints( obId, intervals, stcVersion)
+    
 
     def getHelp(self):
         s = self.getName()
