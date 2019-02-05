@@ -246,6 +246,8 @@ class VltiInstrument(Instrument):
         return intervals
     
     def saveSiderealTimeConstraints(self, api, obId, LSTINTERVAL):
+        # wait for next Aspro release to only send constraints set by user
+        return
         intervals = self.getSiderealTimeConstraints(LSTINTERVAL)
         if intervals:
             sidTCs, stcVersion = api.getSiderealTimeConstraints(obId)           

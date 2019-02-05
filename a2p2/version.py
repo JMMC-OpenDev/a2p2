@@ -1,4 +1,4 @@
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 __release_notes__ = {
     #"0.1.6": {
@@ -12,6 +12,17 @@ __release_notes__ = {
     #        ""
     #        ]
     #    },
+     "0.2.2": {
+        "A2P2": [
+            ""
+        ],
+        "VLTI": [
+            "ignore default time constraints computed by Aspro"
+        ],
+        "CHARA": [
+            ""
+        ]
+    },
      "0.2.1": {
         "A2P2": [
             ""
