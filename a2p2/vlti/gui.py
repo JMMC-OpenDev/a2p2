@@ -180,7 +180,7 @@ class LoginFrame(Frame):
         self.password = StringVar()
         self.password.set(self.login[1])
         self.password_entry = Entry(
-            self.loginframe, textvariable=self.password)
+            self.loginframe, textvariable=self.password, show="*")
         self.password_entry.pack()
 
         self.loginbutton = Button(
