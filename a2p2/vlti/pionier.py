@@ -53,7 +53,8 @@ class Pionier(VltiInstrument):
         doFolder = (len(obsconflist) > 1)
         parentContainerId = containerId
         if doFolder and not dryMode:
-            folderName = obsconflist[0].Target.name
+            
+            folderName = obsconflist[0].SCTarget.name
             folderName = re.sub('[^A-Za-z0-9]+', '_', folderName.strip())
             folder, _ = api.createFolder(containerId, folderName)
             containerId = folder['containerId']
