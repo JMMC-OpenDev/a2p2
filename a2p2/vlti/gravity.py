@@ -100,7 +100,11 @@ class Gravity(VltiInstrument):
             COU_GS_MAG = self.getFlux(scienceTarget, "V")
             acqTSF.SEQ_INS_SOBJ_MAG = self.getFlux(scienceTarget, "K")
             acqTSF.SEQ_FI_HMAG = self.getFlux(scienceTarget, "H")
-
+            
+            # Set baseline  interferometric array code (should be a keywordlist)
+            # TODO ass handling of keywordlist types 
+            # acqTSF.ISS_BASELINE = "['"+self.getBaselineCode(BASELINE)+"']"
+            
             # setup some default values, to be changed below
             COU_AG_GSSOURCE = 'SCIENCE'  # by default
             GSRA = '00:00:00.000'
@@ -183,7 +187,7 @@ class Gravity(VltiInstrument):
             # FIXME: error (OB): "Phase 2 constraints must closely follow what was requested in the Phase 1 proposal.
             # The seeing value allowed for this OB is >= java0x0 arcsec."
             obConstraints.seeing = 1.0
-            obConstraints.baseline = BASELINE.replace(' ', '-')
+
             # FIXME: default values NOT IN ASPRO!
             # constaints.airmass = 5.0
             # constaints.fli = 1
@@ -235,7 +239,7 @@ class Gravity(VltiInstrument):
             else:
                 self.createGravityOB(
                     ui, self.facility.a2p2client.getUsername(
-                    ), api, containerId, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
+                    ), api, containerId, self.getBaselineCode(BASELINE), obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
                                      DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
         # endfor
@@ -314,7 +318,7 @@ class Gravity(VltiInstrument):
         return self.getGravityTemplateName("acq", dualField, OBJTYPE)
 
     def createGravityOB(
-        self, ui, username, api, containerId, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
+        self, ui, username, api, containerId, baselinecode, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
                         DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG,
                         SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
         ui.setProgress(0.1)
@@ -326,7 +330,7 @@ class Gravity(VltiInstrument):
         # create new OB in container:
         goodName = re.sub('[^A-Za-z0-9]+', '_', acqTSF.SEQ_INS_SOBJ_NAME)
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_GRAVITY_' + \
-            obConstraints.baseline.replace('-', '') + '_' + instrumentMode
+            baselinecode + '_' + instrumentMode
 
         ob, obVersion = api.createOB(containerId, OBS_DESCR)
         obId = ob['obId']

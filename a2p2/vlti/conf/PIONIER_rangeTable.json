@@ -9,7 +9,9 @@
     "TEL.COU.DELTA":         {                                    "default": 0.0  },
     "TEL.COU.MAG":           {   "min":   0.0,   "max": 25.0,     "default": 0.0  },
     "TEL.COU.PMA":           {   "min": -10.0,   "max": 10.0,     "default": 0.0  },
-    "TEL.COU.PMD":           {   "min": -10.0,   "max": 10.0,     "default": 0.0  }
+    "TEL.COU.PMD":           {   "min": -10.0,   "max": 10.0,     "default": 0.0  },
+    "ISS.BASELINE":          {   "list": [ "small", "medium", "large", "UTs" ]    }
+
     },
     "PIONIER_obs_science.tsf, PIONIER_obs_calibrator.tsf" :
     {

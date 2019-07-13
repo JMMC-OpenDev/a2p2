@@ -4,6 +4,7 @@ __all__ = []
 
 import os
 import json
+#import ast
 import collections
 from astropy.coordinates import SkyCoord
 import numpy as np
@@ -71,6 +72,22 @@ class VltiInstrument(Instrument):
         flux in 'V', 'J', 'H'...
         """
         return round(float(getattr(target, "FLUX_" + flux)), 3)
+
+    def getBaselineCode(self, baseline):
+        # as of P104
+        # take care if you change next branch order
+        if "B2" in baseline:
+            return "small"
+        elif "G2" in baseline:
+            return "medium"
+        elif "J3" in baseline:
+            return "large"
+        elif "K0" in baseline:
+            return "astrometric"
+        elif "U" in baseline:
+            return "UTs"
+        else:
+            raise ValueError("Can't detect Interferometric Array type from given baseline : %s)" % (baseline))
 
 
 # ditTable and rangeTable are extracted from online doc:
@@ -164,6 +181,13 @@ class VltiInstrument(Instrument):
                 value <= rangeTable[_tpl][key]['max']
         if 'list' in rangeTable[_tpl][key].keys():
             return value in rangeTable[_tpl][key]['list']
+#            if value[0] == "[":
+#                for v in ast.literal_eval(value):
+#                    if not v in rangeTable[_tpl][key]['list']:
+#                        return False
+#                    return True
+#            else:
+#                return value in rangeTable[_tpl][key]['list']
         if 'spaceseparatedlist' in rangeTable[_tpl][key].keys():
             ssl = rangeTable[_tpl][key]['spaceseparatedlist']
             for e in value.strip().split(" "):
@@ -344,7 +368,7 @@ class TSF(object):
         self.set(rname, value)
 
     def __str__(self):
-        buffer = "TSF values (%s) : \n"
+        buffer = "TSF values (%s) : \n" % ( self.tpl )
         for e in self.tsfParams:
             buffer += "    %30s : %s\n" % (e, str(self.tsfParams[e]))
         return buffer
@@ -408,4 +432,5 @@ class OBConstraints(FixedDict):
 
     def __init__(self):
         FixedDict.__init__(
-            self, ('name', 'seeing', 'skyTransparency', 'baseline', 'airmass', 'fli'))
+#            self, ('name', 'seeing', 'skyTransparency', 'baseline', 'airmass', 'fli'))
+            self, ('name', 'seeing', 'skyTransparency', 'baseline', 'airmass'))

@@ -1,4 +1,4 @@
-__version__ = "0.2.4"
+__version__ = "0.2.5"
 
 __release_notes__ = {
     #"0.1.6": {
@@ -12,6 +12,18 @@ __release_notes__ = {
     #        ""
     #        ]
     #    },
+     "0.2.5": {
+        "A2P2": [
+            ""
+        ],
+        "VLTI": [
+            "Add missing template name in log",
+            "Fix error removing baseline after constraint changes on P2 side. Next a2p2 version should add them back in acq templates"
+        ],
+        "CHARA": [
+            ""
+        ]
+    },
      "0.2.4": {
         "A2P2": [
             ""
