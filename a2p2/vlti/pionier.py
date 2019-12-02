@@ -101,10 +101,8 @@ class Pionier(VltiInstrument):
             acqTSF.ISS_IAS_HMAG = self.getFlux(scienceTarget, "H")
             
             # Set baseline  interferometric array code (should be a keywordlist)
-            # TODO ass handling of keywordlist types 
-            # acqTSF.ISS_BASELINE = "['"+self.getBaselineCode(BASELINE)+"']"
+            acqTSF.ISS_BASELINE = [ self.getBaselineCode(BASELINE) ]
             
-
 
             # setup some default values, to be changed below
             TEL_COU_GSSOURCE = 'SCIENCE'  # by default

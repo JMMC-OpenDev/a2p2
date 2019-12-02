@@ -180,14 +180,14 @@ class VltiInstrument(Instrument):
             return value >= rangeTable[_tpl][key]['min'] and\
                 value <= rangeTable[_tpl][key]['max']
         if 'list' in rangeTable[_tpl][key].keys():
-            return value in rangeTable[_tpl][key]['list']
-#            if value[0] == "[":
-#                for v in ast.literal_eval(value):
-#                    if not v in rangeTable[_tpl][key]['list']:
-#                        return False
-#                    return True
-#            else:
-#                return value in rangeTable[_tpl][key]['list']
+#            return value in rangeTable[_tpl][key]['list']
+            if type(value) is list:
+                for v in value:
+                    if not v in rangeTable[_tpl][key]['list']:
+                        return False
+                    return True
+            else:
+                return value in rangeTable[_tpl][key]['list']
         if 'spaceseparatedlist' in rangeTable[_tpl][key].keys():
             ssl = rangeTable[_tpl][key]['spaceseparatedlist']
             for e in value.strip().split(" "):

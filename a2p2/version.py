@@ -1,4 +1,4 @@
-__version__ = "0.2.5"
+__version__ = "0.2.6"
 
 __release_notes__ = {
     #"0.1.6": {
@@ -12,6 +12,17 @@ __release_notes__ = {
     #        ""
     #        ]
     #    },
+    "0.2.6": {
+        "A2P2": [
+            ""
+        ],
+        "VLTI": [
+            "Support baseline back again (single one at present)"
+        ],
+        "CHARA": [
+            ""
+        ]
+    },
      "0.2.5": {
         "A2P2": [
             ""
