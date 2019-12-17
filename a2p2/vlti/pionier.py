@@ -53,7 +53,7 @@ class Pionier(VltiInstrument):
         doFolder = (len(obsconflist) > 1)
         parentContainerId = containerId
         if doFolder and not dryMode:
-            
+
             folderName = obsconflist[0].SCTarget.name
             folderName = re.sub('[^A-Za-z0-9]+', '_', folderName.strip())
             folder, _ = api.createFolder(containerId, folderName)
@@ -99,10 +99,10 @@ class Pionier(VltiInstrument):
             # Retrieve Fluxes
             TEL_COU_MAG = self.getFlux(scienceTarget, "V")
             acqTSF.ISS_IAS_HMAG = self.getFlux(scienceTarget, "H")
-            
+
             # Set baseline  interferometric array code (should be a keywordlist)
             acqTSF.ISS_BASELINE = [ self.getBaselineCode(BASELINE) ]
-            
+
 
             # setup some default values, to be changed below
             TEL_COU_GSSOURCE = 'SCIENCE'  # by default
@@ -147,7 +147,7 @@ class Pionier(VltiInstrument):
 
             if acqTSF.ISS_IAS_HMAG > 7.5:
                     acqTSF.INS_DISP_NAME = "FREE"
-                    
+
             # FIXME: error (OB): "Phase 2 constraints must closely follow what was requested in the Phase 1 proposal.
             # The seeing value allowed for this OB is >= java0x0 arcsec."
             obConstraints.seeing = 1.0
@@ -188,6 +188,48 @@ class Pionier(VltiInstrument):
     def submitOB(self, ob, p2container):
         self.checkOB(ob, p2container, False)
 
+    def formatRangeTable(self):
+        rangeTable = self.getRangeTable()
+        buffer = ""
+        for l in rangeTable.keys():
+            buffer += l + "\n"
+            for k in rangeTable[l].keys():
+                constraint = rangeTable[l][k]
+                keys = constraint.keys()
+                buffer += ' %30s :' % (k)
+                if 'min' in keys and 'max' in keys:
+                    buffer += ' %f ... %f ' % (
+                        constraint['min'], constraint['max'])
+                elif 'list' in keys:
+                    buffer += str(constraint['list'])
+                elif "spaceseparatedlist" in keys:
+                    buffer += ' ' + " ".join(constraint['spaceseparatedlist'])
+                if 'default' in keys:
+                    buffer += ' (' + str(constraint['default']) + ')'
+                else:
+                    buffer += ' -no default-'
+                buffer += "\n"
+        return buffer
+
+    def formatDitTable(self):
+        ditTable = self.getDitTable()
+        buffer = '   Tel | Spec |  Pol  |     H   | DIT(s)\n'
+        buffer += '--------------------------------------------------------\n'
+        for tel in ['AT']:
+            for spec in ['GRISM','FREE']:
+                for pol in  ['IN','OUT']:
+                    for i in range(len(ditTable[tel][spec][pol]['DIT'])):
+                        buffer += ' %3s | %4s | %3s | %2s |' % ( tel,
+                            spec, pol, tel)
+                        buffer += ' %4.1f <K<= %3.1f | %4.1f' % (ditTable[tel][spec][pol]['MAG'][i],
+                                                                 ditTable[tel][spec][
+                            pol]['MAG'][i + 1],
+                            ditTable[tel][spec][pol]['DIT'][i])
+                        buffer += "\n"
+            Hut = ditTable[tel]['Hut']
+        return buffer
+
+
     def getPionierTemplateName(self, templateType, OBJTYPE):
         objType = "calibrator"
         if OBJTYPE and "SCI" in OBJTYPE:
@@ -210,11 +252,11 @@ class Pionier(VltiInstrument):
         # everything seems OK
         # create new OB in container:
         goodName = re.sub('[^A-Za-z0-9]+', '_', acqTSF.TARGET_NAME)
-        
+
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_PIONIER_' + \
             baselinecode + '_' + instrumentMode
 
-            
+
 
         ob, obVersion = api.createOB(containerId, OBS_DESCR)
         ui.addToLog("Getting new ob from p2: ")
@@ -244,7 +286,7 @@ class Pionier(VltiInstrument):
 
         # time constraints if present
         self.saveSiderealTimeConstraints(api, obId, LSTINTERVAL)
-            
+
         ui.setProgress(0.2)
 
         # then, attach acquisition template(s)

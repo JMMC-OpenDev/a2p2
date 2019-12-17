@@ -54,8 +54,8 @@ class VltiFacility(Facility):
         gravity = Gravity(self)
         from a2p2.vlti.pionier import Pionier
         pionier = Pionier(self)
-        # from a2p2.vlti.matisse import Matisse
-        # matisse= Matisse(self)
+        from a2p2.vlti.matisse import Matisse
+        matisse= Matisse(self)
 
         # self.supportedInstrumentsByAspro = ['GRAVITY', 'MATISSE', 'AMBER',
         # 'PIONIER']

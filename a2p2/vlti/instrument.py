@@ -249,13 +249,13 @@ class VltiInstrument(Instrument):
         ra_offset = (science.ra - ft.ra) * np.cos(ft.dec.to('radian'))
         dec_offset = (science.dec - ft.dec)
         return [ra_offset.deg * 3600 * 1000, dec_offset.deg * 3600 * 1000]  # in mas
-    
-    
-    def getSiderealTimeConstraints(self, LSTINTERVAL):        
+
+
+    def getSiderealTimeConstraints(self, LSTINTERVAL):
         # by default, above 40 degree. Will generate a WAIVERABLE ERROR if not.
         # we could warn before ?
         intervals=[]
-        if LSTINTERVAL:                        
+        if LSTINTERVAL:
             for lst in LSTINTERVAL:
                 lsts = lst.split('/')
                 # p2 seems happy with endlst < startlst
@@ -268,15 +268,15 @@ class VltiInstrument(Instrument):
                 lstEndSex = lsts[1]
                 intervals.append ( {'from': lstStartSex, 'to': lstEndSex} )
         return intervals
-    
+
     def saveSiderealTimeConstraints(self, api, obId, LSTINTERVAL):
         # wait for next Aspro release to only send constraints set by user
         return
         intervals = self.getSiderealTimeConstraints(LSTINTERVAL)
         if intervals:
-            sidTCs, stcVersion = api.getSiderealTimeConstraints(obId)           
+            sidTCs, stcVersion = api.getSiderealTimeConstraints(obId)
             api.saveSiderealTimeConstraints( obId, intervals, stcVersion)
-    
+
 
     def getHelp(self):
         s = self.getName()
@@ -287,20 +287,18 @@ class VltiInstrument(Instrument):
             s += Gravity.formatRangeTable(self)
             s += "\n\nGravityDitTable:\n"
             s += Gravity.formatDitTable(self)
-        # if s_name == "PIONIER":
-            # TODO 
-            # from a2p2.vlti.pionier import Pionier
-            # s += "\n\n PionierRangeTable: \n"
-            # s += Pionier.formatRangeTable(self)
-            # s += "\n\nPionierDitTable:\n"
-            # s += Pionier.formatDitTable(self)
-        # if s_name == "MATISSE":
-            # TODO
-            # from a2p2.vlti.matisse import Matisse
-            # s += "\n\n MatisseRangeTable: \n"
-            # s += Matisse.formatRangeTable(self)
-            # s += "\n\nMatisseDitTable:\n"
-            # s += Matisse.formatDitTable(self)
+        if s_name == "PIONIER":
+            from a2p2.vlti.pionier import Pionier
+            s += "\n\n PionierRangeTable: \n"
+            s += Pionier.formatRangeTable(self)
+            s += "\n\nPionierDitTable:\n"
+            s += Pionier.formatDitTable(self)
+        if s_name == "MATISSE_LM": # "MATISSE_LM" "MATISSE_N"
+            from a2p2.vlti.matisse import Matisse
+            s += "\n\n MatisseRangeTable: \n"
+            s += Matisse.formatRangeTable(self)
+            s += "\n\nMatisseDitTable:\n"
+            s += Matisse.formatDitTable(self)
 
         return s
 
