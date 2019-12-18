@@ -39,24 +39,24 @@ class VltiInstrument(Instrument):
         api = self.facility.getAPI()
         ui= self.ui
 
-        ui.addToLog("OB checked / preparing  submission...")
-
-        # if we have more than 1 obs, then better put it in a subfolder waiting
-        # for the existence of a block sequence not yet implemented in P2
+        # create new container
         obsconflist = ob.observationConfiguration
-        doFolder = (len(obsconflist) > 1)
-        if doFolder :
-            ui.addToLog("create concatenation folder", False)
-            folderName = obsconflist[0].SCTarget.name
-            folderName = re.sub('[^A-Za-z0-9]+', '_', folderName.strip())
+        folderName = obsconflist[0].SCTarget.name
+        folderName = re.sub('[^A-Za-z0-9]+', '_', folderName.strip())
+        # force a top folder in demo.
+        if p2container.isRoot() and self.facility.isDemoApi() :
+            ui.addToLog("create pre folder (forced for demo) ", False)
             folder, _ = api.createFolder(p2container.containerId, folderName)
             p2container.containerId = folder['containerId']
+
+        # create a concatenation if service mode
+        if p2container.isServiceModeRun():
             folder, _ = api.createConcatenation(p2container.containerId, folderName)
-            p2container.containerId = folder['containerId']
         else:
-            ui.addToLog("do not create concatenation folder (target list < 2)", False)
+            folder, _ = api.createFolder(p2container.containerId, folderName)
+        p2container.containerId = folder['containerId']
 
-
+        ui.addToLog("OB checked / preparing  submission...")
         self.checkOB(ob, p2container)
 
 

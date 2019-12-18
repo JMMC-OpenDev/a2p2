@@ -34,6 +34,7 @@ class VltiUI(FacilityUI):
         self.tree = self.treeFrame.tree
 
         self.container.pack(fill=BOTH, expand=True)
+        self.treeItemToRuns={}
 
     def showLoginFrame(self, ob):
         self.ob = ob
@@ -51,14 +52,21 @@ class VltiUI(FacilityUI):
             self.ShowErrorMessage(
                 "No Runs defined, impossible to program ESO's P2 interface.")
             return
+        # cleanup old entries if any
+        for item in self.treeItemToRuns:
+            try:
+                self.tree.delete(item)
+            except:
+                pass
+        self.treeItemToRuns = {}
 
         for run in runs:
             if self.facility.hasSupportedInsname(run['instrument']):
                 runName = run['progId']
                 instrument = run['instrument']
                 cid = run['containerId']
-                self.tree.insert(
-                    '', 'end', cid, text=runName, values=(instrument, cid), tags=(run))
+                e = self.tree.insert('', 'end', cid, text=runName, values=(instrument, cid))
+                self.treeItemToRuns[e] = run
                 # if folders, add them recursively
                 folders = getFolders(self.facility.api, cid)
                 if len(folders) > 0:
@@ -71,8 +79,8 @@ class VltiUI(FacilityUI):
         for j in range(len(folders)):
             name = folders[j]['name']
             contid2 = folders[j]['containerId']
-            self.tree.insert(contid, 'end', contid2, text=name,
-                             values=(instrument, contid2), tags=(run))
+            e = self.tree.insert(contid, 'end', contid2, text=name, values=(instrument, contid2))
+            self.treeItemToRuns[e] = run
             folders2 = getFolders(self.facility.api, contid2)
             if len(folders2) > 0:
                 try:
@@ -87,9 +95,7 @@ class VltiUI(FacilityUI):
             instru = ret['values'][0]
             cid = ret['values'][1]
             curname = ret['text']
-            tag = ret['tags']
-            run = tag[0]
-            self.facility.containerInfo.store(run, instru, cid)
+            self.facility.containerInfo.store(self.treeItemToRuns[curItem], instru, cid)
 
     def isBusy(self):
         self.tree.configure(selectmode='browse')

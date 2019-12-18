@@ -15,6 +15,7 @@ __release_notes__ = {
     "0.2.7": {
         "A2P2": [
             "Refactor code accross vlti instruments",
+            "Fix container selection in P2 tree"
             "Add release notes in the GUI"
         ],
         "VLTI": [

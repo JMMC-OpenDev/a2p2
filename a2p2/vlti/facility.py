@@ -62,6 +62,7 @@ class VltiFacility(Facility):
             self.facilityHelp += "\n" + i.getHelp()
 
         self.connected = False
+        self.apitype = 'demo' # set to demo by default (may change in connectAPI)
         self.containerInfo = P2Container(self)
 
         # will store later : name for status info, api
@@ -92,6 +93,9 @@ class VltiFacility(Facility):
                 self.ui.addToLog(
                     "everything ready! Request OB creation inside selected container ")
                 instrument.submitOB(ob, self.containerInfo)
+                self.refreshTree()
+
+
 
         # TODO add P2Error handling P2Error(r.status_code, method, url,
         # r.json()['error'])
@@ -108,12 +112,13 @@ class VltiFacility(Facility):
         except Exception as e:
             traceback.print_exc()
             trace = traceback.format_exc(
-                limit=1)  # limit = 2 should raise errors in our codes
+                )  # limit = 2 should raise errors in our codes
             self.ui.ShowErrorMessage(
                 "General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check LOG and fix before new submission." % (trace))
             trace = traceback.format_exc()
             self.ui.addToLog(trace, False)
             self.ui.setProgress(0)
+
 
     def isReadyToSubmit(self):
         return self.api and self.containerInfo.isOk()
@@ -131,15 +136,14 @@ class VltiFacility(Facility):
     def connectAPI(self, username, password, ob):
         import p2api
         if username == '52052':
-            type = 'demo'
+            self.apitype = 'demo'
         else:
-            type = 'production'
+            self.apitype = 'production'
         try:
-            self.api = p2api.ApiConnection(type, username, password)
+            self.api = p2api.ApiConnection(self.apitype, username, password)
             # TODO test that api is ok and handle error if any...
 
-            runs, _ = self.api.getRuns()
-            self.ui.fillTree(runs)
+            self.refreshTree()
 
             self.setConnected(True)
             self.username = username
@@ -148,6 +152,13 @@ class VltiFacility(Facility):
             self.ui.addToLog("Can't connect to P2 (see LOG).")
             trace = traceback.format_exc()
             self.ui.addToLog(trace, False)
+
+    def refreshTree(self):
+        runs, _ = self.api.getRuns()
+        self.ui.fillTree(runs)
+
+    def isDemoAPI(self):
+        return self.apitype=='demo'
 
     def getAPI(self):
         return self.api
@@ -167,7 +178,7 @@ class P2Container:
     #{'pi': {'lastName': 'Accont', 'emailAddress': '52052@nodomain.net', 'firstName': 'Phase 1/2 Ttorial'},
     # 'telescope': 'VLTI', 'title': 'p2 ttorial', 'schedledPeriod': 60, 'isToO': False, 'period': 60, 'owned': Tre,
     # 'ipVersion': 104.05, 'instrment': 'PIONIER', 'containerId': 1601182, 'observingConstraints': {'fli' : 'd', 'seeing': 0.8},
-    # 'mode': 'SM', 'progId': '60.A-9253(T)', 'itemCont': 2, 'delegated': False, 'rnId': 60925319}
+    # 'mode': 'SM', 'progId': '60.A-9253(T)', 'itemCont': 2, 'delegated': False, 'runId': 60925319}
 
     def __init__(self, facility):
         self.facility = facility
@@ -188,7 +199,10 @@ class P2Container:
         return (self.run != None)
 
     def isRoot(self):
-        return self.containerId == self.run['rnId']
+        return self.containerId == str(self.run['runId'])
+
+    def isServiceModeRun(self):
+        return self.run['mode']=='SM'
 
     def __str__(self):
         return """instrument:'%s', containerId:'%s'""" % (self.instrument, self.containerId)
