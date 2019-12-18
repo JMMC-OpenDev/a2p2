@@ -88,7 +88,7 @@ class VltiUI(FacilityUI):
             cid = ret['values'][1]
             curname = ret['text']
             tag = ret['tags']
-            run = tag[1]
+            run = tag[0]
             self.facility.containerInfo.store(run, instru, cid)
 
     def isBusy(self):
@@ -180,5 +180,5 @@ def getFolders(p2api, containerId):
     items, _ = p2api.getItems(containerId)
     for item in items:
         if item['itemType'] == 'Folder':
-            folders.append(itemList[i])
+            folders.append(item)
     return folders

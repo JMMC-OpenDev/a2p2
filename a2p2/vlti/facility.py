@@ -78,7 +78,7 @@ class VltiFacility(Facility):
         instrument = self.getInstrument(ob.instrumentConfiguration.name)
         try:
             # run checkOB which may raise some error before connection request
-            instrument.checkOB(ob, self.containerInfo)
+            instrument.checkOB(ob)
 
             # performs operation
             if not self.isConnected():

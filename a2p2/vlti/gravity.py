@@ -13,7 +13,6 @@ from astropy.coordinates import SkyCoord
 import cgi
 import numpy as np
 import re
-import datetime
 
 HELPTEXT = """
 Please define Gravity instrument help in a2p2/vlti/gravity.py
@@ -25,11 +24,9 @@ class Gravity(VltiInstrument):
     def __init__(self, facility):
         VltiInstrument.__init__(self, facility, "GRAVITY")
 
-    # mainly corresponds to a refactoring of old utils.processXmlMessage
-    def checkOB(self, ob, p2container, dryMode=True):
-        api = self.facility.getAPI()
+    def checkOB(self, ob, p2container=None):
+
         ui = self.ui
-        containerId = p2container.containerId
 
         instrumentConfiguration = ob.instrumentConfiguration
         BASELINE = ob.interferometerConfiguration.stations
@@ -50,17 +47,6 @@ class Gravity(VltiInstrument):
             ins_pol = "OUT"
         else:
             ins_pol = 'IN'
-
-        # if we have more than 1 obs, then better put it in a subfolder waiting
-        # for the existence of a block sequence not yet implemented in P2
-        obsconflist = ob.observationConfiguration
-        doFolder = (len(obsconflist) > 1)
-        parentContainerId = containerId
-        if doFolder and not dryMode:
-            folderName = obsconflist[0].SCTarget.name
-            folderName = re.sub('[^A-Za-z0-9]+', '_', folderName.strip())
-            folder, _ = api.createFolder(containerId, folderName)
-            containerId = folder['containerId']
 
         for observationConfiguration in ob.observationConfiguration:
 
@@ -100,17 +86,17 @@ class Gravity(VltiInstrument):
             COU_GS_MAG = self.getFlux(scienceTarget, "V")
             acqTSF.SEQ_INS_SOBJ_MAG = self.getFlux(scienceTarget, "K")
             acqTSF.SEQ_FI_HMAG = self.getFlux(scienceTarget, "H")
-            
+
             # Set baseline  interferometric array code (should be a keywordlist)
             acqTSF.ISS_BASELINE = [ self.getBaselineCode(BASELINE) ]
-            
+
             # setup some default values, to be changed below
             COU_AG_GSSOURCE = 'SCIENCE'  # by default
             GSRA = '00:00:00.000'
             GSDEC = '00:00:00.000'
             dualField = False
             dualFieldDistance = 0.0 #needed as must exist for the argument list of createGravityOB
-            
+
             # initialize FT variables (must exist)
             # TODO remove next lines using a dual_acq TSF that would handle
             # them
@@ -193,7 +179,7 @@ class Gravity(VltiInstrument):
 
             # compute dit, ndit, nexp
             dit = self.getDit(tel, acqTSF.INS_SPEC_RES, acqTSF.INS_SPEC_POL,
-                              acqTSF.SEQ_INS_SOBJ_MAG, dualField, showWarning=dryMode)
+                              acqTSF.SEQ_INS_SOBJ_MAG, dualField, showWarning=(p2container==None))
             ndit = 300 / dit
             if ndit < 10:
                 ndit = 10
@@ -226,28 +212,20 @@ class Gravity(VltiInstrument):
             obsTSF.SEQ_SKY_X = 2000
             obsTSF.SEQ_SKY_Y = 2000
 
-            # then call the ob-creation using the API.
-            if dryMode:
-                ui.addToLog(
-                    obTarget.name + " ready for p2 upload (details logged)")
+            # then call the ob-creation using the API if p2container exists.
+            if p2container == None:
+                ui.addToLog(obTarget.name + " ready for p2 upload (details logged)")
                 ui.addToLog(obTarget, False)
                 ui.addToLog(obConstraints, False)
                 ui.addToLog(acqTSF, False)
                 ui.addToLog(obsTSF, False)
-
             else:
-                self.createGravityOB(
-                    ui, self.facility.a2p2client.getUsername(
-                    ), api, containerId, self.getBaselineCode(BASELINE), obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
+                self.createGravityOB( p2container, self.getBaselineCode(BASELINE), obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
                                      DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
-        # endfor
-        if doFolder:
-            containerId = parentContainerId
-            doFolder = False
 
-    def submitOB(self, ob, p2container):
-        self.checkOB(ob, p2container, False)
+
+
 
     def formatRangeTable(self):
         rangeTable = self.getRangeTable()
@@ -317,9 +295,12 @@ class Gravity(VltiInstrument):
         return self.getGravityTemplateName("acq", dualField, OBJTYPE)
 
     def createGravityOB(
-        self, ui, username, api, containerId, baselinecode, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
+        self, p2container, baselinecode, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
                         DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG,
                         SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
+
+        api = self.facility.getAPI()
+        ui = self.ui
         ui.setProgress(0.1)
 
         # TODO compute value
@@ -331,13 +312,12 @@ class Gravity(VltiInstrument):
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_GRAVITY_' + \
             baselinecode + '_' + instrumentMode
 
-        ob, obVersion = api.createOB(containerId, OBS_DESCR)
+        ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
         obId = ob['obId']
 
         # we use obId to populate OB
         ob['obsDescription']['name'] = OBS_DESCR[0:min(len(OBS_DESCR), 31)]
-        ob['obsDescription']['userComments'] = 'Generated by ' + username + \
-            ' using ASPRO 2 (c) JMMC on ' + datetime.datetime.now().isoformat()
+        ob['obsDescription']['userComments'] = self.getA2p2Comments()
         # ob['obsDescription']['InstrumentComments'] = 'AO-B1-C2-E3' #should be
         # a list of alternative quadruplets!
 
@@ -355,7 +335,7 @@ class Gravity(VltiInstrument):
 
         # time constraints if present
         self.saveSiderealTimeConstraints(api, obId, LSTINTERVAL)
-            
+
         ui.setProgress(0.2)
 
         # then, attach acquisition template(s)
@@ -400,8 +380,3 @@ class Gravity(VltiInstrument):
         response, _ = api.verifyOB(obId, True)
         ui.setProgress(1.0)
         self.showP2Response(response, ob, obId)
-
-        # fetch OB again to confirm its status change
-        #   ob, obVersion = api.getOB(obId)
-        # python3: print('Status of verified OB', obId, 'is now',
-        # ob['obStatus'])
