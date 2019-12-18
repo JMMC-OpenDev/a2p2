@@ -4,6 +4,8 @@ __all__ = []
 
 import sys
 from a2p2 import __version__
+from a2p2 import __release_notes__
+
 
 if sys.version_info[0] == 2:
     from Tkinter import *
@@ -57,10 +59,15 @@ class MainWindow():
         self.helpFrame.pack(fill=BOTH, expand=True)
         self.addHelp("A2P2", HELPTEXT)
 
+        self.releaseNotesFrame = Frame(self.notebook)
+        self.releaseNotesFrame.pack(fill=BOTH, expand=True)
+        self.addReleaseNotes(self.releaseNotesFrame)
+
         # add tab and store index for later use in showFacilityUI
         self.tabIdx = {}
         self.registerTab("LOG", self.logFrame)
         self.registerTab("HELP", self.helpFrame)
+        self.registerTab("RELEASE NOTES", self.releaseNotesFrame)
         self.notebook.select(self.tabIdx["LOG"])
 
         self.notebook.pack(side=TOP, fill=BOTH, expand=True)
@@ -96,6 +103,28 @@ class MainWindow():
         frame.pack(side=TOP, fill=BOTH, expand=True)
         self.helptabs.add(frame, text=tabname)
         widget.insert(END, txt)
+
+    def addReleaseNotes(self, frame):
+        txt=""
+        for v in  __release_notes__ :
+            txt+="\nV " + v + " :"
+            txt += "\n---------------"
+            for e in __release_notes__[v]:
+                infos = __release_notes__[v][e]
+                if infos:
+                    txt+="\n  " + e + " : "
+                    for i in infos:
+                        txt+="\n    - " + i
+            txt += "\n\n"
+
+
+        widget = Text(frame, width=120)
+        helpscroll = Scrollbar(frame, command=widget.yview)
+        widget.configure(yscrollcommand=helpscroll.set)
+        helpscroll.pack(side=RIGHT, fill=Y)
+        widget.pack(side=LEFT, fill=BOTH, expand=True)
+        widget.insert(END, txt)
+
 
     def registerTab(self, text, widget):
         self.notebook.add(widget, text=text)

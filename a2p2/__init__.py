@@ -3,6 +3,7 @@
 __all__ = ['facility', 'instrument', 'gui', 'samp', 'client']
 
 from .version import __version__
+from .version import __release_notes__
 
 from . import facility
 from . import instrument
