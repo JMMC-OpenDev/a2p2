@@ -81,7 +81,11 @@ class Facility():
 
     def hasSupportedInsname(self, insname):
         # ... we may log failures
-        return insname in self.getSupportedInsnames()
+        if insname in self.getSupportedInsnames():
+            return True
+        for i in self.getSupportedInstruments():
+            if i.getShortName() == insname :
+                return True
 
     def getSupportedInstruments(self):
         return self.facilityInstruments.values()

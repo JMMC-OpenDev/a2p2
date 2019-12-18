@@ -14,5 +14,14 @@ class Instrument():
     def getName(self):
         return self.insname
 
+    def getShortName(self):
+        """
+        Keep left part of _ tokenized name.
+        EG. useful to replace MATISSE_LM or MATISSE_N by MATISSE in some common parts (config or treeview).
+        """
+        if not "_" in self.insname:
+            return self.insname
+        return self.insname[0:self.insname.index("_")]
+
     def getHelp(self):
         return self.help
