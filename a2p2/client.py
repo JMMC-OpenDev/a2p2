@@ -38,7 +38,9 @@ class A2p2Client():
     def __enter__(self):
         """Handle starting the 'with' statements."""
 
-        self.ui.addToLog("Welcome in the A2P2 V" + __version__)
+        self.ui.addToLog("              Welcome in the A2P2 V" + __version__)
+        self.ui.addToLog("")
+        self.ui.addToLog("( https://github.com/JMMC-OpenDev/a2p2/wiki )")
 
         return self
 
