@@ -52,40 +52,31 @@ class VltiUI(FacilityUI):
                 "No Runs defined, impossible to program ESO's P2 interface.")
             return
 
-        for i in range(len(runs)):
-            if self.facility.hasSupportedInsname(runs[i]['instrument']):
-                runName = runs[i]['progId']
-                instrument = runs[i]['instrument']
-                rid = runs[i]['runId']
-                cid = runs[i]['containerId']
+        for run in runs:
+            if self.facility.hasSupportedInsname(run['instrument']):
+                runName = run['progId']
+                instrument = run['instrument']
+                cid = run['containerId']
                 self.tree.insert(
-                    '', 'end', cid, text=runName, values=(instrument, cid), tags=('run', rid))
+                    '', 'end', cid, text=runName, values=(instrument, cid), tags=(run))
                 # if folders, add them recursively
                 folders = getFolders(self.facility.api, cid)
                 if len(folders) > 0:
                     try:
-                        self.folder_explore(folders, cid, instrument, rid)
+                        self.folder_explore(folders, cid, instrument, run)
                     except:
                         pass
 
-    def folder_added(self, name, pid, cid):
-        ret = self.tree.item(pid)
-        curinst = ret['values'][0]
-        tag = ret['tags']
-        rid = tag[1]
-        self.tree.insert(pid, 'end', cid, text=name,
-                         values=(curinst, cid), tags=('folder', rid))
-
-    def folder_explore(self, folders, contid, instrument, rid):
+    def folder_explore(self, folders, contid, instrument, run):
         for j in range(len(folders)):
             name = folders[j]['name']
             contid2 = folders[j]['containerId']
             self.tree.insert(contid, 'end', contid2, text=name,
-                             values=(instrument, contid2), tags=('folder', rid))
+                             values=(instrument, contid2), tags=(run))
             folders2 = getFolders(self.facility.api, contid2)
             if len(folders2) > 0:
                 try:
-                    self.folder_explore(folders2, contid2, instrument, rid)
+                    self.folder_explore(folders2, contid2, instrument, run)
                 except:
                     pass
 
@@ -93,24 +84,12 @@ class VltiUI(FacilityUI):
         curItem = self.tree.focus()
         ret = self.tree.item(curItem)
         if len(ret['values']) > 0:
-            curinst = ret['values'][0]
+            instru = ret['values'][0]
             cid = ret['values'][1]
             curname = ret['text']
             tag = ret['tags']
-            rid = tag[1]
-            entryType = tag[0]
-            # self.flag[0]=1
-            # TODO can we remove previous line ?
-            if (entryType == 'folder'):  # we have a folder
-                new_containerId_same_run = cid
-                folderName = curname
-                self.facility.containerInfo.store_containerId(
-                    new_containerId_same_run)
-            else:
-                instru = curinst
-                run, _ = self.facility.api.getRun(rid)
-                containerId = run["containerId"]
-                self.facility.containerInfo.store(rid, instru, containerId)
+            run = tag[1]
+            self.facility.containerInfo.store(run, instru, cid)
 
     def isBusy(self):
         self.tree.configure(selectmode='browse')
@@ -128,16 +107,16 @@ class TreeFrame(Frame):
         subframe = Frame(self)
 
         self.tree = ttk.Treeview(
-            subframe, columns=('Project Id'))  # , 'instrument'))#, 'folder Id'))
+            subframe, columns=('Project ID'))  # , 'instrument'))#, 'folder ID'))
         ysb = ttk.Scrollbar(
             subframe, orient='vertical', command=self.tree.yview)
         xsb = ttk.Scrollbar(
             subframe, orient='horizontal', command=self.tree.xview)
 
         self.tree.configure(yscroll=ysb.set, xscroll=xsb.set)
-        self.tree.heading('#0', text='Project Id', anchor='w')
+        self.tree.heading('#0', text='Project ID', anchor='w')
         self.tree.heading('#1', text='Instrument', anchor='w')
-        self.tree.heading('#2', text='folder Id', anchor='w')
+        self.tree.heading('#2', text='Container ID', anchor='w')
         self.tree.bind(
             '<ButtonRelease-1>', self.vltiUI.on_tree_selection_changed)
 
@@ -198,8 +177,8 @@ class LoginFrame(Frame):
 # TODO move into a common part
 def getFolders(p2api, containerId):
     folders = []
-    itemList, _ = p2api.getItems(containerId)
-    for i in range(len(itemList)):
-        if itemList[i]['itemType'] == 'Folder':
+    items, _ = p2api.getItems(containerId)
+    for item in items:
+        if item['itemType'] == 'Folder':
             folders.append(itemList[i])
     return folders

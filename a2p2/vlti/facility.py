@@ -57,9 +57,6 @@ class VltiFacility(Facility):
         from a2p2.vlti.matisse import Matisse
         matisse= Matisse(self)
 
-        # self.supportedInstrumentsByAspro = ['GRAVITY', 'MATISSE', 'AMBER',
-        # 'PIONIER']
-
         # complete help
         for i in self.getSupportedInstruments():
             self.facilityHelp += "\n" + i.getHelp()
@@ -90,10 +87,10 @@ class VltiFacility(Facility):
                  # self.a2p2client.ui.addToLog("Receive OB for
                  # '"+ob.instrumentConfiguration.name+"'")
                 self.ui.addToLog(
-                    "Please select a Project Id or Folder in the above list. OBs are not shown")
+                    "Please select a folder in the above list. OBs are not shown")
             else:
                 self.ui.addToLog(
-                    "everything ready! process OB for selected container")
+                    "everything ready! Request OB creation inside selected container ")
                 instrument.submitOB(ob, self.containerInfo)
 
         # TODO add P2Error handling P2Error(r.status_code, method, url,
@@ -166,22 +163,21 @@ class VltiFacility(Facility):
 
 class P2Container:
     # TODO add runName field so we can show information instead of numeric
-    # projectId
+    # run object stores:
+    #{'pi': {'lastName': 'Accont', 'emailAddress': '52052@nodomain.net', 'firstName': 'Phase 1/2 Ttorial'},
+    # 'telescope': 'VLTI', 'title': 'p2 ttorial', 'schedledPeriod': 60, 'isToO': False, 'period': 60, 'owned': Tre,
+    # 'ipVersion': 104.05, 'instrment': 'PIONIER', 'containerId': 1601182, 'observingConstraints': {'fli' : 'd', 'seeing': 0.8},
+    # 'mode': 'SM', 'progId': '60.A-9253(T)', 'itemCont': 2, 'delegated': False, 'rnId': 60925319}
 
     def __init__(self, facility):
         self.facility = facility
-        self.projectId = None
-        # TODO check projectId because it is not used ?
+        self.run = None # dict returned by p2api
         self.instrument = None
         self.containerId = None
 
-    def store(self, projectId, instrument, containerId):
-        self.projectId = projectId
+    def store(self, run, instrument, containerId):
+        self.run = run
         self.instrument = instrument
-        self.containerId = containerId
-        self.log()
-
-    def store_containerId(self, containerId):
         self.containerId = containerId
         self.log()
 
@@ -189,9 +185,10 @@ class P2Container:
         self.facility.ui.addToLog("*** Working with %s ***" % self)
 
     def isOk(self):
-        return (self.projectId != None)
+        return (self.run != None)
+
+    def isRoot(self):
+        return self.containerId == self.run['rnId']
 
     def __str__(self):
-# return """projectId:'%s', instrument:'%s', containerId:'%s'""" %
-# (self.projectId, self.instrument, self.containerId)
         return """instrument:'%s', containerId:'%s'""" % (self.instrument, self.containerId)
