@@ -2,8 +2,8 @@
     "PIONIER_acq.tsf":
     {
     "TARGET.NAME":                {    },
-    "TEL.COU.ALPHA":              {"default": 0.},
-    "TEL.COU.DELTA":              {"default": 0.},
+    "TEL.COU.ALPHA":              {"default": 0},
+    "TEL.COU.DELTA":              {"default": 0},
     "TEL.COU.EPOCH":              {"default": 2000, "max": 3000, "min": -2000},
     "TEL.COU.EQUINOX":            {"default": 2000, "max": 3000, "min": -2000},
     "TEL.COU.GSSOURCE":           {"default": "SCIENCE", "list": ["NONE", "SETUPFILE", "SCIENCE"]},

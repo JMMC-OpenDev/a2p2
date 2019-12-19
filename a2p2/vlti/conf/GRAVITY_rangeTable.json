@@ -26,7 +26,7 @@
         "DET2.DIT":                   {"default": 0.3, "list": ["0.3", "1", "3", "10", "30", "100", "300"]},
         "DET2.NDIT.OBJECT":           {"default": 32, "max": 320, "min": 4},
         "DET2.NDIT.SKY":              {"default": 32, "max": 320, "min": 4},
-        "SEQ.HWPOFF":                 {"default": 0, "max": 180, "min": -180},
+        "SEQ.HWPOFF":                 {"max": 180, "min": -180},
         "SEQ.OBSSEQ":                 {"default": "O S", "spaceseparatedlist": [    "O",    "S" ]},
         "SEQ.SKY.X":                  {"default": 2000, "max": 8000, "min": -8000},
         "SEQ.SKY.Y":                  {"default": 2000, "max": 8000, "min": -8000}
