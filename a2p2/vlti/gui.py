@@ -35,6 +35,7 @@ class VltiUI(FacilityUI):
 
         self.container.pack(fill=BOTH, expand=True)
         self.treeItemToRuns={}
+        self.treeItemToP2Items = {}
 
     def showLoginFrame(self, ob):
         self.ob = ob
@@ -62,40 +63,43 @@ class VltiUI(FacilityUI):
 
         for run in runs:
             if self.facility.hasSupportedInsname(run['instrument']):
-                runName = run['progId']
-                instrument = run['instrument']
                 cid = run['containerId']
-                e = self.tree.insert('', 'end', cid, text=runName, values=(instrument, cid))
-                self.treeItemToRuns[e] = run
+                self._insertInTree('', run['progId'], cid, run,run)
                 # if folders, add them recursively
                 folders = getFolders(self.facility.api, cid)
                 if len(folders) > 0:
                     try:
-                        self.folder_explore(folders, cid, instrument, run)
+                        self.folder_explore(folders, cid, run)
                     except:
                         pass
 
-    def folder_explore(self, folders, contid, instrument, run):
-        for j in range(len(folders)):
-            name = folders[j]['name']
-            contid2 = folders[j]['containerId']
-            e = self.tree.insert(contid, 'end', contid2, text=name, values=(instrument, contid2))
-            self.treeItemToRuns[e] = run
-            folders2 = getFolders(self.facility.api, contid2)
+    def folder_explore(self, folders, contid, run):
+        for folder in folders:
+            self._insertInTree(contid, folder['name'], folder['containerId'], run , folder)
+            folders2 = getFolders(self.facility.api, folder['containerId'])
             if len(folders2) > 0:
                 try:
-                    self.folder_explore(folders2, contid2, instrument, run)
+                    self.folder_explore(folders2, folder['containerId'], run)
                 except:
                     pass
+
+    def _insertInTree(self, parentContainerID, name, containerID, run, item):
+        instrument=run['instrument']
+        if run!=item:
+            label=item['itemType']
+        else:
+            label = "%s Run" % run['mode']
+
+        e = self.tree.insert(parentContainerID, 'end', containerID, text=name, values=(run['instrument'], label ))
+        self.treeItemToRuns[e] = run
+        self.treeItemToP2Items[e] = item
+
 
     def on_tree_selection_changed(self, selection):
         curItem = self.tree.focus()
         ret = self.tree.item(curItem)
         if len(ret['values']) > 0:
-            instru = ret['values'][0]
-            cid = ret['values'][1]
-            curname = ret['text']
-            self.facility.containerInfo.store(self.treeItemToRuns[curItem], instru, cid)
+            self.facility.containerInfo.store(self.treeItemToRuns[curItem], self.treeItemToP2Items[curItem])
 
     def isBusy(self):
         self.tree.configure(selectmode='browse')
@@ -122,7 +126,7 @@ class TreeFrame(Frame):
         self.tree.configure(yscroll=ysb.set, xscroll=xsb.set)
         self.tree.heading('#0', text='Project ID', anchor='w')
         self.tree.heading('#1', text='Instrument', anchor='w')
-        self.tree.heading('#2', text='Container ID', anchor='w')
+        self.tree.heading('#2', text='Container type', anchor='w')
         self.tree.bind(
             '<ButtonRelease-1>', self.vltiUI.on_tree_selection_changed)
 
@@ -185,6 +189,6 @@ def getFolders(p2api, containerId):
     folders = []
     items, _ = p2api.getItems(containerId)
     for item in items:
-        if item['itemType'] == 'Folder':
+        if item['itemType'] in ['Folder','Concatenation']:
             folders.append(item)
     return folders

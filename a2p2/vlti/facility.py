@@ -88,7 +88,7 @@ class VltiFacility(Facility):
                  # self.a2p2client.ui.addToLog("Receive OB for
                  # '"+ob.instrumentConfiguration.name+"'")
                 self.ui.addToLog(
-                    "Please select a folder in the above list. OBs are not shown")
+                    "Please select a folder (not a concatenation) in the above list. OBs are not shown")
             else:
                 self.ui.addToLog(
                     "everything ready! Request OB creation inside selected container ")
@@ -111,8 +111,7 @@ class VltiFacility(Facility):
             self.ui.setProgress(0)
         except Exception as e:
             traceback.print_exc()
-            trace = traceback.format_exc(
-                )  # limit = 2 should raise errors in our codes
+            trace = traceback.format_exc(limit=1)  # limit = 2 should raise errors in our codes
             self.ui.ShowErrorMessage(
                 "General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check LOG and fix before new submission." % (trace))
             trace = traceback.format_exc()
@@ -122,6 +121,7 @@ class VltiFacility(Facility):
 
     def isReadyToSubmit(self):
         return self.api and self.containerInfo.isOk()
+
 
     def isConnected(self):
         return self.connected
@@ -173,30 +173,42 @@ class VltiFacility(Facility):
 
 
 class P2Container:
-    # TODO add runName field so we can show information instead of numeric
     # run object stores:
     #{'pi': {'lastName': 'Accont', 'emailAddress': '52052@nodomain.net', 'firstName': 'Phase 1/2 Ttorial'},
-    # 'telescope': 'VLTI', 'title': 'p2 ttorial', 'schedledPeriod': 60, 'isToO': False, 'period': 60, 'owned': Tre,
-    # 'ipVersion': 104.05, 'instrment': 'PIONIER', 'containerId': 1601182, 'observingConstraints': {'fli' : 'd', 'seeing': 0.8},
+    # 'telescope': 'VLTI', 'title': 'p2 tutorial', 'schedledPeriod': 60, 'isToO': False, 'period': 60, 'owned': Tre,
+    # 'ipVersion': 104.05, 'instrument': 'PIONIER', 'containerId': 1601182, 'observingConstraints': {'fli' : 'd', 'seeing': 0.8},
     # 'mode': 'SM', 'progId': '60.A-9253(T)', 'itemCont': 2, 'delegated': False, 'runId': 60925319}
+    # and item (when not run) :
+    # {u'containerStatus': u'P', u'itemType': u'Group', u'name': u'New Group', u'groupScore': 0.0,
+    # u'containerId': 2609528, u'runId': 60925213, u'userPriority': 1, u'itemCount': 0, u'parentContainerId': 2609516}
 
     def __init__(self, facility):
         self.facility = facility
         self.run = None # dict returned by p2api
-        self.instrument = None
         self.containerId = None
+        self.item = None
 
-    def store(self, run, instrument, containerId):
+    def store(self, run, item):
         self.run = run
-        self.instrument = instrument
-        self.containerId = containerId
+        self.item = item
+        if self.run==self.item:
+            self.containerId = run['runId']
+        else:
+            self.containerId = item['containerId']
         self.log()
 
     def log(self):
-        self.facility.ui.addToLog("*** Working with %s ***" % self)
+        if self.run != self.item and self.item['itemType'] == 'Concatenation':
+            self.facility.ui.addToLog("*** Please do not select a Concatenatin and select another container. ***" )
+        else:
+            self.facility.ui.addToLog("*** Working with %s ***" % self)
 
     def isOk(self):
-        return (self.run != None)
+        if self.run == None :
+            return False
+        if self.run == self.item :
+            return True
+        return self.item['itemType'] != 'Concatenation'
 
     def isRoot(self):
         return self.containerId == str(self.run['runId'])
@@ -205,4 +217,4 @@ class P2Container:
         return self.run['mode']=='SM'
 
     def __str__(self):
-        return """instrument:'%s', containerId:'%s'""" % (self.instrument, self.containerId)
+        return """instrument:'%s', containerId:'%s'""" % (self.run['instrument'], self.containerId)

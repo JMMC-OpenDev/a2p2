@@ -20,7 +20,8 @@ __release_notes__ = {
         ],
         "VLTI": [
             "Add MATISSE support",
-            "Support Concatenations"
+            "Support Concatenations (also shown in the tree panel)",
+            "Show type in the container chooser instead of containerID"
         ],
         "CHARA": [
         ]
