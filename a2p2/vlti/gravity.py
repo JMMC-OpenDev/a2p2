@@ -331,6 +331,7 @@ class Gravity(VltiInstrument):
         for k in constraints:
             ob['constraints'][k] = constraints[k]
 
+        ui.addToLog("Save ob to p2:\n%s" % ob, False)
         ob, obVersion = api.saveOB(ob, obVersion)
 
         # time constraints if present

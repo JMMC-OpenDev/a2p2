@@ -197,7 +197,7 @@ class Matisse(VltiInstrument):
                     COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG):
 
         api = self.facility.getAPI()
-        username=self.facility.a2p2client.getUsername()
+        ui = self.ui
         ui.setProgress(0.1)
 
         # TODO compute value
@@ -214,7 +214,7 @@ class Matisse(VltiInstrument):
 
         # we use obId to populate OB
         ob['obsDescription']['name'] = OBS_DESCR[0:min(len(OBS_DESCR), 31)]
-        ob['obsDescription']['userComments'] = self.getA2P2Comments()
+        ob['obsDescription']['userComments'] = self.getA2p2Comments()
         # ob['obsDescription']['InstrumentComments'] = 'AO-B1-C2-E3' #should be
         # a list of alternative quadruplets!
 
@@ -228,6 +228,7 @@ class Matisse(VltiInstrument):
         for k in constraints:
             ob['constraints'][k] = constraints[k]
 
+        ui.addToLog("Save ob to p2:\n%s" % ob, False)
         ob, obVersion = api.saveOB(ob, obVersion)
 
          # time constraints if present

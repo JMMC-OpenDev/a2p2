@@ -255,8 +255,7 @@ class Pionier(VltiInstrument):
         for k in constraints:
             ob['constraints'][k] = constraints[k]
 
-        ui.addToLog("Submitting ob to p2: ")
-        ui.addToLog("ob: %s"%ob)
+        ui.addToLog("Save ob to p2:\n%s"%ob, False)
         ob, obVersion = api.saveOB(ob, obVersion)
 
         # time constraints if present
