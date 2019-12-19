@@ -207,7 +207,7 @@ class Gravity(VltiInstrument):
             sequence = 'O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O'
             my_sequence = sequence[0:2 * nexp]
             # and store computed values in obsTSF
-            obsTSF.DET2_DIT = dit
+            obsTSF.DET2_DIT = str(dit)
             obsTSF.DET2_NDIT_OBJECT = ndit
             obsTSF.DET2_NDIT_SKY = ndit
             obsTSF.SEQ_OBSSEQ = my_sequence
