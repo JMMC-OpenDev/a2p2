@@ -381,6 +381,9 @@ class TSF(object):
     def getDict(self):
         return self.tsfParams
 
+    def getP2Name(self):
+        return self.tpl[0:-4]
+
     def __getattr__(self, name):  # called for non instance attributes (i.e. keywords)
         rname = name.replace('_', '.')
         if rname in self.tsfParams:
@@ -460,9 +463,11 @@ class OBTarget(FixedDict):
             self, ('name', 'ra', 'dec', 'properMotionRa', 'properMotionDec'))
 
 
-class OBConstraints(FixedDict):
+class OBConstraints(TSF):
 
-    def __init__(self):
-        FixedDict.__init__(
+    def __init__(self, instrument):
+        TSF.__init__(self, instrument, "instrumentConstraints.tsf")
+#        FixedDict.__init__(
 #            self, ('name', 'seeing', 'skyTransparency', 'baseline', 'airmass', 'fli'))
-            self, ('name', 'seeing', 'skyTransparency', 'baseline', 'airmass'))
+#            self, ('name', 'seeing', 'skyTransparency', 'baseline', 'airmass'))
+#            self, ('name', 'skyTransparency', 'baseline', 'airmass'))
