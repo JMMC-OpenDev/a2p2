@@ -33,13 +33,15 @@ __release_notes__ = {
         ],
         "TODO-SCIENCE": [
             "Complete/fix GRAVITY DIT table with P105 changes that will come in the next template user manual",
-            "Use a calibrator template for MATISSE (instead of default hyb_obs)"
+            "Use a calibrator template for MATISSE (instead of default hyb_obs)",
+            "flag ~important~ keyword that MUST be set in a2p2 code to avoid default"
         ],
         "TODO-DEV": [
             "Support numlist keyword : eg. SEQ.HWPOFF",
             "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
             "Do not set default values in a2p2 if not set",
-            "flag ~important~ keyword that MUST be set in a2p2 code to avoid default"
+            "unify ob name creation in vlti instrument createOB()"
+
         ]
     },"0.2.6": {
         "A2P2": [
