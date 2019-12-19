@@ -54,7 +54,7 @@ class Pionier(VltiInstrument):
             darkTSF = TSF(self, "PIONIER_gen_cal_dark.tsf")
 
             obTarget = OBTarget()
-            obConstraints = OBConstraints()
+            obConstraints = OBConstraints(self)
 
             # set common properties
             acqTSF.INS_DISP_NAME = ins_disp
@@ -76,6 +76,9 @@ class Pionier(VltiInstrument):
             obTarget.properMotionRa, obTarget.properMotionDec = self.getPMCoords(
                 scienceTarget)
 
+            # Set baseline  interferometric array code (should be a keywordlist)
+            acqTSF.ISS_BASELINE = [self.getBaselineCode(BASELINE)]
+
             # define some default values
             DIAMETER = float(self.get(scienceTarget, "DIAMETER", 0.0))
             VIS = 1.0  # FIXME
@@ -83,10 +86,6 @@ class Pionier(VltiInstrument):
             # Retrieve Fluxes
             TEL_COU_MAG = self.getFlux(scienceTarget, "V")
             acqTSF.ISS_IAS_HMAG = self.getFlux(scienceTarget, "H")
-
-            # Set baseline  interferometric array code (should be a keywordlist)
-            acqTSF.ISS_BASELINE = [ self.getBaselineCode(BASELINE) ]
-
 
             # setup some default values, to be changed below
             TEL_COU_GSSOURCE = 'SCIENCE'  # by default
@@ -134,7 +133,8 @@ class Pionier(VltiInstrument):
 
             # FIXME: error (OB): "Phase 2 constraints must closely follow what was requested in the Phase 1 proposal.
             # The seeing value allowed for this OB is >= java0x0 arcsec."
-            obConstraints.seeing = 1.0
+            # FIXME REPLACE SEEING THAT IS NO MORE SUPPORTED
+            # obConstraints.seeing = 1.0
             # FIXME: default values NOT IN ASPRO!
             # constaints.airmass = 5.0
             # constaints.fli = 1
@@ -157,7 +157,7 @@ class Pionier(VltiInstrument):
                 ui.addToLog(kappaTSF, False)
                 ui.addToLog(darkTSF, False)
             else:
-                self.createPionierOB(p2container, self.getBaselineCode(BASELINE), obTarget, obConstraints, acqTSF,
+                self.createPionierOB(p2container, obTarget, obConstraints, acqTSF,
                                      obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode, TEL_COU_GSSOURCE, GSRA, GSDEC, TEL_COU_MAG, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
 
@@ -216,7 +216,7 @@ class Pionier(VltiInstrument):
         return self.getPionierTemplateName("obs", OBJTYPE)
 
     def createPionierOB(
-        self, p2container, baselinecode, obTarget, obConstraints, acqTSF, obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode,
+        self, p2container, obTarget, obConstraints, acqTSF, obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode,
                        TEL_COU_GSSOURCE, GSRA, GSDEC, TEL_COU_MAG, LSTINTERVAL):
 
         api = self.facility.getAPI()
@@ -228,10 +228,10 @@ class Pionier(VltiInstrument):
 
         # everything seems OK
         # create new OB in container:
+        # TODO use a common function for next lines
         goodName = re.sub('[^A-Za-z0-9]+', '_', acqTSF.TARGET_NAME)
-
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_PIONIER_' + \
-            baselinecode + '_' + instrumentMode
+            acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
 
 
 

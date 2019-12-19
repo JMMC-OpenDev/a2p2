@@ -56,7 +56,7 @@ class Gravity(VltiInstrument):
                          # alias for
                          # ,GRAVITY_single_obs_calibrator.tsf,GRAVITY_dual_obs_exp.tsf,GRAVITY_dual_obs_calibrator.tsf")
             obTarget = OBTarget()
-            obConstraints = OBConstraints()
+            obConstraints = OBConstraints(self)
 
             # set common properties
             acqTSF.INS_SPEC_RES = ins_spec_res
@@ -78,6 +78,9 @@ class Gravity(VltiInstrument):
             obTarget.properMotionRa, obTarget.properMotionDec = self.getPMCoords(
                 scienceTarget)
 
+            # Set baseline  interferometric array code (should be a keywordlist)
+            acqTSF.ISS_BASELINE = [self.getBaselineCode(BASELINE)]
+
             # define some default values
             DIAMETER = float(self.get(scienceTarget, "DIAMETER", 0.0))
             VIS = 1.0  # FIXME
@@ -86,9 +89,6 @@ class Gravity(VltiInstrument):
             COU_GS_MAG = self.getFlux(scienceTarget, "V")
             acqTSF.SEQ_INS_SOBJ_MAG = self.getFlux(scienceTarget, "K")
             acqTSF.SEQ_FI_HMAG = self.getFlux(scienceTarget, "H")
-
-            # Set baseline  interferometric array code (should be a keywordlist)
-            acqTSF.ISS_BASELINE = [ self.getBaselineCode(BASELINE) ]
 
             # setup some default values, to be changed below
             COU_AG_GSSOURCE = 'SCIENCE'  # by default
@@ -170,8 +170,10 @@ class Gravity(VltiInstrument):
             else:
                 obConstraints.skyTransparency = 'Clear'
             # FIXME: error (OB): "Phase 2 constraints must closely follow what was requested in the Phase 1 proposal.
+
             # The seeing value allowed for this OB is >= java0x0 arcsec."
-            obConstraints.seeing = 1.0
+            #FIXME REPLACE SEEING THAT IS NO MORE SUPPORTED
+            # obConstraints.seeing = 1.0
 
             # FIXME: default values NOT IN ASPRO!
             # constaints.airmass = 5.0
@@ -220,7 +222,7 @@ class Gravity(VltiInstrument):
                 ui.addToLog(acqTSF, False)
                 ui.addToLog(obsTSF, False)
             else:
-                self.createGravityOB( p2container, self.getBaselineCode(BASELINE), obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
+                self.createGravityOB( p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
                                      DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
 
@@ -295,7 +297,7 @@ class Gravity(VltiInstrument):
         return self.getGravityTemplateName("acq", dualField, OBJTYPE)
 
     def createGravityOB(
-        self, p2container, baselinecode, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
+        self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
                         DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG,
                         SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
 
@@ -308,9 +310,10 @@ class Gravity(VltiInstrument):
 
         # everything seems OK
         # create new OB in container:
+        # TODO use a common function for next lines
         goodName = re.sub('[^A-Za-z0-9]+', '_', acqTSF.SEQ_INS_SOBJ_NAME)
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_GRAVITY_' + \
-            baselinecode + '_' + instrumentMode
+            acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
 
         ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
         obId = ob['obId']

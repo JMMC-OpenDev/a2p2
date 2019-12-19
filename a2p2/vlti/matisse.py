@@ -45,7 +45,7 @@ class Matisse(VltiInstrument):
             obsTSF = TSF(self, "MATISSE_hyb_obs.tsf")
 
             obTarget = OBTarget()
-            obConstraints = OBConstraints()
+            obConstraints = OBConstraints(self)
 
 
             if 'SCIENCE' in observationConfiguration.type:
@@ -62,14 +62,14 @@ class Matisse(VltiInstrument):
             obTarget.ra, obTarget.dec = self.getCoords(scienceTarget)
             obTarget.properMotionRa, obTarget.properMotionDec = self.getPMCoords(scienceTarget)
 
+            # Set baseline  interferometric array code (should be a keywordlist)
+            acqTSF.ISS_BASELINE = [self.getBaselineCode(BASELINE)]
+
             # define some default values
             VIS = 1.0  # FIXME
 
             # Retrieve Fluxes
             COU_GS_MAG = self.getFlux(scienceTarget, "V")
-
-            # Set baseline  interferometric array code (should be a keywordlist)
-            acqTSF.ISS_BASELINE = [ self.getBaselineCode(BASELINE) ]
 
             # setup some default values, to be changed below
             COU_AG_GSSOURCE = 'SCIENCE'  # by default
@@ -117,8 +117,9 @@ class Matisse(VltiInstrument):
             obConstraints.skyTransparency = 'Clear'
             # FIXME: error (OB): "Phase 2 constraints must closely follow what was requested in the Phase 1 proposal.
             # The seeing value allowed for this OB is >= java0x0 arcsec."
-            obConstraints.seeing = 1.0
-            obConstraints.baseline = BASELINE.replace(' ', '-')
+            #FIXME REPLACE SEEING THAT IS NO MORE SUPPORTED
+            # obConstraints.seeing = 1.0
+            # baseline not in instrumecnstraints obConstraints.baseline = BASELINE.replace(' ', '-')
             # FIXME: default values NOT IN ASPRO!
             # constaints.airmass = 5.0
             # constaints.fli = 1
@@ -134,7 +135,7 @@ class Matisse(VltiInstrument):
                 ui.addToLog(obsTSF, False)
             else:
                 self.createMatisseOB(p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-                                     COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG)
+                                     COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
 
     def formatRangeTable(self):
@@ -166,8 +167,8 @@ class Matisse(VltiInstrument):
         if OBJTYPE and "SCI" in OBJTYPE:
             objType = "science"
         if OBJTYPE:
-            return "_".join((self.getName(), templateType, objType))
-        return "_".join((self.getName(), templateType))
+            return "_".join((self.getShortName(), templateType, objType))
+        return "_".join((self.getShortName(), templateType))
 
     def getMatisseObsTemplateName(self, OBJTYPE):
         return self.getMatisseTemplateName("obs", OBJTYPE)
@@ -194,7 +195,7 @@ class Matisse(VltiInstrument):
 
     def createMatisseOB(
         self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-                    COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG):
+                    COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, LSTINTERVAL):
 
         api = self.facility.getAPI()
         ui = self.ui
@@ -205,9 +206,10 @@ class Matisse(VltiInstrument):
 
         # everything seems OK
         # create new OB in container:
+        # TODO use a common function for next lines
         goodName = re.sub('[^A-Za-z0-9]+', '_', obTarget.name)
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_MATISSE_' + \
-            obConstraints.baseline.replace('-', '') + '_' + instrumentMode
+            acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
 
         ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
         obId = ob['obId']
@@ -236,7 +238,7 @@ class Matisse(VltiInstrument):
         ui.setProgress(0.2)
 
         # then, attach acquisition template(s)
-        tpl, tplVersion = api.createTemplate(obId, 'MATISSE_img_acq.tsf')
+        tpl, tplVersion = api.createTemplate(obId, 'MATISSE_img_acq')
         # and put values
         # start with acqTSF ones and complete manually missing ones
         values = acqTSF.getDict()
@@ -250,7 +252,9 @@ class Matisse(VltiInstrument):
         tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
         ui.setProgress(0.3)
 
-        tpl, tplVersion = api.createTemplate(obId, self.getMatisseObsTemplateName(OBJTYPE))
+        # was :
+        #tpl, tplVersion = api.createTemplate(obId, self.getMatisseObsTemplateName(OBJTYPE))
+        tpl, tplVersion = api.createTemplate(obId, obsTSF.getP2Name())
         ui.setProgress(0.4)
 
         # put values. they are the same except for dual obs science (?)
