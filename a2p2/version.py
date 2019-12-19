@@ -1,4 +1,4 @@
-__version__ = "0.2.7beta1"
+__version__ = "0.2.7"
 
 __release_notes__ = {
     #"0.1.6": {
@@ -13,17 +13,33 @@ __release_notes__ = {
     #        ]
     #    },
     "0.2.7": {
+        "STATUS":[
+            "This version get lot of changes and may contain bugs or missing features, please provide any feedback to improve and prepare a better future release !"
+        ],
         "A2P2": [
             "Refactor code accross vlti instruments",
             "Fix container selection in P2 tree"
             "Add release notes in the GUI"
         ],
         "VLTI": [
+            "Conf updated with IPs 105.18",
             "Add MATISSE support",
+            "Change GRAVITY DIT computation",
+            "OB constraints autochecked using an instrumentConstraints TSF",
             "Support Concatenations (also shown in the tree panel)",
             "Show type in the container chooser instead of containerID"
         ],
         "CHARA": [
+        ],
+        "TODO-SCIENCE": [
+            "Complete/fix GRAVITY DIT table with P105 changes that will come in the next template user manual",
+            "Use a calibrator template for MATISSE (instead of default hyb_obs)"
+        ],
+        "TODO-DEV": [
+            "Support numlist keyword : eg. SEQ.HWPOFF",
+            "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
+            "Do not set default values in a2p2 if not set",
+            "flag ~important~ keyword that MUST be set in a2p2 code to avoid default"
         ]
     },"0.2.6": {
         "A2P2": [
