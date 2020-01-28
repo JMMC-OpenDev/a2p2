@@ -88,7 +88,12 @@ class VltiUI(FacilityUI):
         if run!=item:
             label=item['itemType']
         else:
-            label = "%s Run" % run['mode']
+            # {"runId":60900301,"progId":"60.A-9003(B)","title":"Tutorial account","period":60,
+            # "scheduledPeriod":60,"mode":"VM","instrument":"FORS2","telescope":"UT1","ipVersion":104.26,
+            # "isToO":false,"owned":true,"delegated":false,"itemCount":0,"containerId":2587672,
+            # "pi":{"emailAddress":"52052@nodomain.net","firstName":"Phase 1/2 Tutorial","lastName":"Account"},
+            # "observingConstraints":{"seeing":2.0}}
+            label = "%s Run (IP %s)" % (run['mode'],run['ipVersion'])
 
         e = self.tree.insert(parentContainerID, 'end', containerID, text=name, values=(run['instrument'], label ))
         self.treeItemToRuns[e] = run
