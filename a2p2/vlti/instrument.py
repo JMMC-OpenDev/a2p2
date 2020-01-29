@@ -359,8 +359,11 @@ class TSF(object):
         self.instrument = instrument
         supportedTpl = instrument.getRangeTable().keys()
 
-        # init with default values for every keywords
-        self.tsfParams = self.instrument.getRangeDefaults(tpl)
+        # DO not init with default values for every keywords so we only transfert changed values
+        # this also reduce the risk to transmit some  incompatible keywords accross various IP versions
+        # a TODO will come to test accross dicts get from A2P2 and not in our json config
+        #self.tsfParams = self.instrument.getRangeDefaults(tpl)
+        self.tsfParams = {}
 
         self.__initialised = True
         # after initialisation, setting attributes is the same as setting an
