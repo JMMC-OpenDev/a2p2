@@ -135,7 +135,7 @@ class VltiFacility(Facility):
 
     def connectAPI(self, username, password, ob):
         import p2api
-        if username == '52052':
+        if username == '52052' or username == 'jmmc' :
             self.apitype = 'demo'
         else:
             self.apitype = 'production'

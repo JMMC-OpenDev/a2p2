@@ -17,14 +17,14 @@ __release_notes__ = {
     #    },
     "0.2.8": {
         "STATUS":[
-            "This version get lot of changes and may contain bugs or missing features, please provide any feedback to improve and prepare a better future release !"
         ],
         "A2P2": [
             "Fix release notes order in the GUI",
+            "Handle special jmmc account, kindly set by ESO colleagues to perfom future tests as closed as possible to the real UX"
         ],
         "VLTI": [
             "Display instrument package version in the container table",
-            "Limit keyword set on P2 only to the modified ones. No more default values from our static config are send, and this enhances compatibility accross multiple Period versions",
+            "Limit keyword set on P2 only to the modified ones. No more default values from our static config are sent so it enhances compatibility accross multiple Period versions",
         ],
         "CHARA": [
         ],
