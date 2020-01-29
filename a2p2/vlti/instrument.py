@@ -44,7 +44,7 @@ class VltiInstrument(Instrument):
         obsconflist = ob.observationConfiguration
         folderName = obsconflist[0].SCTarget.name
         folderName = re.sub('[^A-Za-z0-9]+', '_', folderName.strip())
-        print("container is root '%s'" % p2container.isRoot())
+        
         # force a top folder in demo.
         if p2container.isRoot() and self.facility.isTutorialAccount():
             ui.addToLog("create pre folder (required for tutorial account) ", False)
