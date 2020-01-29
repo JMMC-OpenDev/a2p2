@@ -10,6 +10,15 @@ from a2p2.vlti.gui import VltiUI
 
 import traceback
 
+MODE_SM = 'SM'
+
+ITEMTYPE_CONCATENATION = 'Concatenation'
+
+JMMC_LOGIN = 'jmmc'
+
+TUTORIAL_LOGIN = '52052'
+PRODUCTION_APITYPE = 'production'
+DEMO_APITYPE = 'demo'
 
 # TODO handle a period subdirectory
 CONFDIR = "conf"
@@ -55,14 +64,14 @@ class VltiFacility(Facility):
         from a2p2.vlti.pionier import Pionier
         pionier = Pionier(self)
         from a2p2.vlti.matisse import Matisse
-        matisse= Matisse(self)
+        matisse = Matisse(self)
 
         # complete help
         for i in self.getSupportedInstruments():
             self.facilityHelp += "\n" + i.getHelp()
 
         self.connected = False
-        self.apitype = 'demo' # set to demo by default (may change in connectAPI)
+        self.apitype = 'demo'  # set to demo by default (may change in connectAPI)
         self.containerInfo = P2Container(self)
 
         # will store later : name for status info, api
@@ -85,8 +94,8 @@ class VltiFacility(Facility):
             if not self.isConnected():
                 self.ui.showLoginFrame(ob)
             elif not self.isReadyToSubmit():
-                 # self.a2p2client.ui.addToLog("Receive OB for
-                 # '"+ob.instrumentConfiguration.name+"'")
+                # self.a2p2client.ui.addToLog("Receive OB for
+                # '"+ob.instrumentConfiguration.name+"'")
                 self.ui.addToLog(
                     "Please select a folder (not a concatenation) in the above list. OBs are not shown")
             else:
@@ -102,8 +111,8 @@ class VltiFacility(Facility):
         except ValueError as e:
             traceback.print_exc()
             trace = traceback.format_exc(limit=1)
-# ui.ShowErrorMessage("Value error :\n %s \n%s\n\n%s" % (e, trace,
-# "Aborting submission to P2. Look at the whole traceback in the log."))
+            # ui.ShowErrorMessage("Value error :\n %s \n%s\n\n%s" % (e, trace,
+            # "Aborting submission to P2. Look at the whole traceback in the log."))
             self.ui.ShowErrorMessage("Value error :\n %s \n\n%s" %
                                      (e, "Aborting submission to P2. Please check LOG and fix before new submission."))
             trace = traceback.format_exc()
@@ -113,15 +122,14 @@ class VltiFacility(Facility):
             traceback.print_exc()
             trace = traceback.format_exc(limit=1)  # limit = 2 should raise errors in our codes
             self.ui.ShowErrorMessage(
-                "General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check LOG and fix before new submission." % (trace))
+                "General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check LOG and fix before new submission." % (
+                    trace))
             trace = traceback.format_exc()
             self.ui.addToLog(trace, False)
             self.ui.setProgress(0)
 
-
     def isReadyToSubmit(self):
         return self.api and self.containerInfo.isOk()
-
 
     def isConnected(self):
         return self.connected
@@ -135,10 +143,10 @@ class VltiFacility(Facility):
 
     def connectAPI(self, username, password, ob):
         import p2api
-        if username == '52052' or username == 'jmmc' :
-            self.apitype = 'demo'
+        if username == TUTORIAL_LOGIN or username == JMMC_LOGIN:
+            self.apitype = DEMO_APITYPE
         else:
-            self.apitype = 'production'
+            self.apitype = PRODUCTION_APITYPE
         try:
             self.api = p2api.ApiConnection(self.apitype, username, password)
             # TODO test that api is ok and handle error if any...
@@ -158,7 +166,10 @@ class VltiFacility(Facility):
         self.ui.fillTree(runs)
 
     def isDemoAPI(self):
-        return self.apitype=='demo'
+        return self.apitype == DEMO_APITYPE
+
+    def isTutorialAccount(self):
+        return self.username == TUTORIAL_LOGIN
 
     def getAPI(self):
         return self.api
@@ -169,12 +180,13 @@ class VltiFacility(Facility):
         """
         return CONFDIR
 
+
 # TODO Move code out of this class
 
 
 class P2Container:
     # run object stores:
-    #{'pi': {'lastName': 'Accont', 'emailAddress': '52052@nodomain.net', 'firstName': 'Phase 1/2 Ttorial'},
+    # {'pi': {'lastName': 'Accont', 'emailAddress': '52052@nodomain.net', 'firstName': 'Phase 1/2 Ttorial'},
     # 'telescope': 'VLTI', 'title': 'p2 tutorial', 'schedledPeriod': 60, 'isToO': False, 'period': 60, 'owned': Tre,
     # 'ipVersion': 104.05, 'instrument': 'PIONIER', 'containerId': 1601182, 'observingConstraints': {'fli' : 'd', 'seeing': 0.8},
     # 'mode': 'SM', 'progId': '60.A-9253(T)', 'itemCont': 2, 'delegated': False, 'runId': 60925319}
@@ -184,37 +196,34 @@ class P2Container:
 
     def __init__(self, facility):
         self.facility = facility
-        self.run = None # dict returned by p2api
+        self.run = None  # dict returned by p2api
         self.containerId = None
         self.item = None
 
     def store(self, run, item):
         self.run = run
         self.item = item
-        if self.run==self.item:
-            self.containerId = run['runId']
-        else:
-            self.containerId = item['containerId']
+        self.containerId = item['containerId']
         self.log()
 
     def log(self):
-        if self.run != self.item and self.item['itemType'] == 'Concatenation':
-            self.facility.ui.addToLog("*** Please do not select a Concatenatin and select another container. ***" )
+        if self.run != self.item and self.item['itemType'] == ITEMTYPE_CONCATENATION:
+            self.facility.ui.addToLog("*** Please do not select a Concatenation and select another container. ***")
         else:
             self.facility.ui.addToLog("*** Working with %s ***" % self)
 
     def isOk(self):
-        if self.run == None :
+        if self.run == None:
             return False
-        if self.run == self.item :
+        if self.run == self.item:
             return True
-        return self.item['itemType'] != 'Concatenation'
+        return self.item['itemType'] != ITEMTYPE_CONCATENATION
 
     def isRoot(self):
-        return self.containerId == str(self.run['runId'])
+        return self.item.keys() != None and 'pi' in self.item.keys()
 
     def isServiceModeRun(self):
-        return self.run['mode']=='SM'
+        return self.run['mode'] == MODE_SM
 
     def __str__(self):
         return """instrument:'%s', containerId:'%s'""" % (self.run['instrument'], self.containerId)

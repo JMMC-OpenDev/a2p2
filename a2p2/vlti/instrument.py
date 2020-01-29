@@ -44,8 +44,8 @@ class VltiInstrument(Instrument):
         folderName = obsconflist[0].SCTarget.name
         folderName = re.sub('[^A-Za-z0-9]+', '_', folderName.strip())
         # force a top folder in demo.
-        if p2container.isRoot() and self.facility.isDemoApi() :
-            ui.addToLog("create pre folder (forced for demo) ", False)
+        if p2container.isRoot() and self.facility.isTutorialAccount() :
+            ui.addToLog("create pre folder (required for tutorial account) ", False)
             folder, _ = api.createFolder(p2container.containerId, folderName)
             p2container.containerId = folder['containerId']
 

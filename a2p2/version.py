@@ -1,4 +1,4 @@
-__version__ = "0.2.8"
+__version__ = "0.2.9"
 
 __release_notes__ = {
     #"0.1.6": {
@@ -13,8 +13,33 @@ __release_notes__ = {
     #        ],
     #    "CHARA": [
     #        
-    #        ]
+    #        ],
+    #    "TODO-SCIENCE": [
+    #
+    #        ],
+    #    "TODO-DEV": [
+    #
+    #        ],
     #    },
+    "0.2.9": {
+        "STATUS":[
+        ],
+        "A2P2": [
+
+        ],
+        "VLTI": [
+            "Fix bug that prevent to create any folder or concatenation at RUNS's root"
+        ],
+        "CHARA": [
+
+        ],
+        "TODO-SCIENCE": [
+
+        ],
+        "TODO-DEV": [
+
+        ],
+    },
     "0.2.8": {
         "STATUS":[
         ],
