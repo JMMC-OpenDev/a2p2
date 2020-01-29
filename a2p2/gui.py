@@ -105,11 +105,22 @@ class MainWindow():
         widget.insert(END, txt)
 
     def addReleaseNotes(self, frame):
+        """
+        Present in a ordered way the dictionnary version items.
+        """
         txt=""
-        for v in  __release_notes__ :
+        for v in  sorted(__release_notes__, reverse=True) :
             txt+="\nV " + v + " :"
             txt += "\n---------------"
-            for e in __release_notes__[v]:
+            keys = []
+            for k in sorted(__release_notes__[v]) :
+                if not ( "TODO" in k ):
+                    keys.append(k)
+            for k in sorted(__release_notes__[v]):
+                if "TODO" in k:
+                    keys.append(k)
+
+            for e in keys:
                 infos = __release_notes__[v][e]
                 if infos:
                     txt+="\n  " + e + " : "
