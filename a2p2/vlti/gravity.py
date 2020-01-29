@@ -2,17 +2,14 @@
 
 __all__ = []
 
-from a2p2.instrument import Instrument
-from a2p2.vlti.gui import VltiUI
-from a2p2.vlti.instrument import VltiInstrument
-from a2p2.vlti.instrument import TSF
+import re
+
+import numpy as np
+
 from a2p2.vlti.instrument import OBConstraints
 from a2p2.vlti.instrument import OBTarget
-
-from astropy.coordinates import SkyCoord
-import cgi
-import numpy as np
-import re
+from a2p2.vlti.instrument import TSF
+from a2p2.vlti.instrument import VltiInstrument
 
 HELPTEXT = """
 Please define Gravity instrument help in a2p2/vlti/gravity.py
@@ -53,8 +50,8 @@ class Gravity(VltiInstrument):
             # create keywords storage objects
             acqTSF = TSF(self, "GRAVITY_gen_acq.tsf")
             obsTSF = TSF(self, "GRAVITY_single_obs_exp.tsf")
-                         # alias for
-                         # ,GRAVITY_single_obs_calibrator.tsf,GRAVITY_dual_obs_exp.tsf,GRAVITY_dual_obs_calibrator.tsf")
+            # alias for
+            # ,GRAVITY_single_obs_calibrator.tsf,GRAVITY_dual_obs_exp.tsf,GRAVITY_dual_obs_calibrator.tsf")
             obTarget = OBTarget()
             obConstraints = OBConstraints(self)
 
@@ -95,7 +92,7 @@ class Gravity(VltiInstrument):
             GSRA = '00:00:00.000'
             GSDEC = '00:00:00.000'
             dualField = False
-            dualFieldDistance = 0.0 #needed as must exist for the argument list of createGravityOB
+            dualFieldDistance = 0.0  # needed as must exist for the argument list of createGravityOB
 
             # initialize FT variables (must exist)
             # TODO remove next lines using a dual_acq TSF that would handle
@@ -112,8 +109,8 @@ class Gravity(VltiInstrument):
                 FTRA, FTDEC = self.getCoords(ftTarget)
                 # no PMRA, PMDE for FT !!
                 SEQ_FI_HMAG = float(ftTarget.FLUX_H)
-                                    # just to say we must treat the case there
-                                    # is no FT Target
+                # just to say we must treat the case there
+                # is no FT Target
                 SEQ_FT_ROBJ_MAG = self.getFlux(ftTarget, "K")
                 SEQ_FT_ROBJ_DIAMETER = 0.0  # FIXME
                 SEQ_FT_ROBJ_VIS = 1.0  # FIXME
@@ -172,7 +169,7 @@ class Gravity(VltiInstrument):
             # FIXME: error (OB): "Phase 2 constraints must closely follow what was requested in the Phase 1 proposal.
 
             # The seeing value allowed for this OB is >= java0x0 arcsec."
-            #FIXME REPLACE SEEING THAT IS NO MORE SUPPORTED
+            # FIXME REPLACE SEEING THAT IS NO MORE SUPPORTED
             # obConstraints.seeing = 1.0
 
             # FIXME: default values NOT IN ASPRO!
@@ -181,7 +178,7 @@ class Gravity(VltiInstrument):
 
             # compute dit, ndit, nexp
             dit = self.getDit(tel, acqTSF.INS_SPEC_RES, acqTSF.INS_SPEC_POL,
-                              acqTSF.SEQ_INS_SOBJ_MAG, dualField, showWarning=(p2container==None))
+                              acqTSF.SEQ_INS_SOBJ_MAG, dualField, showWarning=(p2container == None))
             ndit = 300 / dit
             if ndit < 10:
                 ndit = 10
@@ -202,7 +199,8 @@ class Gravity(VltiInstrument):
                 if ndit < 10:
                     ndit = 10
                     ui.addToLog(
-                        "**Warning**, OB NDIT has been set to min value=%d, but OB will take longer than 1800 s" % (ndit))
+                        "**Warning**, OB NDIT has been set to min value=%d, but OB will take longer than 1800 s" % (
+                            ndit))
             nexp %= 40
             sequence = 'O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O S O O'
             my_sequence = sequence[0:2 * nexp]
@@ -222,12 +220,11 @@ class Gravity(VltiInstrument):
                 ui.addToLog(acqTSF, False)
                 ui.addToLog(obsTSF, False)
             else:
-                self.createGravityOB( p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-                                     DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL)
+                self.createGravityOB(p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
+                                     DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance,
+                                     SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS,
+                                     LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
-
-
-
 
     def formatRangeTable(self):
         rangeTable = self.getRangeTable()
@@ -264,8 +261,8 @@ class Gravity(VltiInstrument):
                             spec, pol, tel)
                         buffer += ' %4.1f <K<= %3.1f | %4.1f' % (ditTable[tel][spec][pol]['MAG'][i],
                                                                  ditTable[tel][spec][
-                            pol]['MAG'][i + 1],
-                            ditTable[tel][spec][pol]['DIT'][i])
+                                                                     pol]['MAG'][i + 1],
+                                                                 ditTable[tel][spec][pol]['DIT'][i])
                         buffer += "\n"
             Kdf = ditTable[tel]['Kdf']
             Kut = ditTable[tel]['Kut']
@@ -297,9 +294,10 @@ class Gravity(VltiInstrument):
         return self.getGravityTemplateName("acq", dualField, OBJTYPE)
 
     def createGravityOB(
-        self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-                        DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG,
-                        SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
+            self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
+            DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME,
+            SEQ_FT_ROBJ_MAG,
+            SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
 
         api = self.facility.getAPI()
         ui = self.ui
@@ -313,7 +311,7 @@ class Gravity(VltiInstrument):
         # TODO use a common function for next lines
         goodName = re.sub('[^A-Za-z0-9]+', '_', acqTSF.SEQ_INS_SOBJ_NAME)
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_GRAVITY_' + \
-            acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
+                    acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
 
         ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
         obId = ob['obId']
@@ -349,13 +347,13 @@ class Gravity(VltiInstrument):
         # start with acqTSF ones and complete manually missing ones
         values = acqTSF.getDict()
         values.update({
-            'SEQ.INS.SOBJ.DIAMETER':   DIAMETER,
-                    'SEQ.INS.SOBJ.VIS':   VISIBILITY,
-                    'COU.AG.GSSOURCE':   COU_AG_GSSOURCE,
-                    'COU.AG.ALPHA':   GSRA,
-                    'COU.AG.DELTA':   GSDEC,
-                    'COU.GS.MAG':  round(COU_GS_MAG, 3),
-                    'TEL.TARG.PARALLAX':   0.0
+            'SEQ.INS.SOBJ.DIAMETER': DIAMETER,
+            'SEQ.INS.SOBJ.VIS': VISIBILITY,
+            'COU.AG.GSSOURCE': COU_AG_GSSOURCE,
+            'COU.AG.ALPHA': GSRA,
+            'COU.AG.DELTA': GSDEC,
+            'COU.GS.MAG': round(COU_GS_MAG, 3),
+            'TEL.TARG.PARALLAX': 0.0
         })
         if dualField:
             values.update({'SEQ.INS.SOBJ.X': dualFieldDistance[0],
@@ -363,8 +361,8 @@ class Gravity(VltiInstrument):
                            'SEQ.FT.ROBJ.NAME': SEQ_FT_ROBJ_NAME,
                            'SEQ.FT.ROBJ.MAG': round(SEQ_FT_ROBJ_MAG, 3),
                            'SEQ.FT.ROBJ.DIAMETER': SEQ_FT_ROBJ_DIAMETER,
-                           'SEQ.FT.ROBJ.VIS':  SEQ_FT_ROBJ_VIS,
-                           'SEQ.FT.MODE':      "AUTO"})
+                           'SEQ.FT.ROBJ.VIS': SEQ_FT_ROBJ_VIS,
+                           'SEQ.FT.MODE': "AUTO"})
         tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
         ui.setProgress(0.3)
 

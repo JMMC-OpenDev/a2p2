@@ -2,17 +2,12 @@
 
 __all__ = []
 
-from a2p2.instrument import Instrument
-from a2p2.vlti.gui import VltiUI
-from a2p2.vlti.instrument import VltiInstrument
-from a2p2.vlti.instrument import TSF
+import re
+
 from a2p2.vlti.instrument import OBConstraints
 from a2p2.vlti.instrument import OBTarget
-
-from astropy.coordinates import SkyCoord
-import cgi
-import numpy as np
-import re
+from a2p2.vlti.instrument import TSF
+from a2p2.vlti.instrument import VltiInstrument
 
 HELPTEXT = """
 Please define PIONIER instrument help in a2p2/vlti/pionier.py
@@ -48,8 +43,8 @@ class Pionier(VltiInstrument):
             # create keywords storage objects
             acqTSF = TSF(self, "PIONIER_acq.tsf")
             obsTSF = TSF(self, "PIONIER_obs_calibrator.tsf")
-                         # alias for PIONIER_obs_calibrator.tsf and
-                         # PIONIER_obs_science.tsf")
+            # alias for PIONIER_obs_calibrator.tsf and
+            # PIONIER_obs_science.tsf")
             kappaTSF = TSF(self, "PIONIER_gen_cal_kappa.tsf")
             darkTSF = TSF(self, "PIONIER_gen_cal_dark.tsf")
 
@@ -129,7 +124,7 @@ class Pionier(VltiInstrument):
                 obConstraints.skyTransparency = 'Clear'
 
             if acqTSF.ISS_IAS_HMAG > 7.5:
-                    acqTSF.INS_DISP_NAME = "FREE"
+                acqTSF.INS_DISP_NAME = "FREE"
 
             # FIXME: error (OB): "Phase 2 constraints must closely follow what was requested in the Phase 1 proposal.
             # The seeing value allowed for this OB is >= java0x0 arcsec."
@@ -158,9 +153,9 @@ class Pionier(VltiInstrument):
                 ui.addToLog(darkTSF, False)
             else:
                 self.createPionierOB(p2container, obTarget, obConstraints, acqTSF,
-                                     obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode, TEL_COU_GSSOURCE, GSRA, GSDEC, TEL_COU_MAG, LSTINTERVAL)
+                                     obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode, TEL_COU_GSSOURCE, GSRA, GSDEC,
+                                     TEL_COU_MAG, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
-
 
     def formatRangeTable(self):
         rangeTable = self.getRangeTable()
@@ -190,19 +185,18 @@ class Pionier(VltiInstrument):
         buffer = '   Tel | Spec |  Pol  |     H   | DIT(s)\n'
         buffer += '--------------------------------------------------------\n'
         for tel in ['AT']:
-            for spec in ['GRISM','FREE']:
-                for pol in  ['IN','OUT']:
+            for spec in ['GRISM', 'FREE']:
+                for pol in ['IN', 'OUT']:
                     for i in range(len(ditTable[tel][spec][pol]['DIT'])):
-                        buffer += ' %3s | %4s | %3s | %2s |' % ( tel,
-                            spec, pol, tel)
+                        buffer += ' %3s | %4s | %3s | %2s |' % (tel,
+                                                                spec, pol, tel)
                         buffer += ' %4.1f <K<= %3.1f | %4.1f' % (ditTable[tel][spec][pol]['MAG'][i],
                                                                  ditTable[tel][spec][
-                            pol]['MAG'][i + 1],
-                            ditTable[tel][spec][pol]['DIT'][i])
+                                                                     pol]['MAG'][i + 1],
+                                                                 ditTable[tel][spec][pol]['DIT'][i])
                         buffer += "\n"
             Hut = ditTable[tel]['Hut']
         return buffer
-
 
     def getPionierTemplateName(self, templateType, OBJTYPE):
         objType = "calibrator"
@@ -216,8 +210,8 @@ class Pionier(VltiInstrument):
         return self.getPionierTemplateName("obs", OBJTYPE)
 
     def createPionierOB(
-        self, p2container, obTarget, obConstraints, acqTSF, obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode,
-                       TEL_COU_GSSOURCE, GSRA, GSDEC, TEL_COU_MAG, LSTINTERVAL):
+            self, p2container, obTarget, obConstraints, acqTSF, obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode,
+            TEL_COU_GSSOURCE, GSRA, GSDEC, TEL_COU_MAG, LSTINTERVAL):
 
         api = self.facility.getAPI()
         ui = self.ui
@@ -231,9 +225,7 @@ class Pionier(VltiInstrument):
         # TODO use a common function for next lines
         goodName = re.sub('[^A-Za-z0-9]+', '_', acqTSF.TARGET_NAME)
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_PIONIER_' + \
-            acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
-
-
+                    acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
 
         ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
         ui.addToLog("Getting new ob from p2: ")
@@ -255,7 +247,7 @@ class Pionier(VltiInstrument):
         for k in constraints:
             ob['constraints'][k] = constraints[k]
 
-        ui.addToLog("Save ob to p2:\n%s"%ob, False)
+        ui.addToLog("Save ob to p2:\n%s" % ob, False)
         ob, obVersion = api.saveOB(ob, obVersion)
 
         # time constraints if present
@@ -268,10 +260,10 @@ class Pionier(VltiInstrument):
         # and put values
         # start with acqTSF ones and complete manually missing ones
         values = acqTSF.getDict()
-        values.update({'TEL.COU.GSSOURCE':   TEL_COU_GSSOURCE,
-                       'TEL.COU.ALPHA':   GSRA,
-                       'TEL.COU.DELTA':   GSDEC,
-                       'TEL.COU.MAG':  round(TEL_COU_MAG, 3)
+        values.update({'TEL.COU.GSSOURCE': TEL_COU_GSSOURCE,
+                       'TEL.COU.ALPHA': GSRA,
+                       'TEL.COU.DELTA': GSDEC,
+                       'TEL.COU.MAG': round(TEL_COU_MAG, 3)
                        })
 
         tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)

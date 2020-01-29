@@ -3,9 +3,9 @@
 __all__ = []
 
 import sys
-from a2p2 import __version__
-from a2p2 import __release_notes__
 
+from a2p2 import __release_notes__
+from a2p2 import __version__
 
 if sys.version_info[0] == 2:
     from Tkinter import *
@@ -15,8 +15,6 @@ else:
     from tkinter import *
     from tkinter.messagebox import *
     import tkinter.ttk as ttk
-
-import time
 
 HELPTEXT = """This application provides the link between ASPRO (that you should have started) and interferometers facilities.
 
@@ -78,7 +76,7 @@ class MainWindow():
         self.log.pack()
 
         self.status_bar = StatusBar(self.window)
-        self.status_bar.pack(side=BOTTOM,  fill=X)
+        self.status_bar.pack(side=BOTTOM, fill=X)
         self.progress_value = self.status_bar.progress_value
 
     def __del__(self):
@@ -108,13 +106,13 @@ class MainWindow():
         """
         Present in a ordered way the dictionnary version items.
         """
-        txt=""
-        for v in  sorted(__release_notes__, reverse=True) :
-            txt+="\nV " + v + " :"
+        txt = ""
+        for v in sorted(__release_notes__, reverse=True):
+            txt += "\nV " + v + " :"
             txt += "\n---------------"
             keys = []
-            for k in sorted(__release_notes__[v]) :
-                if not ( "TODO" in k ):
+            for k in sorted(__release_notes__[v]):
+                if not ("TODO" in k):
                     keys.append(k)
             for k in sorted(__release_notes__[v]):
                 if "TODO" in k:
@@ -123,11 +121,10 @@ class MainWindow():
             for e in keys:
                 infos = __release_notes__[v][e]
                 if infos:
-                    txt+="\n  " + e + " : "
+                    txt += "\n  " + e + " : "
                     for i in infos:
-                        txt+="\n    - " + i
+                        txt += "\n    - " + i
             txt += "\n\n"
-
 
         widget = Text(frame, width=120)
         helpscroll = Scrollbar(frame, command=widget.yview)
@@ -135,7 +132,6 @@ class MainWindow():
         helpscroll.pack(side=RIGHT, fill=Y)
         widget.pack(side=LEFT, fill=BOTH, expand=True)
         widget.insert(END, txt)
-
 
     def registerTab(self, text, widget):
         self.notebook.add(widget, text=text)
@@ -215,7 +211,8 @@ class StatusBar(Frame):
         self.progress_value.set(0.0)
         self.progressbar = ttk.Progressbar(
             self, orient='horizontal', length=200, maximum=1,
-                                           variable=self.progress_value, mode='determinate')  # , from_=0, to=1, resolution=0.01,showvalue=0,takefocus=0)
+            variable=self.progress_value,
+            mode='determinate')  # , from_=0, to=1, resolution=0.01,showvalue=0,takefocus=0)
         self.progressbar.pack(side=LEFT)
 
     def set_label(self, name, text='', side=RIGHT, width=0):

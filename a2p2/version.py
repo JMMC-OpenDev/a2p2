@@ -1,7 +1,7 @@
 __version__ = "0.2.9"
 
 __release_notes__ = {
-    #"0.1.6": {
+    # "0.1.6": {
     #    "STATUS":[
     #             "This version get lot of changes and may contain bugs or missing features, please provide any feedback to improve and prepare a better future release !"
     #         ],
@@ -22,7 +22,7 @@ __release_notes__ = {
     #        ],
     #    },
     "0.2.9": {
-        "STATUS":[
+        "STATUS": [
         ],
         "A2P2": [
 
@@ -41,7 +41,7 @@ __release_notes__ = {
         ],
     },
     "0.2.8": {
-        "STATUS":[
+        "STATUS": [
         ],
         "A2P2": [
             "Fix release notes order in the GUI",
@@ -64,8 +64,8 @@ __release_notes__ = {
             "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
             "unify ob name creation in vlti instrument createOB()"
         ]
-    },"0.2.7": {
-        "STATUS":[
+    }, "0.2.7": {
+        "STATUS": [
             "This version get lot of changes and may contain bugs or missing features, please provide any feedback to improve and prepare a better future release !"
         ],
         "A2P2": [
@@ -94,82 +94,82 @@ __release_notes__ = {
             "Do not set default values in a2p2 if not set",
             "unify ob name creation in vlti instrument createOB()"
         ]
-    },"0.2.6": {
+    }, "0.2.6": {
         "A2P2": [
-            
+
         ],
         "VLTI": [
             "Support baseline back again (single one at present)"
         ],
         "CHARA": [
-            
+
         ]
     },
-     "0.2.5": {
+    "0.2.5": {
         "A2P2": [
-            
+
         ],
         "VLTI": [
             "Add missing template name in log",
             "Fix error removing baseline after constraint changes on P2 side. Next a2p2 version should add them back in acq templates"
         ],
         "CHARA": [
-            
+
         ]
     },
-     "0.2.4": {
+    "0.2.4": {
         "A2P2": [
-            
+
         ],
         "VLTI": [
             "Fix bug / wrong keys"
         ],
         "CHARA": [
-            
+
         ]
     },
-     "0.2.3": {
+    "0.2.3": {
         "A2P2": [
-            
+
         ],
         "VLTI": [
             "Hide password in login frame"
         ],
         "CHARA": [
-            
+
         ]
     },
-     "0.2.2": {
+    "0.2.2": {
         "A2P2": [
-            
+
         ],
         "VLTI": [
             "ignore default time constraints computed by Aspro"
         ],
         "CHARA": [
-            
+
         ]
     },
-     "0.2.1": {
+    "0.2.1": {
         "A2P2": [
-            
+
         ],
         "VLTI": [
             "fix support for a list of multiples time constraints"
         ],
         "CHARA": [
-            
+
         ]
     },
-     "0.2.0": {
+    "0.2.0": {
         "A2P2": [
-            
+
         ],
         "VLTI": [
             "bug fix"
         ],
         "CHARA": [
-            
+
         ]
     },
     "0.1.6": {
@@ -181,18 +181,18 @@ __release_notes__ = {
             "add PIONIER"
         ],
         "CHARA": [
-            
+
         ]
     },
     "0.1.5": {
         "A2P2": [
-            
+
         ],
         "VLTI": [
             "bugfix for dualfield cases"
         ],
         "CHARA": [
-            
+
         ]
     },
     "0.1.4": {

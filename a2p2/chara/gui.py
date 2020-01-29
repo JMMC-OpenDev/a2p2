@@ -10,11 +10,9 @@ from a2p2.gui import FacilityUI
 if sys.version_info[0] == 2:
     from Tkinter import *
     from tkMessageBox import *
-    import ttk
 else:
     from tkinter import *
     from tkinter.messagebox import *
-    import tkinter.ttk as ttk
 
 # Constants
 _HR = "\n----------------------------------------------\n"
@@ -47,7 +45,7 @@ class CharaUI(FacilityUI):
             buffer = self.extractReport(ob)
         except:
             buffer = "Error during report generation\n" + \
-                traceback.format_exc() + _HR + str(ob)
+                     traceback.format_exc() + _HR + str(ob)
 
         self.text.insert(END, buffer)
 
@@ -114,18 +112,18 @@ AO Flat Star:
             buffer += oc.observationConstraints.LSTinterval + "\n"
             buffer += "Object:\n"
             fluxes = ", ".join([e[0] + "=" + e[1]
-                               for e in ob.getFluxes(sct).items()])
+                                for e in ob.getFluxes(sct).items()])
             info = sct.SPECTYP + ", " + sct.PARALLAX
             buffer += sct.name + " (" + info + ") : " + fluxes + "\n"
             if ftt:
                 buffer += "Fringe Finder:\n"
                 fluxes = ", ".join([e[0] + "=" + e[1]
-                                   for e in ob.getFluxes(ftt).items()])
+                                    for e in ob.getFluxes(ftt).items()])
                 buffer += ftt.name + " : " + fluxes + "\n"
             if aot:
                 buffer += "AO Flat Star:\n"
                 fluxes = ", ".join([e[0] + "=" + e[1]
-                                   for e in ob.getFluxes(aot).items()])
+                                    for e in ob.getFluxes(aot).items()])
                 buffer += aot.name + " : " + fluxes + "\n"
 
             if len(cals) >= 1:

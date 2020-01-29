@@ -2,18 +2,17 @@
 
 __all__ = ['A2p2Client']
 
-from a2p2.facility import FacilityManager
-from a2p2.gui import MainWindow
-from a2p2.samp import A2p2SampClient
-from a2p2.ob import OB
-from a2p2 import __version__
-import sys
 import time
 import traceback
 
+from a2p2 import __version__
+from a2p2.facility import FacilityManager
+from a2p2.gui import MainWindow
+from a2p2.ob import OB
+from a2p2.samp import A2p2SampClient
+
 
 class A2p2Client():
-
     """Transmit your Aspro2 observation to remote Observatory scheduling database.
 
        with A2p2Client() as a2p2:
@@ -76,9 +75,9 @@ class A2p2Client():
 
     def setProgress(self, perc, actionName=None):
         if actionName:
-            print ("%s action progress is  %s" % (actionName, perc))
+            print("%s action progress is  %s" % (actionName, perc))
         else:
-            print ("progress is  %s %%" % (perc))
+            print("progress is  %s %%" % (perc))
 
     def run(self):
         # bool of status change

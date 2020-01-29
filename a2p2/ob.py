@@ -2,14 +2,9 @@
 
 __all__ = []
 
-from astropy.coordinates import SkyCoord
-import cgi
-import numpy as np
-import re
-import traceback
-import xml.etree.ElementTree as ET
 import json
-from collections import defaultdict, namedtuple, Iterable, OrderedDict
+import xml.etree.ElementTree as ET
+from collections import defaultdict, namedtuple, OrderedDict
 
 
 # https://stackoverflow.com/questions/2148119/how-to-convert-an-xml-string-to-a-dictionary-in-python
@@ -38,7 +33,6 @@ def etree_to_dict(t):
 
 
 class OB():
-
     """
     Give access to OBs sent by Aspro2 and provide some helper functions.
     You can use attributes to walk to associated configurations values, e.g.:
@@ -60,8 +54,8 @@ class OB():
         ds = d[list(d)[0]]  # -> version and name are lost
         # store attributes
         for e in ds.keys():
-             # parse JSON into an object with attributes corresponding to dict keys.
-             # We should probably avoid json use...
+            # parse JSON into an object with attributes corresponding to dict keys.
+            # We should probably avoid json use...
             o = json.loads(
                 json.dumps(ds[e]), object_hook=lambda d: namedtuple(e, d.keys())(*d.values()))
             # observationConfiguration may be uniq but force it to be a list

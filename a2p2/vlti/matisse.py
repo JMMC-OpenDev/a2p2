@@ -2,17 +2,12 @@
 
 __all__ = []
 
-from a2p2.instrument import Instrument
-from a2p2.vlti.gui import VltiUI
-from a2p2.vlti.instrument import VltiInstrument
-from a2p2.vlti.instrument import TSF
+import re
+
 from a2p2.vlti.instrument import OBConstraints
 from a2p2.vlti.instrument import OBTarget
-
-from astropy.coordinates import SkyCoord
-import cgi
-import numpy as np
-import re
+from a2p2.vlti.instrument import TSF
+from a2p2.vlti.instrument import VltiInstrument
 
 HELPTEXT = """
     Please define MATISSE instrument help in a2p2/vlti/matisse.py
@@ -22,7 +17,7 @@ HELPTEXT = """
 class Matisse(VltiInstrument):
 
     def __init__(self, facility):
-        VltiInstrument.__init__(self, facility, "MATISSE_LM") # MATISSE_LM" MATISSE_N
+        VltiInstrument.__init__(self, facility, "MATISSE_LM")  # MATISSE_LM" MATISSE_N
 
     def checkOB(self, ob, p2container=None):
         ui = self.ui
@@ -41,12 +36,11 @@ class Matisse(VltiInstrument):
         for observationConfiguration in ob.observationConfiguration:
 
             # create keywords storage objects
-            acqTSF = TSF(self, "MATISSE_img_acq.tsf") # or .tsfx?
+            acqTSF = TSF(self, "MATISSE_img_acq.tsf")  # or .tsfx?
             obsTSF = TSF(self, "MATISSE_hyb_obs.tsf")
 
             obTarget = OBTarget()
             obConstraints = OBConstraints(self)
-
 
             if 'SCIENCE' in observationConfiguration.type:
                 OBJTYPE = 'SCIENCE'
@@ -57,7 +51,8 @@ class Matisse(VltiInstrument):
 
             # define target
 
-            obTarget.name = scienceTarget.name.replace(' ', '_')  # allowed characters: letters, digits, + - _ . and no spaces
+            obTarget.name = scienceTarget.name.replace(' ',
+                                                       '_')  # allowed characters: letters, digits, + - _ . and no spaces
             # allowed characters: letters, digits, + - _ . and no spaces
             obTarget.ra, obTarget.dec = self.getCoords(scienceTarget)
             obTarget.properMotionRa, obTarget.properMotionDec = self.getPMCoords(scienceTarget)
@@ -109,22 +104,21 @@ class Matisse(VltiInstrument):
             # Constraints
             obConstraints.name = 'Aspro-created constraints'
             skyTransparencyMagLimits = {"AT": 3, "UT": 5}
-#            if acqTSF.IAS.HMAG < skyTransparencyMagLimits[tel]:
-#                obConstraints.skyTransparency = 'Variable, thin cirrus'
-#            else:
-#                obConstraints.skyTransparency = 'Clear'
+            #            if acqTSF.IAS.HMAG < skyTransparencyMagLimits[tel]:
+            #                obConstraints.skyTransparency = 'Variable, thin cirrus'
+            #            else:
+            #                obConstraints.skyTransparency = 'Clear'
 
             obConstraints.skyTransparency = 'Clear'
             # FIXME: error (OB): "Phase 2 constraints must closely follow what was requested in the Phase 1 proposal.
             # The seeing value allowed for this OB is >= java0x0 arcsec."
-            #FIXME REPLACE SEEING THAT IS NO MORE SUPPORTED
+            # FIXME REPLACE SEEING THAT IS NO MORE SUPPORTED
             # obConstraints.seeing = 1.0
             # baseline not in instrumecnstraints obConstraints.baseline = BASELINE.replace(' ', '-')
             # FIXME: default values NOT IN ASPRO!
             # constaints.airmass = 5.0
             # constaints.fli = 1
             # and store computed values in obsTSF
-
 
             # then call the ob-creation using the API if p2container exists.
             if p2container == None:
@@ -161,7 +155,6 @@ class Matisse(VltiInstrument):
                 buffer += "\n"
         return buffer
 
-
     def getMatisseTemplateName(self, templateType, OBJTYPE):
         objType = "calibrator"
         if OBJTYPE and "SCI" in OBJTYPE:
@@ -173,29 +166,27 @@ class Matisse(VltiInstrument):
     def getMatisseObsTemplateName(self, OBJTYPE):
         return self.getMatisseTemplateName("obs", OBJTYPE)
 
-
     def formatDitTable(self):
-    #    fluxTable = self.getDitTable()
+        #    fluxTable = self.getDitTable()
         buffer = '   Tel | Spec |  spec band  | Flux (Jy)    | tau(ms)\n'
-    #    buffer += '--------------------------------------------------------\n'
-    #    for tel in ['AT']:
-    #        for spec in ['Low','Med']:
-    #            for band in  ['L','M','N']:
-    #                for i in range(len(fluxTable[tel][spec][band]['Flux'])):
-    #                    buffer += ' %3s | %4s | %3s | %2s |' % ( tel,
-    #                        spec, band, tel)
-    #                    buffer += ' %4.1f <K<= %3.1f | %4.1f' % (fluxTable[tel][spec][pol]['MAG'][i],
-    #                                                             fluxTable[tel][spec][
-    #                        pol]['MAG'][i + 1],
-    #                        fluxTable[tel][spec][pol]['DIT'][i])
-    #                    buffer += "\n"
+        #    buffer += '--------------------------------------------------------\n'
+        #    for tel in ['AT']:
+        #        for spec in ['Low','Med']:
+        #            for band in  ['L','M','N']:
+        #                for i in range(len(fluxTable[tel][spec][band]['Flux'])):
+        #                    buffer += ' %3s | %4s | %3s | %2s |' % ( tel,
+        #                        spec, band, tel)
+        #                    buffer += ' %4.1f <K<= %3.1f | %4.1f' % (fluxTable[tel][spec][pol]['MAG'][i],
+        #                                                             fluxTable[tel][spec][
+        #                        pol]['MAG'][i + 1],
+        #                        fluxTable[tel][spec][pol]['DIT'][i])
+        #                    buffer += "\n"
 
         return buffer
 
-
     def createMatisseOB(
-        self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-                    COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, LSTINTERVAL):
+            self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
+            COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, LSTINTERVAL):
 
         api = self.facility.getAPI()
         ui = self.ui
@@ -209,7 +200,7 @@ class Matisse(VltiInstrument):
         # TODO use a common function for next lines
         goodName = re.sub('[^A-Za-z0-9]+', '_', obTarget.name)
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_MATISSE_' + \
-            acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
+                    acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
 
         ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
         obId = ob['obId']
@@ -233,7 +224,7 @@ class Matisse(VltiInstrument):
         ui.addToLog("Save ob to p2:\n%s" % ob, False)
         ob, obVersion = api.saveOB(ob, obVersion)
 
-         # time constraints if present
+        # time constraints if present
         self.saveSiderealTimeConstraints(api, obId, LSTINTERVAL)
         ui.setProgress(0.2)
 
@@ -242,18 +233,18 @@ class Matisse(VltiInstrument):
         # and put values
         # start with acqTSF ones and complete manually missing ones
         values = acqTSF.getDict()
-        values.update({'COU.AG.GSSOURCE':   COU_AG_GSSOURCE,
-                    'COU.AG.ALPHA':   GSRA,
-                    'COU.AG.DELTA':   GSDEC,
-                    'COU.GS.MAG':  round(COU_GS_MAG, 3),
-                    'TEL.TARG.PARALLAX':   0.0
-        })
+        values.update({'COU.AG.GSSOURCE': COU_AG_GSSOURCE,
+                       'COU.AG.ALPHA': GSRA,
+                       'COU.AG.DELTA': GSDEC,
+                       'COU.GS.MAG': round(COU_GS_MAG, 3),
+                       'TEL.TARG.PARALLAX': 0.0
+                       })
 
         tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
         ui.setProgress(0.3)
 
         # was :
-        #tpl, tplVersion = api.createTemplate(obId, self.getMatisseObsTemplateName(OBJTYPE))
+        # tpl, tplVersion = api.createTemplate(obId, self.getMatisseObsTemplateName(OBJTYPE))
         tpl, tplVersion = api.createTemplate(obId, obsTSF.getP2Name())
         ui.setProgress(0.4)
 
@@ -266,4 +257,3 @@ class Matisse(VltiInstrument):
         response, _ = api.verifyOB(obId, True)
         ui.setProgress(1.0)
         self.showP2Response(response, ob, obId)
-

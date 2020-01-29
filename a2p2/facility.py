@@ -2,11 +2,8 @@
 
 __all__ = []
 
-from a2p2.instrument import Instrument
-
 
 class FacilityManager():
-
     """
     Manage real and fake apis.
     """
@@ -55,7 +52,8 @@ class FacilityManager():
             facility.processOB(ob)
         else:
             self.a2p2client.ui.ShowErrorMessage("Received OB for unsupported instrument \n" +
-                                                insname + " @ " + interferometer + "\n" + "Supported instrument(s): " + ", ".join(supportedIns))
+                                                insname + " @ " + interferometer + "\n" + "Supported instrument(s): " + ", ".join(
+                supportedIns))
 
 
 # TODO move to a dedicated source file
@@ -84,7 +82,7 @@ class Facility():
         if insname in self.getSupportedInsnames():
             return True
         for i in self.getSupportedInstruments():
-            if i.getShortName() == insname :
+            if i.getShortName() == insname:
                 return True
 
     def getSupportedInstruments(self):

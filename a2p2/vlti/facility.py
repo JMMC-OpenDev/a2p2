@@ -3,12 +3,10 @@
 __all__ = []
 
 import os
-from a2p2.facility import Facility
-from a2p2.instrument import Instrument
-
-from a2p2.vlti.gui import VltiUI
-
 import traceback
+
+from a2p2.facility import Facility
+from a2p2.vlti.gui import VltiUI
 
 MODE_SM = 'SM'
 
