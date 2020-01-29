@@ -1,7 +1,10 @@
-__version__ = "0.2.7"
+__version__ = "0.2.8"
 
 __release_notes__ = {
     #"0.1.6": {
+    #    "STATUS":[
+    #             "This version get lot of changes and may contain bugs or missing features, please provide any feedback to improve and prepare a better future release !"
+    #         ],
     #    "A2P2": [
     #        
     #        ],
@@ -12,7 +15,31 @@ __release_notes__ = {
     #        
     #        ]
     #    },
-    "0.2.7": {
+    "0.2.8": {
+        "STATUS":[
+            "This version get lot of changes and may contain bugs or missing features, please provide any feedback to improve and prepare a better future release !"
+        ],
+        "A2P2": [
+            "Fix release notes order in the GUI",
+        ],
+        "VLTI": [
+            "Display instrument package version in the container table",
+            "Limit keyword set on P2 only to the modified ones. No more default values from our static config are send, and this enhances compatibility accross multiple Period versions",
+        ],
+        "CHARA": [
+        ],
+        "TODO-SCIENCE": [
+            "Complete/fix GRAVITY DIT table with P105 changes that will come in the next template user manual",
+            "Use a calibrator template for MATISSE (instead of default hyb_obs)",
+            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values"
+        ],
+        "TODO-DEV": [
+            "Support multiple version (two major at least)",
+            "Support numlist keyword : eg. SEQ.HWPOFF",
+            "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
+            "unify ob name creation in vlti instrument createOB()"
+        ]
+    },"0.2.7": {
         "STATUS":[
             "This version get lot of changes and may contain bugs or missing features, please provide any feedback to improve and prepare a better future release !"
         ],
@@ -41,7 +68,6 @@ __release_notes__ = {
             "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
             "Do not set default values in a2p2 if not set",
             "unify ob name creation in vlti instrument createOB()"
-
         ]
     },"0.2.6": {
         "A2P2": [
