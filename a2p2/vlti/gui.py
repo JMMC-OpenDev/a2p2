@@ -75,7 +75,8 @@ class VltiUI(FacilityUI):
 
     def folder_explore(self, folders, contid, run):
         for folder in folders:
-            self._insertInTree(contid, folder['name'], folder['containerId'], run, folder)
+            self._insertInTree(
+                contid, folder['name'], folder['containerId'], run, folder)
             folders2 = getFolders(self.facility.api, folder['containerId'])
             if len(folders2) > 0:
                 try:
@@ -95,7 +96,8 @@ class VltiUI(FacilityUI):
             # "observingConstraints":{"seeing":2.0}}
             label = "%s Run (IP %s)" % (run['mode'], run['ipVersion'])
 
-        e = self.tree.insert(parentContainerID, 'end', containerID, text=name, values=(run['instrument'], label))
+        e = self.tree.insert(parentContainerID, 'end', containerID,
+                             text=name, values=(run['instrument'], label))
         self.treeItemToRuns[e] = run
         self.treeItemToP2Items[e] = item
 
@@ -103,7 +105,8 @@ class VltiUI(FacilityUI):
         curItem = self.tree.focus()
         ret = self.tree.item(curItem)
         if len(ret['values']) > 0:
-            self.facility.containerInfo.store(self.treeItemToRuns[curItem], self.treeItemToP2Items[curItem])
+            self.facility.containerInfo.store(
+                self.treeItemToRuns[curItem], self.treeItemToP2Items[curItem])
 
     def isBusy(self):
         self.tree.configure(selectmode='browse')

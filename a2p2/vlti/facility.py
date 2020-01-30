@@ -69,7 +69,8 @@ class VltiFacility(Facility):
             self.facilityHelp += "\n" + i.getHelp()
 
         self.connected = False
-        self.apitype = 'demo'  # set to demo by default (may change in connectAPI)
+        # set to demo by default (may change in connectAPI)
+        self.apitype = 'demo'
         self.containerInfo = P2Container(self)
 
         # will store later : name for status info, api
@@ -102,8 +103,6 @@ class VltiFacility(Facility):
                 instrument.submitOB(ob, self.containerInfo)
                 self.refreshTree()
 
-
-
         # TODO add P2Error handling P2Error(r.status_code, method, url,
         # r.json()['error'])
         except ValueError as e:
@@ -118,7 +117,8 @@ class VltiFacility(Facility):
             self.ui.setProgress(0)
         except Exception as e:
             traceback.print_exc()
-            trace = traceback.format_exc(limit=1)  # limit = 2 should raise errors in our codes
+            # limit = 2 should raise errors in our codes
+            trace = traceback.format_exc(limit=1)
             self.ui.ShowErrorMessage(
                 "General error or Absent Parameter in template!\n Missing magnitude or OB not set ?\n\nError :\n %s \n Please check LOG and fix before new submission." % (
                     trace))
@@ -206,7 +206,8 @@ class P2Container:
 
     def log(self):
         if self.run != self.item and self.item['itemType'] == ITEMTYPE_CONCATENATION:
-            self.facility.ui.addToLog("*** Please do not select a Concatenation and select another container. ***")
+            self.facility.ui.addToLog(
+                "*** Please do not select a Concatenation and select another container. ***")
         else:
             self.facility.ui.addToLog("*** Working with %s ***" % self)
 

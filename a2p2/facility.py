@@ -53,7 +53,7 @@ class FacilityManager():
         else:
             self.a2p2client.ui.ShowErrorMessage("Received OB for unsupported instrument \n" +
                                                 insname + " @ " + interferometer + "\n" + "Supported instrument(s): " + ", ".join(
-                supportedIns))
+                                                    supportedIns))
 
 
 # TODO move to a dedicated source file

@@ -34,7 +34,8 @@ class MainWindow():
         try:
             dpi_value = self.window.winfo_fpixels('1i')
             # print("dpi: " + str(dpi_value));
-            self.window.tk.call('tk', 'scaling', '-displayof', '.', dpi_value / 72.0)
+            self.window.tk.call(
+                'tk', 'scaling', '-displayof', '.', dpi_value / 72.0)
         except:
             print("Can not set tk scaling !")
 

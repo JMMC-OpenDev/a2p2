@@ -110,7 +110,8 @@ class A2p2Client():
                             warnForAspro = False
                             self.ui.addToLog(
                                 "\nPlease launch Aspro2 to submit your OBs.")
-                        pass  # TODO test for other exception than SAMPHubError(u'Unable to find a running SAMP Hub.',)
+                        # TODO test for other exception than SAMPHubError(u'Unable to find a running SAMP Hub.',)
+                        pass
 
                 if self.a2p2SampClient.has_message():
                     try:

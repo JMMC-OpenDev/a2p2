@@ -17,7 +17,8 @@ HELPTEXT = """
 class Matisse(VltiInstrument):
 
     def __init__(self, facility):
-        VltiInstrument.__init__(self, facility, "MATISSE_LM")  # MATISSE_LM" MATISSE_N
+        # MATISSE_LM" MATISSE_N
+        VltiInstrument.__init__(self, facility, "MATISSE_LM")
 
     def checkOB(self, ob, p2container=None):
         ui = self.ui
@@ -55,7 +56,8 @@ class Matisse(VltiInstrument):
                                                        '_')  # allowed characters: letters, digits, + - _ . and no spaces
             # allowed characters: letters, digits, + - _ . and no spaces
             obTarget.ra, obTarget.dec = self.getCoords(scienceTarget)
-            obTarget.properMotionRa, obTarget.properMotionDec = self.getPMCoords(scienceTarget)
+            obTarget.properMotionRa, obTarget.properMotionDec = self.getPMCoords(
+                scienceTarget)
 
             # Set baseline  interferometric array code (should be a keywordlist)
             acqTSF.ISS_BASELINE = [self.getBaselineCode(BASELINE)]
@@ -122,7 +124,8 @@ class Matisse(VltiInstrument):
 
             # then call the ob-creation using the API if p2container exists.
             if p2container == None:
-                ui.addToLog(obTarget.name + " ready for p2 upload (details logged)")
+                ui.addToLog(obTarget.name +
+                            " ready for p2 upload (details logged)")
                 ui.addToLog(obTarget, False)
                 ui.addToLog(obConstraints, False)
                 ui.addToLog(acqTSF, False)
@@ -200,7 +203,7 @@ class Matisse(VltiInstrument):
         # TODO use a common function for next lines
         goodName = re.sub('[^A-Za-z0-9]+', '_', obTarget.name)
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_MATISSE_' + \
-                    acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
+            acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
 
         ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
         obId = ob['obId']

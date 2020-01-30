@@ -124,7 +124,8 @@ class Gravity(VltiInstrument):
                     SCtoREFminDist = 0  # before P103: 1500
                     SCtoREFmaxDist = 4000
                 # compute x,y between science and ref beams:
-                dualFieldDistance = self.getSkyDiff(obTarget.ra, obTarget.dec, FTRA, FTDEC)
+                dualFieldDistance = self.getSkyDiff(
+                    obTarget.ra, obTarget.dec, FTRA, FTDEC)
                 if np.abs(dualFieldDistance[0]) < SCtoREFminDist:
                     raise ValueError("Dual-Field distance of two stars is  < " + str(
                         SCtoREFminDist) + " mas, Please Correct.")
@@ -214,7 +215,8 @@ class Gravity(VltiInstrument):
 
             # then call the ob-creation using the API if p2container exists.
             if p2container == None:
-                ui.addToLog(obTarget.name + " ready for p2 upload (details logged)")
+                ui.addToLog(obTarget.name +
+                            " ready for p2 upload (details logged)")
                 ui.addToLog(obTarget, False)
                 ui.addToLog(obConstraints, False)
                 ui.addToLog(acqTSF, False)
@@ -311,7 +313,7 @@ class Gravity(VltiInstrument):
         # TODO use a common function for next lines
         goodName = re.sub('[^A-Za-z0-9]+', '_', acqTSF.SEQ_INS_SOBJ_NAME)
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_GRAVITY_' + \
-                    acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
+            acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
 
         ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
         obId = ob['obId']

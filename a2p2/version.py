@@ -6,13 +6,13 @@ __release_notes__ = {
     #             "This version get lot of changes and may contain bugs or missing features, please provide any feedback to improve and prepare a better future release !"
     #         ],
     #    "A2P2": [
-    #        
+    #
     #        ],
     #    "VLTI": [
-    #        
+    #
     #        ],
     #    "CHARA": [
-    #        
+    #
     #        ],
     #    "TODO-SCIENCE": [
     #

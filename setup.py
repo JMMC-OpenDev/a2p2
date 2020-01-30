@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 with open('README.rst') as README:
     long_description = README.read()
     description = long_description[
-                  :long_description.index('Description')].split("*")[1].strip()
+        :long_description.index('Description')].split("*")[1].strip()
     long_description = long_description[long_description.index('Description'):]
 
 version = {}
