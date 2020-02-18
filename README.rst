@@ -85,7 +85,7 @@ Interaction diagram
 .. |A2P2Badge| image:: https://travis-ci.org/JMMC-OpenDev/a2p2.svg?branch=master
    :alt: A2P2 Badge on master branch
    :target:    https://travis-ci.org/JMMC-OpenDev/a2p2
-.. _PyPI:      https://pypi.python.org
+.. _PyPI:      https://pypi.org/project/a2p2/
 .. _P2:        https://www.eso.org/sci/observing/phase2/p2intro.html
 .. _P2API:     https://www.eso.org/copdemo/apidoc/
 .. _Aspro2:    http://www.jmmc.fr/aspro2
