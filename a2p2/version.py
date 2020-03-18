@@ -1,4 +1,4 @@
-__version__ = "0.2.9"
+__version__ = "0.2.10"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,6 +21,21 @@ __release_notes__ = {
     #
     #        ],
     #    },
+    "0.2.10": {
+        "STATUS": [
+        ],
+        "A2P2": [
+            "Patch bad SAMP url handling on Windows"
+        ],
+        "VLTI": [
+        ],
+        "CHARA": [
+        ],
+        "TODO-SCIENCE": [
+        ],
+        "TODO-DEV": [
+        ],
+    },
     "0.2.9": {
         "STATUS": [
         ],
