@@ -35,7 +35,7 @@ Prerequisites
 -------------
 Some basic tests have been operated on windows, Linux and Mac OS.
 
-a2p2 should launch the program. You may have to run ``python a2p2`` on windows. 
+a2p2 should launch the program. You may have to run ``python ...\Python\Scripts\a2p2`` on windows. 
 
 You may have to install some package to run tk GUI (``python-tk`` on linux).
 
@@ -85,7 +85,7 @@ Interaction diagram
 .. |A2P2Badge| image:: https://travis-ci.org/JMMC-OpenDev/a2p2.svg?branch=master
    :alt: A2P2 Badge on master branch
    :target:    https://travis-ci.org/JMMC-OpenDev/a2p2
-.. _PyPI:      https://pypi.python.org
+.. _PyPI:      https://pypi.org/project/a2p2/
 .. _P2:        https://www.eso.org/sci/observing/phase2/p2intro.html
 .. _P2API:     https://www.eso.org/copdemo/apidoc/
 .. _Aspro2:    http://www.jmmc.fr/aspro2
