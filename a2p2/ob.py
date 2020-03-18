@@ -5,8 +5,6 @@ __all__ = []
 import json
 import xml.etree.ElementTree as ET
 from collections import defaultdict, namedtuple, OrderedDict
-import os
-
 
 # https://stackoverflow.com/questions/2148119/how-to-convert-an-xml-string-to-a-dictionary-in-python
 # see comment below for our custom mods on attributes naming
@@ -48,10 +46,6 @@ class OB():
 
     def __init__(self, url):
         # extract XML in elementTree
-
-        # Drop 'bad' leading / on windows machine (waiting patch on jMCS)
-        if os.sep != '/' and url.startswith('/'):
-            url = url[1:]
 
         e = ET.parse(url)
         d = etree_to_dict(e.getroot())
