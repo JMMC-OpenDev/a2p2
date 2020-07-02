@@ -38,6 +38,6 @@ setup(
     license='OSI Approved :: GNU General Public License v3 (GPLv3)',
     packages=find_packages(),
     include_package_data=True,
-    scripts=['scripts/a2p2'],
+    entry_points={'console_scripts': ['a2p2=a2p2.__main__:main']},
     keywords='observation preparation tool optical-interferometry p2 samp'
 )

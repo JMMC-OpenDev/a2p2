@@ -1,4 +1,4 @@
-__version__ = "0.2.10"
+__version__ = "0.2.11"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,6 +21,21 @@ __release_notes__ = {
     #
     #        ],
     #    },
+    "0.2.10": {
+        "STATUS": [
+        ],
+        "A2P2": [
+            "enhance setup.py so it install Windows special-cases .exe files"
+        ],
+        "VLTI": [
+        ],
+        "CHARA": [
+        ],
+        "TODO-SCIENCE": [
+        ],
+        "TODO-DEV": [
+        ],
+    },
     "0.2.10": {
         "STATUS": [
         ],
