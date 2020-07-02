@@ -35,7 +35,7 @@ Prerequisites
 -------------
 Some basic tests have been operated on windows, Linux and Mac OS.
 
-a2p2 should launch the program. You may have to run ``python ...\Python\Scripts\a2p2`` on windows. 
+a2p2 should launch the program. 
 
 You may have to install some package to run tk GUI (``python-tk`` on linux).
 
