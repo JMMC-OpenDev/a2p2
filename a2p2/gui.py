@@ -16,6 +16,8 @@ else:
     from tkinter.messagebox import *
     import tkinter.ttk as ttk
 
+from distutils.version import LooseVersion
+
 HELPTEXT = """This application provides the link between ASPRO (that you should have started) and interferometers facilities.
 
 """
@@ -108,7 +110,9 @@ class MainWindow():
         Present in a ordered way the dictionnary version items.
         """
         txt = ""
-        for v in sorted(__release_notes__, reverse=True):
+        lvs = [LooseVersion(v) for v in __release_notes__]
+        for lv in sorted(lvs, reverse=True):
+            v=lv.vstring
             txt += "\nV " + v + " :"
             txt += "\n---------------"
             keys = []
