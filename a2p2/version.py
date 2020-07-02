@@ -1,4 +1,4 @@
-__version__ = "0.2.11"
+__version__ = "0.2.12"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,6 +21,21 @@ __release_notes__ = {
     #
     #        ],
     #    },
+    "0.2.12": {
+        "STATUS": [
+        ],
+        "A2P2": [
+            "Fix import in main console script"
+        ],
+        "VLTI": [
+        ],
+        "CHARA": [
+        ],
+        "TODO-SCIENCE": [
+        ],
+        "TODO-DEV": [
+        ],
+    },
     "0.2.11": {
         "STATUS": [
         ],
