@@ -18,7 +18,7 @@ def main():
 
     args = parser.parse_args()
 
-    import A2p2Client
+    from . import A2p2Client
     try:
         with A2p2Client(args.fakeapi) as a2p2c:
             if args.username:
