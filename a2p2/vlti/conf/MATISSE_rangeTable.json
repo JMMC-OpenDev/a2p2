@@ -6,8 +6,8 @@
         "SEQ.TARG.MAG.K":             {"default": 0},
         "TEL.TARG.ADDVELALPHA":       {"default": 0, "max": 15, "min": -15},
         "TEL.TARG.ADDVELDELTA":       {"default": 0, "max": 15, "min": -15},
-        "COU.AG.ALPHA":               {"default": 0},
-        "COU.AG.DELTA":               {"default": 0},
+        "COU.AG.ALPHA":               {"default": "0.", "list": ["ra"]},
+        "COU.AG.DELTA":               {"default": "0.", "list": ["dec"]},
         "COU.AG.EPOCH":               {"default": 2000, "max": 3000, "min": -2000},
         "COU.AG.EQUINOX":             {"default": 2000, "max": 3000, "min": -2000},
         "COU.AG.GSSOURCE":            {"default": "SCIENCE", "list": ["NONE", "SETUPFILE", "SCIENCE"]},
@@ -23,7 +23,7 @@
         "DET1.DIT":                   {"default": 0.075, "list": ["0.020", "0.075", "0.111"]},
         "DET1.READ.CURNAME":          {"default": "SCI-SLOW-SPEED", "list": ["SCI-FAST-SPEED", "SCI-SLOW-SPEED"]},
         "SEQ.DIL.USER.WL0":           {"default": 0, "max": 4.9, "min": 0},
-        "SEQ.DIL.WL0":                {"default": 3.5, "list": ["3.5", "3.9", "3.03", "3.05", "3.17", "3.3", "3.4", "3.52", "3.77", "3.88", "3.95", "4.0", "4.05", "4.65", "4.78"]},
+        "SEQ.DIL.WL0":                {"default": 3.5, "list": ["3.5", "4.1", "3.03", "3.05", "3.17", "3.3", "3.4", "3.52", "3.77", "3.88", "3.95", "4.0", "4.05", "4.65", "4.78"]},
         "SEQ.FRINGES.NCYCLES":        {"default": 1, "max": 10, "min": 1},
         "SEQ.PHOTO.ST":               {"default": true},
         "SEQ.SKY.OFFS.ALPHA":         {"default": 1},
@@ -35,10 +35,11 @@
     },
     "instrumentConstraints.tsf":
     {
-        "name":                        {},
-        "airmass":                    {"default": 1.6, "max":5, "min":1},
+        "airmass":                    {"default": 1.6, "max": 5, "min": 1},
         "skyTransparency":            {"default": "Photometric", "list": ["Photometric", "Clear", "Variable, thin cirrus", "Variable, thick cirrus"]},
-        "waterVapour":                {"default": 30, "max":30, "min":0.1},
-        "atm":                        {"default": "70%  (Seeing < 1.15 arcsec, t0 > 2.2 ms)", "list": ["30%  (Seeing < 0.8  arcsec, t0 > 4.1 ms)", "70%  (Seeing < 1.15 arcsec, t0 > 2.2 ms)"]}
+        "waterVapour":                {"default": 30, "max": 30, "min": 0.1},
+        "atm":                        {"default": "70%  (Seeing < 1.15 arcsec, t0 > 2.2 ms)", "list": ["10%  (Seeing < 0.6  arcsec, t0 > 5.2 ms)", "30%  (Seeing < 0.8  arcsec, t0 > 4.1 ms)", "50%  (Seeing < 1.0  arcsec, t0 > 3.2 ms)", "70%  (Seeing < 1.15 arcsec, t0 > 2.2 ms)", "85%  (Seeing < 1.40 arcsec, t0 > 1.6 ms)"]},
+        "fli":                        {"default": 1, "max": 1, "min": 0},
+        "moonDistance":               {"default": 20, "max": 180, "min": 0}
     }
 }
