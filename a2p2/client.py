@@ -26,11 +26,14 @@ class A2p2Client():
         self.apiName = ""
         if fakeAPI:
             self.apiName = "fakeAPI"
+        self.fakeAPI = fakeAPI
 
         self.ui = MainWindow(self)
         # Instantiate the samp client and connect to the hub later
         self.a2p2SampClient = A2p2SampClient()
         self.facilityManager = FacilityManager(self)
+
+        self.errors=[]
 
         pass
 
@@ -78,6 +81,18 @@ class A2p2Client():
             print("%s action progress is  %s" % (actionName, perc))
         else:
             print("progress is  %s %%" % (perc))
+
+    def clearErrors(self):
+        self.errors.clear()
+
+    def getErrors(self):
+        return self.errors
+
+    def addError(self, error):
+        self.errors.append(error)
+
+    def processOB(self, ob):
+        self.facilityManager.processOB(ob)
 
     def run(self):
         # bool of status change

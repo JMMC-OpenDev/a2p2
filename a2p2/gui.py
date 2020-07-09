@@ -176,17 +176,29 @@ class MainWindow():
         self.showFrameToFront()
 
     def ShowErrorMessage(self, text):
-        showerror("Error", text)
-        self.addToLog("Info message")
+        if self.a2p2client.fakeAPI:
+            pass
+        else:
+            showerror("Error", text)
+        self.addToLog("Error message")
         self.addToLog(text, False)
 
+        # do also append to simple error stack (for testing purpose first)
+        self.a2p2client.addError(text)
+
     def ShowWarningMessage(self, text):
-        showwarning("Warning", text)
-        self.addToLog("Info message")
+        if self.a2p2client.fakeAPI:
+            pass
+        else:
+            showwarning("Warning", text)
+        self.addToLog("Warning message")
         self.addToLog(text, False)
 
     def ShowInfoMessage(self, text):
-        showinfo("Info", text)
+        if self.a2p2client.fakeAPI:
+            pass
+        else:
+            showinfo("Info", text)
         self.addToLog("Info message")
         self.addToLog(text, False)
 

@@ -4,28 +4,52 @@
 #
 
 import os
+import pytest
 
 from a2p2.ob import OB
+from a2p2 import A2p2Client
 
 
-def test_obs():
-    for root, dirs, files in os.walk("."):
-        for file in files:
-            if ".obxml" in file:
-                check_obs(os.path.join(root, file))
+FIXTURE_DIR = os.path.join( os.path.dirname(os.path.realpath(__file__)) )
+
+ALL_OBXML_VALUE_ERROR = pytest.mark.datafiles(
+    os.path.join(FIXTURE_DIR,"aspro-sample-bad-coords.obxml", ''),
+    os.path.join(FIXTURE_DIR,"aspro-sample-bad-k.obxml", ''),
+    os.path.join(FIXTURE_DIR,"aspro-sample.obxml", ''),
+    os.path.join(FIXTURE_DIR,"aspro-sample-bad-insmode.obxml", ''),
+)
+
+ALL_OBXML_GENERAL_ERROR = pytest.mark.datafiles(
+)
+
+ALL_OBXML_NO_ERROR = pytest.mark.datafiles(
+)
 
 
-def check_obs(path):
-    ob = OB(path)
-    print("checking OB at %s location" % path)
+@ALL_OBXML_VALUE_ERROR
+def test_obxml_value_error(datafiles):
+    a2p2c=A2p2Client(True)
+
+    for filepath in datafiles.listdir():
+        file = str(filepath)
+        errorLog = processOB(a2p2c, file)
+
+        print("> ERROR log for %s"+ file)
+        print(errorLog)
+        print("< ERROR log \n\n")
+
+        assert "Value error" in errorLog
+
+def processOB(a2p2c, file):
+    print("checking OB at %s location" % file)
+    ob = OB(file)
     for obsc in ob.observationConfiguration:
         print("obsConfig.id=%s" % obsc.id)
     for obss in ob.observationSchedule.OB:
         print("obsSchedule.ref=%s" % str(obss.ref))
-
-    print(ob)
+    #    print(ob)
     print("\n\n")
-    assert True
-
-
-test_obs()
+    a2p2c.clearErrors()
+    a2p2c.processOB(ob)
+    errorLog = "\n\r".join(a2p2c.getErrors())
+    return errorLog
