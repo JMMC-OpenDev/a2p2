@@ -263,7 +263,28 @@ class VltiInstrument(Instrument):
             for e in value.split(" "):
                 return rangeTable[_tpl][key]['spaceseparatedlist']
 
-    def getRangeDefaults(self, tpl):
+    def getDefault(self, tpl, key):
+        """
+        returns the default value if any exists for given "key" in template "tpl", else None
+
+        ValueError raised if key or tpl is not found .
+        """
+        rangeTable = self.getRangeTable()
+        _tpl = ''
+        # -- find relevant range dictionnary
+        for k in rangeTable.keys():
+            if tpl in [l.strip() for l in k.split(',')]:
+                _tpl = k
+        if _tpl == '':
+            raise ValueError("unknown template '%s'" % tpl)
+        if not key in rangeTable[_tpl].keys():
+            raise ValueError(
+                "unknown keyword '%s' in template '%s'" % (key, tpl))
+        if 'default' in rangeTable[_tpl][key].keys() :
+            return rangeTable[_tpl][key]['default']
+        return None
+
+    def getRangeDefaults(self, tpl, ):
         """
         returns a dict of keywords/default values for template "tpl"
 
@@ -282,6 +303,7 @@ class VltiInstrument(Instrument):
             if 'default' in rangeTable[_tpl][key].keys():
                 res[key] = rangeTable[_tpl][key]["default"]
         return res
+
 
     def getSkyDiff(self, ra, dec, ftra, ftdec):
         science = SkyCoord(ra, dec, frame='icrs', unit='deg')
