@@ -36,10 +36,16 @@ class Gravity(VltiInstrument):
 
         instrumentMode = instrumentConfiguration.instrumentMode
 
-        # Retrieve SPEC and POL info from instrumentMode
+        # Retrieve SPEC_RES and POL info from instrumentMode
+
+        # We could force ins_spec_res to be default but prefer a bad keyword value
+        # that throws a Value Error if instrumentMode does not start with an accepted one
+        # ins_spec_res = self.getDefault("GRAVITY_gen_acq.tsf", "INS.SPEC.RES")
+        ins_spec_res = "BAD_SPEC_RES"
         for res in self.getRange("GRAVITY_gen_acq.tsf", "INS.SPEC.RES"):
             if res in instrumentMode[0:len(res)]:
                 ins_spec_res = res
+
         if "COMBINED" in instrumentMode:
             ins_pol = "OUT"
         else:
@@ -55,8 +61,9 @@ class Gravity(VltiInstrument):
             obTarget = OBTarget()
             obConstraints = OBConstraints(self)
 
-            # set common properties
-            acqTSF.INS_SPEC_RES = ins_spec_res
+            # set common properties if any
+            if ins_spec_res:
+                acqTSF.INS_SPEC_RES = ins_spec_res
             acqTSF.INS_FT_POL = ins_pol
             acqTSF.INS_SPEC_POL = ins_pol
 
