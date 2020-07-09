@@ -33,7 +33,6 @@
     },
 	"instrumentConstraints.tsf":
     {
-        "name":                        {},
         "airmass":                    {"default": 1.6, "max": 5, "min": 1},
         "skyTransparency":            {"default": "Variable, thin cirrus", "list": ["Photometric", "Clear", "Variable, thin cirrus", "Variable, thick cirrus"]},
         "waterVapour":                {"default": 30, "max": 30, "min": 0.1},
