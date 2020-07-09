@@ -52,7 +52,7 @@ HELPTEXT += "Config files loaded from " + CONFDIR
 class VltiFacility(Facility):
 
     def __init__(self, a2p2client):
-        Facility.__init__(self, a2p2client, "VLTI", HELPTEXT)
+        Facility.__init__(self, a2p2client, VltiFacility.getName(), HELPTEXT)
         self.ui = VltiUI(self)
 
         # Instanciate instruments
@@ -77,6 +77,14 @@ class VltiFacility(Facility):
         self.username = None
         self.api = None
 
+    def getName():
+        return "VLTI"
+
+    def autologin(self):
+        self.ui.loginFrame.on_loginbutton_clicked()
+        self.a2p2client.ui.showFacilityUI(self.ui)
+        self.ui.showTreeFrame()
+
     def processOB(self, ob):
         # give focus on last updated UI
         self.a2p2client.ui.showFacilityUI(self.ui)
@@ -89,6 +97,9 @@ class VltiFacility(Facility):
             # run checkOB which may raise some error before connection request
             instrument.checkOB(ob)
 
+            insname = instrument.getShortName()
+            containerInsname = self.containerInfo.getInstrument()
+
             # performs operation
             if not self.isConnected():
                 self.ui.showLoginFrame(ob)
@@ -97,6 +108,8 @@ class VltiFacility(Facility):
                 # '"+ob.instrumentConfiguration.name+"'")
                 self.ui.addToLog(
                     "Please select a folder (not a concatenation) in the above list. OBs are not shown")
+            elif  insname.lower() != containerInsname.lower():
+                self.ui.ShowErrorMessage("Aborting: container's instrument '%s' in not applicable for received OB's one '%s'." %(containerInsname,insname))
             else:
                 self.ui.addToLog(
                     "everything ready! Request OB creation inside selected container ")
@@ -217,6 +230,9 @@ class P2Container:
         if self.run == self.item:
             return True
         return self.item['itemType'] != ITEMTYPE_CONCATENATION
+
+    def getInstrument(self):
+        return self.run['instrument']
 
     def isRoot(self):
         return self.item.keys() != None and 'pi' in self.item.keys()

@@ -25,15 +25,28 @@ __release_notes__ = {
         "STATUS": [
         ],
         "A2P2": [
-            "Fix generated release note order according to semver values"
+            "Fix generated release note order according to semver values",
+            "Dry tests done looping on a few OBXML files"
+            "Added -c option to a2p2 so we generated a config file ( helps to automatically fill P2 login info & autologin : )"
         ],
         "VLTI": [
+            "Conf updated with IPs 106.25",
+            "OB no more sent to P2 if OB's instrument is not the same than p2 selected container"
         ],
         "CHARA": [
         ],
         "TODO-SCIENCE": [
+            "Check DIT table from last template user manuals",
+            "Use a calibrator template for MATISSE (instead of default hyb_obs)",
+            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values"
         ],
         "TODO-DEV": [
+            "Support multiple period version (two major at least)",
+            "Add warning if Aspro2's IP versions differs from the selected container" ,
+            "Support numlist keyword : eg. SEQ.HWPOFF",
+            "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
+            "Unify ob name creation in vlti instrument createOB()",
+            "Complete test suite with real p2 submission"
         ],
     },
     "0.2.12": {
@@ -46,10 +59,6 @@ __release_notes__ = {
         ],
         "CHARA": [
         ],
-        "TODO-SCIENCE": [
-        ],
-        "TODO-DEV": [
-        ],
     },
     "0.2.11": {
         "STATUS": [
@@ -61,10 +70,6 @@ __release_notes__ = {
         ],
         "CHARA": [
         ],
-        "TODO-SCIENCE": [
-        ],
-        "TODO-DEV": [
-        ],
     },
     "0.2.10": {
         "STATUS": [
@@ -75,10 +80,6 @@ __release_notes__ = {
         "VLTI": [
         ],
         "CHARA": [
-        ],
-        "TODO-SCIENCE": [
-        ],
-        "TODO-DEV": [
         ],
     },
     "0.2.9": {
@@ -114,15 +115,8 @@ __release_notes__ = {
         "CHARA": [
         ],
         "TODO-SCIENCE": [
-            "Complete/fix GRAVITY DIT table with P105 changes that will come in the next template user manual",
-            "Use a calibrator template for MATISSE (instead of default hyb_obs)",
-            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values"
         ],
         "TODO-DEV": [
-            "Support multiple version (two major at least)",
-            "Support numlist keyword : eg. SEQ.HWPOFF",
-            "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
-            "unify ob name creation in vlti instrument createOB()"
         ]
     }, "0.2.7": {
         "STATUS": [

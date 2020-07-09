@@ -36,6 +36,8 @@ class VltiUI(FacilityUI):
         self.treeItemToRuns = {}
         self.treeItemToP2Items = {}
 
+        self.ob=None
+
     def showLoginFrame(self, ob):
         self.ob = ob
         self.addToLog(
@@ -43,9 +45,12 @@ class VltiUI(FacilityUI):
             (ob.instrumentConfiguration.name))
         self.loginFrame.tkraise()
 
-    def showTreeFrame(self, ob):
-        self.addToLog("Please select a runId in ESO P2 database to process %s OB" %
-                      (ob.instrumentConfiguration.name))
+    def showTreeFrame(self, ob=None):
+        if ob:
+            instrum = ob.instrumentConfiguration.name
+        else:
+            instrum = "incoming"
+        self.addToLog("Please select a runId in ESO P2 database to process %s OB" % instrum )
         self.treeFrame.tkraise()
 
     def fillTree(self, runs):
@@ -155,10 +160,7 @@ class LoginFrame(Frame):
         Frame.__init__(self, vltiUI.container)
         self.vltiUI = vltiUI
 
-        # TODO Would be better to move such config up
-        username = '52052'
-        password = 'tutorial'
-        self.login = [username, password]
+        prefs = vltiUI.a2p2client.preferences
 
         self.loginframe = LabelFrame(
             self, text="login (ESO USER PORTAL or demo account)")
@@ -166,7 +168,7 @@ class LoginFrame(Frame):
         self.username_label = Label(self.loginframe, text="USERNAME")
         self.username_label.pack()
         self.username = StringVar()
-        self.username.set(self.login[0])
+        self.username.set(prefs.getP2Username())
         self.username_entry = Entry(
             self.loginframe, textvariable=self.username)
         self.username_entry.pack()
@@ -174,7 +176,7 @@ class LoginFrame(Frame):
         self.password_label = Label(self.loginframe, text="PASSWORD")
         self.password_label.pack()
         self.password = StringVar()
-        self.password.set(self.login[1])
+        self.password.set(prefs.getP2Password())
         self.password_entry = Entry(
             self.loginframe, textvariable=self.password, show="*")
         self.password_entry.pack()

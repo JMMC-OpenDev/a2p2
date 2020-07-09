@@ -40,10 +40,6 @@ class VltiInstrument(Instrument):
         api = self.facility.getAPI()
         ui = self.ui
 
-        if self.getShortName().lower() != p2container.getInstrument().lower():
-            self.ui.ShowErrorMessage("Selected OB in not applicable for received OB.")
-            return
-
         # create new container
         obsconflist = ob.observationConfiguration
         folderName = obsconflist[0].SCTarget.name
