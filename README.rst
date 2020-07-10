@@ -42,12 +42,12 @@ You may have to install some package to run tk GUI (``python-tk`` on linux).
 Usage
 -----
 
-**a2p2 [-h] [-u USERNAME] [-v]**
+**a2p2 [-h] [-c] [-v]**
 
 
 optional arguments:
  -h, --help                        show this help message and exit
- -u USERNAME, --username USERNAME  use another user login in history's comments. 
+ -c, --createprefs                 Create preferences file
  -v, --verbose                     Verbose
 
 A GUI is provided using tkinter. 
