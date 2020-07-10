@@ -25,6 +25,7 @@ __release_notes__ = {
         "STATUS": [
         ],
         "A2P2": [
+            "A2P2 is now longer python2 compatible. Hope it will be ok for everybody ? Send an issue else ;)",
             "Fix generated release note order according to semver values",
             "Dry tests done looping on a few OBXML files"
             "Added -c option to a2p2 so we generated a config file ( helps to automatically fill P2 login info & autologin : )"
