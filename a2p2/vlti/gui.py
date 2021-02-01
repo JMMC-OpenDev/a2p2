@@ -114,10 +114,10 @@ class VltiUI(FacilityUI):
                 self.treeItemToRuns[curItem], self.treeItemToP2Items[curItem])
 
     def isBusy(self):
-        self.tree.configure(selectmode='browse')
+        self.tree.configure(selectmode='none')
 
     def isIdle(self):
-        self.tree.configure(selectmode='none')
+        self.tree.configure(selectmode='browse')
 
 
 class TreeFrame(Frame):
