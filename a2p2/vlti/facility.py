@@ -98,7 +98,6 @@ class VltiFacility(Facility):
             instrument.checkOB(ob)
 
             insname = instrument.getShortName()
-            containerInsname = self.containerInfo.getInstrument()
 
             # performs operation
             if not self.isConnected():
@@ -108,8 +107,8 @@ class VltiFacility(Facility):
                 # '"+ob.instrumentConfiguration.name+"'")
                 self.ui.addToLog(
                     "Please select a folder (not a concatenation) in the above list. OBs are not shown")
-            elif  insname.lower() != containerInsname.lower():
-                self.ui.ShowErrorMessage("Aborting: container's instrument '%s' in not applicable for received OB's one '%s'." %(containerInsname,insname))
+            elif  insname.lower() != self.containerInfo.getInstrument().lower():
+                self.ui.ShowErrorMessage("Aborting: container's instrument '%s' in not applicable for received OB's one '%s'." %(self.containerInfo.getInstrument(),insname))
             else:
                 self.ui.addToLog(
                     "everything ready! Request OB creation inside selected container ")

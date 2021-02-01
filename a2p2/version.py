@@ -1,4 +1,4 @@
-__version__ = "0.2.13"
+__version__ = "0.2.14"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,18 +21,13 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.2.13": {
+    "0.2.14": {
         "STATUS": [
+            "Bug fix"
         ],
         "A2P2": [
-            "A2P2 is now longer python2 compatible. Hope it will be ok for everybody ? Send an issue else ;)",
-            "Fix generated release note order according to semver values",
-            "Dry tests done looping on a few OBXML files"
-            "Added -c option to a2p2 so we generated a config file ( helps to automatically fill P2 login info & autologin : )"
         ],
         "VLTI": [
-            "Conf updated with IPs 106.25",
-            "OB no more sent to P2 if OB's instrument is not the same than p2 selected container"
         ],
         "CHARA": [
         ],
@@ -48,6 +43,22 @@ __release_notes__ = {
             "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission"
+        ],
+    },
+    "0.2.13": {
+        "STATUS": [
+        ],
+        "A2P2": [
+            "A2P2 is no longer python2 compatible. Hope it will be ok for everybody ? Send an issue else ;)",
+            "Fix generated release note order according to semver values",
+            "Dry tests done looping on a few OBXML files"
+            "Added -c option to a2p2 so we generated a config file ( helps to automatically fill P2 login info & autologin : )"
+        ],
+        "VLTI": [
+            "Conf updated with IPs 106.25",
+            "BugFix: OB no more sent to P2 if OB's instrument is not the same than p2 selected container"
+        ],
+        "CHARA": [
         ],
     },
     "0.2.12": {
