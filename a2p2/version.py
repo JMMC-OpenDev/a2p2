@@ -23,7 +23,7 @@ __release_notes__ = {
     #    },
     "0.2.14": {
         "STATUS": [
-            "Bug fix"
+            "BugFix: ask for container Name only if one is selected"
         ],
         "A2P2": [
         ],

@@ -4,9 +4,11 @@ __all__ = []
 
 from a2p2.chara.gui import CharaUI
 from a2p2.facility import Facility
+import logging
 
 HELPTEXT = "TODO update this HELP message in a2p2/chara/facility.py"
 
+logger = logging.getLogger(__name__)
 
 class CharaFacility(Facility):
 
@@ -16,7 +18,7 @@ class CharaFacility(Facility):
 
     def processOB(self, ob):
         self.a2p2client.ui.addToLog(
-            "Receive OB for '" + self.facilityName + "' interferometer")
+            "OB received for '" + self.facilityName + "' interferometer")
         # show ob dict for debug
         self.a2p2client.ui.addToLog(str(ob), False)
 

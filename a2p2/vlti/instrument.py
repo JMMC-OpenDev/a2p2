@@ -8,12 +8,14 @@ import json
 import os
 # import ast
 import re
+import logging
 
 import numpy as np
 from astropy.coordinates import SkyCoord
 
 from a2p2.instrument import Instrument
 
+logger = logging.getLogger(__name__)
 
 class VltiInstrument(Instrument):
 

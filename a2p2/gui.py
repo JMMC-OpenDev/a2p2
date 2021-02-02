@@ -3,6 +3,7 @@
 __all__ = []
 
 import sys
+import logging
 
 from a2p2 import __release_notes__
 from a2p2 import __version__
@@ -22,6 +23,7 @@ HELPTEXT = """This application provides the link between ASPRO (that you should 
 
 """
 
+logger = logging.getLogger(__name__)
 
 class MainWindow():
 

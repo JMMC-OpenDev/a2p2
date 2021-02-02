@@ -2,9 +2,12 @@
 
 __all__ = []
 
+import logging
 import json
 import xml.etree.ElementTree as ET
 from collections import defaultdict, namedtuple, OrderedDict
+
+logger = logging.getLogger(__name__)
 
 # https://stackoverflow.com/questions/2148119/how-to-convert-an-xml-string-to-a-dictionary-in-python
 # see comment below for our custom mods on attributes naming

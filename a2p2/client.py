@@ -6,6 +6,7 @@ import time
 import traceback
 import os
 import configparser
+import logging
 
 from a2p2 import __version__
 from a2p2.facility import FacilityManager
@@ -15,7 +16,16 @@ from a2p2.samp import A2p2SampClient
 from a2p2.vlti.facility import VltiFacility
 
 
+# prepare global logging
+a2p2Rootlogger = logging.getLogger("a2p2")
+a2p2Rootlogger.setLevel(logging.INFO)
+console = logging.StreamHandler()
+console.setLevel(logging.DEBUG)
+consoleFormatter = logging.Formatter('%(levelname)s - %(name)s  - %(asctime)s - %(filename)s:%(lineno)d - %(message)s')
+console.setFormatter(consoleFormatter)
+a2p2Rootlogger.addHandler(console)
 
+logger = logging.getLogger(__name__)
 
 class A2p2Client():
     """Transmit your Aspro2 observation to remote Observatory scheduling database.
@@ -25,7 +35,7 @@ class A2p2Client():
            ..."""
 
 
-    def __init__(self, fakeAPI=False):
+    def __init__(self, fakeAPI=False, verbose=False):
         """Create the A2p2 client."""
 
         self.preferences = A2P2ClientPreferences()
@@ -34,6 +44,9 @@ class A2p2Client():
         if fakeAPI:
             self.apiName = "fakeAPI"
         self.fakeAPI = fakeAPI
+
+        if verbose:
+            a2p2Rootlogger.setLevel(logging.DEBUG)
 
         self.ui = MainWindow(self)
         # Instantiate the samp client and connect to the hub later
@@ -101,9 +114,11 @@ class A2p2Client():
         # bool of status change
         flag = [0]
 
+        logger.info("Running client ...")
 
         # handle autologin
         if self.preferences.getP2AutoLoginBoolean():
+            logger.debug("Autologin using '%s' file"%A2P2ClientPreferences.getPreferencesFileName())
             self.ui.addToLog("\nAutologin into P2 API please wait...\n")
             self.ui.loop()
             vltifacility = self.facilityManager.facilities.get(VltiFacility.getName())

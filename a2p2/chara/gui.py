@@ -4,6 +4,7 @@ __all__ = []
 
 import sys
 import traceback
+import logging
 
 from a2p2.gui import FacilityUI
 
@@ -17,6 +18,7 @@ else:
 # Constants
 _HR = "\n----------------------------------------------\n"
 
+logger = logging.getLogger(__name__)
 
 class CharaUI(FacilityUI):
 

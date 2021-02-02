@@ -3,6 +3,7 @@
 __all__ = []
 
 import sys
+import logging
 
 from a2p2.gui import FacilityUI
 
@@ -15,10 +16,12 @@ else:
     from tkinter.messagebox import *
     import tkinter.ttk as ttk
 
+logger = logging.getLogger(__name__)
 
 class VltiUI(FacilityUI):
 
     def __init__(self, a2p2client):
+        logger.info("init VltiUI")
         FacilityUI.__init__(self, a2p2client)
 
         self.container = Frame(self, bd=3, relief=SUNKEN)
@@ -54,6 +57,7 @@ class VltiUI(FacilityUI):
         self.treeFrame.tkraise()
 
     def fillTree(self, runs):
+        logger.debug("Start filling tree")
         if len(runs) == 0:
             self.ShowErrorMessage(
                 "No Runs defined, impossible to program ESO's P2 interface.")

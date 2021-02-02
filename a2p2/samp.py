@@ -4,6 +4,9 @@ __all__ = []
 
 from astropy.samp import SAMPIntegratedClient
 from os import sep
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Receiver(object):
 

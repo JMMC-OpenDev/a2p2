@@ -24,7 +24,7 @@ def main():
         exit()
 
     try:
-        with A2p2Client(args.fakeapi) as a2p2c:
+        with A2p2Client(args.fakeapi, args.verbose) as a2p2c:
             # if  args.config:
             #    print(a2p2c)
             # else:
