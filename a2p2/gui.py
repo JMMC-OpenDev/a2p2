@@ -170,12 +170,13 @@ class MainWindow():
     def get_api(self):
         return self.api
 
-    def addToLog(self, text, displayString=True):
+    def addToLog(self, text, displayString=True, level=logging.INFO):
         if displayString:
             self.log_string.set(str(text))
         self.logtext.insert(END, "\n" + str(text))
         self.logtext.see(END)
         self.showFrameToFront()
+        logger.log(level,text)
 
     def ShowErrorMessage(self, text):
         if self.a2p2client.fakeAPI:
@@ -183,7 +184,7 @@ class MainWindow():
         else:
             showerror("Error", text)
         self.addToLog("Error message")
-        self.addToLog(text, False)
+        self.addToLog(text, False, logging.ERROR)
 
         # do also append to simple error stack (for testing purpose first)
         self.a2p2client.addError(text)
@@ -194,7 +195,7 @@ class MainWindow():
         else:
             showwarning("Warning", text)
         self.addToLog("Warning message")
-        self.addToLog(text, False)
+        self.addToLog(text, False, loggin.WARNING)
 
     def ShowInfoMessage(self, text):
         if self.a2p2client.fakeAPI:
@@ -202,7 +203,7 @@ class MainWindow():
         else:
             showinfo("Info", text)
         self.addToLog("Info message")
-        self.addToLog(text, False)
+        self.addToLog(text, False, logging.INFO)
 
     def setProgress(self, perc):
         if perc > 1:
@@ -254,18 +255,18 @@ class FacilityUI(Frame):
         self.facility = facility
         self.a2p2client = facility.a2p2client
 
-    def addToLog(self, text, displayString=True):
+    def addToLog(self, *args, **kwargs):
         """ Wrapper to log message in the common textfield """
-        self.a2p2client.ui.addToLog(text, displayString)
+        self.a2p2client.ui.addToLog(*args, **kwargs)
 
-    def ShowErrorMessage(self, text):
-        self.a2p2client.ui.ShowErrorMessage(text)
+    def ShowErrorMessage(self, *args, **kwargs):
+        self.a2p2client.ui.ShowErrorMessage(*args, **kwargs)
 
-    def ShowWarningMessage(self, text):
-        self.a2p2client.ui.ShowWarningMessage(text)
+    def ShowWarningMessage(self, *args, **kwargs):
+        self.a2p2client.ui.ShowWarningMessage(*args, **kwargs)
 
-    def ShowInfoMessage(self, text):
-        self.a2p2client.ui.ShowInfoMessage(text)
+    def ShowInfoMessage(self, *args, **kwargs):
+        self.a2p2client.ui.ShowInfoMessage(*args, **kwargs)
 
     def setProgress(self, perc):
         """ Wrapper to update progress bar """

@@ -4,6 +4,8 @@ __all__ = []
 
 import os
 import traceback
+import logging
+
 
 from a2p2.facility import Facility
 from a2p2.vlti.gui import VltiUI
@@ -48,6 +50,7 @@ On your first valid VLTI's OB, A2p2 will ask for your ESO User Portal credential
 """
 HELPTEXT += "Config files loaded from " + CONFDIR
 
+logger = logging.getLogger(__name__)
 
 class VltiFacility(Facility):
 
@@ -158,7 +161,9 @@ class VltiFacility(Facility):
         else:
             self.apitype = PRODUCTION_APITYPE
         try:
+            logger.info("Connecting to p2 api(%s).."%self.apitype)
             self.api = p2api.ApiConnection(self.apitype, username, password)
+            logger.info("Connected to p2 api")
             # TODO test that api is ok and handle error if any...
 
             self.refreshTree()
@@ -167,9 +172,9 @@ class VltiFacility(Facility):
             self.username = username
             self.ui.showTreeFrame(ob)
         except:
-            self.ui.addToLog("Can't connect to P2 (see LOG).")
+            self.ui.ShowErrorMessage("Can't connect to P2 (see LOG).")
             trace = traceback.format_exc()
-            self.ui.addToLog(trace, False)
+            self.ui.addToLog(trace, False, level=logging.ERROR)
 
     def refreshTree(self):
         runs, _ = self.api.getRuns()
