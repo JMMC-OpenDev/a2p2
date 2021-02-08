@@ -18,6 +18,8 @@ from a2p2.vlti.facility import VltiFacility
 
 # prepare global logging
 a2p2Rootlogger = logging.getLogger("a2p2")
+# uncomment next line to log requests done by p2api and maybe other ones...
+#a2p2Rootlogger = logging.getLogger()
 a2p2Rootlogger.setLevel(logging.INFO)
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)

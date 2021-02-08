@@ -1,4 +1,4 @@
-__version__ = "0.2.14"
+__version__ = "0.2.15"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,9 +21,9 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.2.14": {
+    "0.2.15": {
         "STATUS": [
-            "BugFix: ask for container Name only if one is selected"
+            "add a wrapper on p2 to make run's tree faster (~2.5x)",
         ],
         "A2P2": [
         ],
@@ -43,6 +43,17 @@ __release_notes__ = {
             "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission"
+        ],
+    },
+    "0.2.14": {
+        "STATUS": [
+            "BugFix: ask for container Name only if one is selected"
+        ],
+        "A2P2": [
+        ],
+        "VLTI": [
+        ],
+        "CHARA": [
         ],
     },
     "0.2.13": {
