@@ -7,7 +7,7 @@
         "TEL.COU.EPOCH":              {"default": 2000, "max": 3000, "min": -2000},
         "TEL.COU.EQUINOX":            {"default": 2000, "max": 3000, "min": -2000},
         "TEL.COU.GSSOURCE":           {"default": "SCIENCE", "list": ["NONE", "SETUPFILE", "SCIENCE"]},
-        "TEL.COU.MAG":                {"default": 0, "max": 25, "min": 0},
+        "TEL.COU.MAG":                {"default": 0, "max": 25, "min": -3},
         "TEL.COU.PMA":                {"default": 0, "max": 10, "min": -10},
         "TEL.COU.PMD":                {"default": 0, "max": 10, "min": -10},
         "INS.DISP.NAME":              {"default": "FREE", "list": ["FREE", "GRISM"]},

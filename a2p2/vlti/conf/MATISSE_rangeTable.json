@@ -14,7 +14,7 @@
         "COU.AG.PMA":                 {"default": 0, "max": 10, "min": -10},
         "COU.AG.PMD":                 {"default": 0, "max": 10, "min": -10},
         "COU.AG.TYPE":                {"default": "ADAPT_OPT", "list": ["DEFAULT", "NONE", "AUTO_GUID", "ADAPT_OPT", "ADAPT_OPT_TCCD"]},
-        "COU.GS.MAG":                 {"default": 0, "max": 25, "min": 0},
+        "COU.GS.MAG":                 {"default": 0, "max": 25, "min": -3},
         "ISS.BASELINE":               {"list": ["small", "medium", "large", "UTs"]},
         "ISS.VLTITYPE":               {"list": ["snapshot", "imaging", "time-series"]}
     },
