@@ -23,11 +23,13 @@ a2p2Rootlogger = logging.getLogger("a2p2")
 a2p2Rootlogger.setLevel(logging.INFO)
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
-consoleFormatter = logging.Formatter('%(levelname)s - %(name)s  - %(asctime)s - %(filename)s:%(lineno)d - %(message)s')
+consoleFormatter = logging.Formatter(
+    '%(levelname)s - %(name)s  - %(asctime)s - %(filename)s:%(lineno)d - %(message)s')
 console.setFormatter(consoleFormatter)
 a2p2Rootlogger.addHandler(console)
 
 logger = logging.getLogger(__name__)
+
 
 class A2p2Client():
     """Transmit your Aspro2 observation to remote Observatory scheduling database.
@@ -35,7 +37,6 @@ class A2p2Client():
        with A2p2Client() as a2p2:
            a2p2.run()
            ..."""
-
 
     def __init__(self, fakeAPI=False, verbose=False):
         """Create the A2p2 client."""
@@ -58,9 +59,10 @@ class A2p2Client():
         if self.preferences.exists():
             pass
         else:
-            self.ui.addToLog("No preference file found, please create one so your data persists (launch program with -c option).\n\n")
+            self.ui.addToLog(
+                "No preference file found, please create one so your data persists (launch program with -c option).\n\n")
 
-        self.errors=[]
+        self.errors = []
 
         pass
 
@@ -120,12 +122,12 @@ class A2p2Client():
 
         # handle autologin
         if self.preferences.getP2AutoLoginBoolean():
-            logger.debug("Autologin using '%s' file"%A2P2ClientPreferences.getPreferencesFileName())
-            self.ui.addToLog("\nAutologin into P2 API please wait...\n")
+            logger.debug("Autologin using '%s' file" %
+                         A2P2ClientPreferences.getPreferencesFileName())
             self.ui.loop()
-            vltifacility = self.facilityManager.facilities.get(VltiFacility.getName())
+            vltifacility = self.facilityManager.facilities.get(
+                VltiFacility.getName())
             vltifacility.autologin()
-
 
         # We now run the loop to wait for the message in a try/finally block so that if
         # the program is interrupted e.g. by control-C, the client terminates
@@ -177,12 +179,13 @@ class A2p2Client():
     def createPreferencesFile():
         A2P2ClientPreferences.createPreferencesFile()
 
+
 class A2P2ClientPreferences():
     # define application name
     appname = "a2p2"
 
     def __init__(self):
-        self._config =  A2P2ClientPreferences.getPreferences()
+        self._config = A2P2ClientPreferences.getPreferences()
         pass
 
     def exists(self):
@@ -199,20 +202,21 @@ class A2P2ClientPreferences():
 
     def getPreferencesFileName():
         from appdirs import user_config_dir
-        preferences_file = os.path.join(user_config_dir(A2P2ClientPreferences.appname), "prefs.ini")
+        preferences_file = os.path.join(user_config_dir(
+            A2P2ClientPreferences.appname), "prefs.ini")
         return preferences_file
 
     def createPreferencesFile():
-        filename=A2P2ClientPreferences.getPreferencesFileName()
+        filename = A2P2ClientPreferences.getPreferencesFileName()
 
         if os.path.exists(filename):
-            print("%s already exists. Nothing done"%filename)
+            print("%s already exists. Nothing done" % filename)
         else:
             config = configparser.ConfigParser()
             #config['DEFAULT'] = {'_noprefyet': '42'}
             config['p2'] = {}
             import getpass
-            config['p2']['# = > please uncomment and update next properties to make it active <']=""
+            config['p2']['# = > please uncomment and update next properties to make it active <'] = ""
             config['p2']['#username'] = getpass.getuser()
             config['p2']['#password'] = "12345zZ"
             config['p2']['#user_comment_name'] = "changed it if your local USER name is not fine"
@@ -222,7 +226,7 @@ class A2P2ClientPreferences():
             with open(filename, 'w+') as configfile:
                 config.write(configfile)
 
-            print("%s template created. Please adjust."%filename)
+            print("%s template created. Please adjust." % filename)
 
     def getConfig(self, section, key, default=None):
         try:
@@ -232,14 +236,14 @@ class A2P2ClientPreferences():
 
     def getConfigBoolean(self, section, key, default=None):
         try:
-            return self._config.getboolean(section,key)
+            return self._config.getboolean(section, key)
         except:
             return default
 
-
     # retrieve P2 username in config or use default demo account
+
     def getP2Username(self):
-        return self.getConfig("p2","username", '52052')
+        return self.getConfig("p2", "username", '52052')
 
     # retrieve P2 password in config or use default demo account
     def getP2Password(self):
@@ -250,5 +254,6 @@ class A2P2ClientPreferences():
         return self.getConfig("p2", "user_comment_name", getpass.getuser())
 
     def getP2AutoLoginBoolean(self):
-            return self.getConfigBoolean("p2", "autologin", False)
+        return self.getConfigBoolean("p2", "autologin", False)
+
 

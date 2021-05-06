@@ -84,6 +84,7 @@ class VltiFacility(Facility):
         return "VLTI"
 
     def autologin(self):
+        self.ui.addToLog("\nAutologin into P2 API please wait...\n")
         self.ui.loginFrame.on_loginbutton_clicked()
         self.a2p2client.ui.showFacilityUI(self.ui)
         self.ui.showTreeFrame()
@@ -152,7 +153,7 @@ class VltiFacility(Facility):
 
     def getStatus(self):
         if self.isConnected():
-            return " P2API connected with " + self.username
+            return " P2API(%s) connected with %s" % ( self.apitype, self.username )
 
     def connectAPI(self, username, password, ob):
         if username == TUTORIAL_LOGIN or username == JMMC_LOGIN:
@@ -160,9 +161,9 @@ class VltiFacility(Facility):
         else:
             self.apitype = PRODUCTION_APITYPE
         try:
-            logger.info("Connecting to p2 api(%s).."%self.apitype)
+            logger.info("Connecting to p2 api...")
             self.api = P2ApiConnectionWrapper(self.apitype, username, password)
-            logger.info("Connected to p2 api")
+            self.ui.addToLog("Connected to p2 api (%s)"%self.apitype)
             # TODO test that api is ok and handle error if any...
 
             self.refreshTree()

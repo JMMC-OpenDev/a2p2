@@ -176,7 +176,11 @@ class MainWindow():
         self.logtext.insert(END, "\n" + str(text))
         self.logtext.see(END)
         self.showFrameToFront()
+        self.refresh()
         logger.log(level,text)
+
+    def refresh(self):
+        self.window.update()
 
     def ShowErrorMessage(self, text):
         if self.a2p2client.fakeAPI:
