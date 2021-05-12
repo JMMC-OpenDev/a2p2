@@ -162,7 +162,8 @@ class VltiFacility(Facility):
             self.apitype = PRODUCTION_APITYPE
         try:
             logger.info("Connecting to p2 api...")
-            self.api = P2ApiConnectionWrapper(self.apitype, username, password)
+            self.api = p2api.ApiConnection(self.apitype, username, password)
+
             self.ui.addToLog("Connected to p2 api (%s)"%self.apitype)
             # TODO test that api is ok and handle error if any...
 
@@ -245,79 +246,3 @@ class P2Container:
 
     def __str__(self):
         return """instrument:'%s', containerId:'%s'""" % (self.run['instrument'], self.containerId)
-
-
-# Add wrapper to wrapp p2api/requsts code and enhance
-import p2api
-from p2api import P2Error
-import json
-
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-#  Retry Handling for requests
-# See https://www.peterbe.com/plog/best-practice-with-retries-with-requests
-# Or https://findwork.dev/blog/advanced-usage-python-requests-timeouts-retries-hooks/
-def requests_retry_session(
-        retries=3,
-        backoff_factor=1.0,
-        status_forcelist=(500, 502, 504)):
-
-    adapter = HTTPAdapter()
-    adapter.max_retries = Retry(
-        total=retries,
-        read=retries,
-        connect=retries,
-        backoff_factor=backoff_factor,
-        status_forcelist=status_forcelist,
-        respect_retry_after_header=False
-    )
-    session = requests.Session()
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
-    return session
-
-
-requests_session = requests_retry_session()
-
-class P2ApiConnectionWrapper(p2api.ApiConnection):
-
-    def __init__(self, apitype, username, password):
-        p2api.ApiConnection.__init__(self, apitype, username, password)
-        logger.debug("init P2ApiConnectionWrapper")
-
-    def request(self, method, url, data=None, etag=None):
-        self.request_count += 1
-
-        # configure request headers
-        assert self.access_token is not None
-        headers = {
-            'Authorization': 'Bearer ' + self.access_token,
-            'Accept': 'application/json'
-        }
-        if data is not None:
-            headers['Content-Type'] = 'application/json'
-        if etag is not None:
-            headers['If-Match'] = etag
-
-        # make request
-        url = self.apiUrl + url
-        if self.debug:
-            print(method, url, data)
-        # using session makes some calls more than 2.5 X faster
-        # r = requests.request(method, url, headers=headers, data=json.dumps(data))
-        r = requests_session.request(method, url, headers=headers, data=json.dumps(data))
-        content_type = r.headers['Content-Type'].split(';')[0]
-        etag = r.headers.get('ETag', None)
-
-        # handle response
-        if 200 <= r.status_code < 300:
-            if content_type == 'application/json':
-                data = r.json()
-                return data, etag
-            return None, etag
-        elif content_type == 'application/json' and 'error' in r.json():
-            raise P2Error(r.status_code, method, url, r.json()['error'])
-        else:
-            raise P2Error(r.status_code, method, url, 'oops unknown error '+r)
-            # TODO handle 401 ? should we do something to reconnect API ...
