@@ -1,4 +1,4 @@
-__version__ = "0.2.15"
+__version__ = "0.3.0"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,29 +21,47 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.2.15": {
-        "STATUS": [
-            "add a wrapper on p2 to make run's tree faster (~2.5x)",
-        ],
+    "0.3.0": {
+        "STATUS":[
+             ],
         "A2P2": [
-        ],
+            "Give a try to embedd some code to interact with JMMC services",         
+            ],
         "VLTI": [
-        ],
+    #            "revert back to p2 requests use which now reuses connections",
+            ],
         "CHARA": [
-        ],
+
+            ],
         "TODO-SCIENCE": [
             "Check DIT table from last template user manuals",
             "Use a calibrator template for MATISSE (instead of default hyb_obs)",
             "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values"
-        ],
+            ],
         "TODO-DEV": [
             "Support multiple period version (two major at least)",
             "Add warning if Aspro2's IP versions differs from the selected container" ,
             "Support numlist keyword : eg. SEQ.HWPOFF",
             "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
             "Unify ob name creation in vlti instrument createOB()",
-            "Complete test suite with real p2 submission"
+            "Complete test suite with real p2 submission",
+            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
         ],
+    },
+    "0.2.15": {
+        "STATUS": [
+        ],
+        "A2P2": [
+        ],
+        "VLTI": [
+#            "add a wrapper on p2 to make run's tree faster (~2.5x)",
+        ],
+        "CHARA": [
+        ],
+        "TODO-SCIENCE": [
+        ],
+        "TODO-DEV": [
+       ],
     },
     "0.2.14": {
         "STATUS": [
