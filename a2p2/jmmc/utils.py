@@ -2,6 +2,7 @@
 
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
+from requests.auth import HTTPBasicAuth
 import requests
 __all__ = []
 
@@ -48,6 +49,8 @@ class JmmcAPI():
     def __init__(self, rootURL, username=None, password=None):
         self.rootURL = rootURL
 
+        # credentials can be given by hand but .netrc files automatically are used on 401
+
         if username and password:
             self.auth = HTTPBasicAuth(username, password)
         else:
@@ -63,6 +66,9 @@ class JmmcAPI():
     def _put(self, url, json):
         return self._request('PUT', url, json)
 
+    def _post(self, url, json):
+        return self._request('POST', url, json)
+
     def _request(self, method, url, json=None):
         logger.info("performing %s request on %s" % (method, self.rootURL+url))
         r = self.requests_session.request(
@@ -71,12 +77,16 @@ class JmmcAPI():
         if (r.status_code == 204):  # No Content : everything is fine
             return
         elif 200 <= r.status_code < 300:
-            if 'application/json' in r.headers['Content-Type']:
+            if 'Content-Type' in r.headers.keys() and 'application/json' in r.headers['Content-Type']:
                 return r.json()
             else:
                 return r.content
         # TODO enhance error handling ? Throw an exception ....
-        if "X-Http-Error-Description" in r.headers.keys() :
-            raise Exception(r.headers["X-Http-Error-Description"])
-        else:
-            raise Exception(r.status_code, r.headers)
+        error = []
+        error.append("status_code is %s"%r.status_code)
+        if r.reason :
+            error.append(r.reason)
+        if "X-Http-Error-Description" in r.headers.keys():
+            error.append(r.headers["X-Http-Error-Description"])
+
+        raise Exception(error)
