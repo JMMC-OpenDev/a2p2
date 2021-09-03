@@ -69,3 +69,8 @@ def test_duplicated_col_update():
     c.updateRow(1, '{"target_priority_pi":1, "TARGET_PRIORITY_PI",2}')
     priority = c.getRow(1)["target_priority_pi"]
     assert priority==2
+
+def test_reject_bad_col():
+    # TODO 
+    # updateRow(1,'{"wrong_key":42})
+    assert False
