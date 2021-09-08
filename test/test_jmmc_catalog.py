@@ -13,6 +13,7 @@ oidbValidId = 38681
 class CustomCatalog(Catalog):
     def __init__(self, catalogName):
         Catalog.__init__(self, catalogName,
+#                )
                          url="http://localhost:8080/exist/restxq/catalogs")
 
 
@@ -62,11 +63,11 @@ def test_simple_update():
 def test_duplicated_col_update():
     c = CustomCatalog("spica")
 
-    c.updateRow(1, '{"target_priority_pi":1, "target_priority_pi",2}')
+    c.updateRow(1, '{"target_priority_pi":1, "target_priority_pi":2}')
     priority = c.getRow(1)["target_priority_pi"]
     assert priority==2
 
-    c.updateRow(1, '{"target_priority_pi":1, "TARGET_PRIORITY_PI",2}')
+    c.updateRow(1, '{"target_priority_pi":1, "TARGET_PRIORITY_PI":2}')
     priority = c.getRow(1)["target_priority_pi"]
     assert priority==2
 
