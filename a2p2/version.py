@@ -1,4 +1,4 @@
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,11 +21,11 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.3.0": {
+    "0.3.1": {
         "STATUS":[
              ],
         "A2P2": [
-            "Give a try to embedd some code to interact with JMMC services",         
+            "Bug fix for authenticated Catalog access",         
             ],
         "VLTI": [
     #            "revert back to p2 requests use which now reuses connections",
@@ -46,6 +46,23 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },
+    "0.3.0": {
+        "STATUS":[
+             ],
+        "A2P2": [
+            "Give a try to embedd some code to interact with JMMC services",         
+            ],
+        "VLTI": [
+    #            "revert back to p2 requests use which now reuses connections",
+            ],
+        "CHARA": [
+
+            ],
+        "TODO-SCIENCE": [
+            ],
+        "TODO-DEV": [
         ],
     },
     "0.2.15": {
