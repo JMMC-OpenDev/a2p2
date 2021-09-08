@@ -9,12 +9,15 @@ from a2p2.jmmc import Catalog
 
 oidbValidId = 38681
 
+spicaCatName = "spica"
+#spicaCatName = "spica_2021_07_08"
+
 
 class CustomCatalog(Catalog):
     def __init__(self, catalogName):
         Catalog.__init__(self, catalogName,
-#                )
                          url="http://localhost:8080/exist/restxq/catalogs")
+#                )
 
 
 def test_same_id():
@@ -33,7 +36,7 @@ def has_same_id(catname, id):
     return
 
 def test_protected():
-    spica = CustomCatalog("spica")
+    spica = CustomCatalog(spicaCatName)
     try:
         spica.getRow(1)
         spicaIsProtected = False
@@ -53,7 +56,14 @@ def test_public():
     assert oidbIsPublic
 
 def test_simple_update():
-    c = CustomCatalog("spica")
+    c = CustomCatalog(spicaCatName)
+    v=2
+    c.updateRow(1, { "target_priority_pi" : v } )
+    priority = c.getRow(1)["target_priority_pi"]
+    assert priority==v
+
+def test_simple_update_with_str_as_json_input():
+    c = CustomCatalog(spicaCatName)
     v=2
     c.updateRow(1, '{"target_priority_pi":%d}'%v)
     priority = c.getRow(1)["target_priority_pi"]
@@ -61,17 +71,17 @@ def test_simple_update():
 
 
 def test_duplicated_col_update():
-    c = CustomCatalog("spica")
+    c = CustomCatalog(spicaCatName)
 
-    c.updateRow(1, '{"target_priority_pi":1, "target_priority_pi":2}')
+    c.updateRow(1, {"target_priority_pi":1, "target_priority_pi":2})
     priority = c.getRow(1)["target_priority_pi"]
     assert priority==2
 
-    c.updateRow(1, '{"target_priority_pi":1, "TARGET_PRIORITY_PI":2}')
+    c.updateRow(1, {"target_priority_pi":1, "TARGET_PRIORITY_PI":2})
     priority = c.getRow(1)["target_priority_pi"]
     assert priority==2
 
 def test_reject_bad_col():
     # TODO 
-    # updateRow(1,'{"wrong_key":42})
+    # updateRow(1,{"wrong_key":42})
     assert False
