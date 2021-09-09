@@ -13,6 +13,7 @@ with open("a2p2/version.py") as fp:
 setup(
     name='a2p2',
     version=version['__version__'],
+    python_requires='>=3',
     description=description,
     long_description=long_description,
     #      install_requires=['astropy', 'p2api','pygtk'],
@@ -23,7 +24,7 @@ setup(
     # we continue moving tk as first gui backend
     # install_requires=['astropy', 'p2api', 'python-tk'] + (['pygtk'] if
     # platform.startswith("win") else []),
-    install_requires=['astropy>=2', 'p2api', 'appdirs'],
+    install_requires=['astropy>=4.3.1', 'p2api', 'appdirs'],
     url='http://www.jmmc.fr/a2p2',
     author='JMMC Tech Group',
     author_email='jmmc-tech-group@jmmc.fr',
