@@ -18,13 +18,13 @@ class Catalog():
     """
 
     # TODO move preprod toggle False by default
-    def __init__(self, catalogName, username=None, password=None, preprod=True, url=None):
+    def __init__(self, catalogName, username=None, password=None, preprod=True, apiUrl=None):
         self.catalogName = catalogName
         self.prod = not(preprod)
         # TODO manage here prod & preprod access points
 
-        if url:
-            self.apiUrl = url  # trust given url as catalogAPI if value is provided
+        if apiUrl:
+            self.apiUrl = apiUrl  # trust given url as catalogAPI if value is provided
         elif self.prod:
             self.apiUrl = ""  # no api in production yet
         else:
@@ -66,9 +66,6 @@ class Catalog():
         """
 
         # We may check befere sending payload that we always provide an id for every record
-        # and the messsages could be of next form
-        # other approach could be to give id value as key so we mask id key name (that is handled on server side)
-        # usage: updateCatalogRows({42:{, "col_a":"a" }, 24:{ , "col_b":"b" } })
         return self.api._put("/%s" % (self.catalogName), values)
 
     def addRows(self, values):
@@ -76,9 +73,4 @@ class Catalog():
             Values is an array of row to add. id column values will be ignored.
             usage: addCatalogRows([ { "id":42, "col_a":"a" }, { "id":24, "col_b":"b" } ])
         """
-
-        # We may check befere sending payload that we always provide an id for every record
-        # and the messsages could be of next form
-        # other approach could be to give id value as key so we mask id key name (that is handled on server side)
-        # usage: updateCatalogRows([{"col_a":"a1", "col_b","b1" },{"col_a":"a2", "col_b","b2" } ])
         return self.api._post("/%s" % (self.catalogName), values)
