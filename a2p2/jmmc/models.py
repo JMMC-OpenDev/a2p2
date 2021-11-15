@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class Models():
     """ Get analytical model's representations (in sync with Aspro2's ones).
     """
-    SAMP_UCD_MODEL="meta.code.class;meta.modelled"
+    SAMP_UCD_MODEL="meta.code.class;meta.modelled" # use it for colums that would be filled by models below
 
     def _xml_model(model):
         """ Rough conversion of dict to xml (Aspro2 namespaces)"""
