@@ -6,6 +6,7 @@ import os
 import traceback
 import logging
 
+import p2api
 
 from a2p2.facility import Facility
 from a2p2.vlti.gui import VltiUI

@@ -28,6 +28,7 @@ __release_notes__ = {
             "Add basic support of Aspro2's model for SAMP interoperability",
         ],
         "VLTI": [
+            "Fix missing import for p2api module"
         ],
         "CHARA": [
 
