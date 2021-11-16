@@ -25,8 +25,10 @@ class Models():
 
         params=""
         paramNames=[ k for k in model.keys() if not k in ("type", "name")]
+        # at present time we must use Aspro2's approach with the same xml namespaces
+        # see
         for p in paramNames:
-            params+=f"""    <tm:parameter name="{modelname}_{p}" type="{p}"><value>{model[p]}</value><tm:parameter>\n"""
+            params+=f"""    <tm:parameter name="{modelname}_{p}" type="{p}"><value>{model[p]}</value></tm:parameter>\n"""
 
         return f"""<tm:model name="{modelname}" type="{modeltype}">\n{params}</tm:model>\n"""
 

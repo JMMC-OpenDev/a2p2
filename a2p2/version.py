@@ -1,4 +1,4 @@
-__version__ = "0.3.2"
+__version__ = "0.3.3"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,14 +21,13 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.3.2": {
+    "0.3.3": {
         "STATUS": [
         ],
         "A2P2": [
-            "Improve setup.py that now requires python 3+ and a fresh version of astropy",
+            "Add basic support of Aspro2's model for SAMP interoperability",
         ],
         "VLTI": [
-            #            "revert back to p2 requests use which now reuses connections",
         ],
         "CHARA": [
 
@@ -46,6 +45,19 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },
+    "0.3.2": {
+        "STATUS": [
+        ],
+        "A2P2": [
+            "Improve setup.py that now requires python 3+ and a fresh version of astropy",
+        ],
+        "VLTI": [
+            #            "revert back to p2 requests use which now reuses connections",
+        ],
+        "CHARA": [
+
         ],
     },
     "0.3.1": {
