@@ -64,8 +64,8 @@ class Pionier(VltiInstrument):
             # define target
             # acqTSF.SEQ_INS_SOBJ_NAME = scienceTarget.name.strip()
 
-            acqTSF.TARGET_NAME = scienceTarget.name.strip()
-            obTarget.name = acqTSF.TARGET_NAME.replace(
+
+            obTarget.name = scienceTarget.name.strip().replace(
                 ' ', '_')  # allowed characters: letters, digits, + - _ . and no spaces
             obTarget.ra, obTarget.dec = self.getCoords(scienceTarget)
             obTarget.properMotionRa, obTarget.properMotionDec = self.getPMCoords(
@@ -224,7 +224,7 @@ class Pionier(VltiInstrument):
         # everything seems OK
         # create new OB in container:
         # TODO use a common function for next lines
-        goodName = re.sub('[^A-Za-z0-9]+', '_', acqTSF.TARGET_NAME)
+        goodName = re.sub('[^A-Za-z0-9]+', '_', obTarget.name)
         OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_PIONIER_' + \
             acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
 

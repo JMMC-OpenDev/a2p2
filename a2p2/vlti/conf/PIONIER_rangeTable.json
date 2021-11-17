@@ -1,7 +1,6 @@
 {
     "PIONIER_acq.tsf":
     {
-        "TARGET.NAME":                {    },
         "TEL.COU.ALPHA":              {"default": "0.", "list": ["ra"]},
         "TEL.COU.DELTA":              {"default": "0.", "list": ["dec"]},
         "TEL.COU.EPOCH":              {"default": 2000, "max": 3000, "min": -2000},
