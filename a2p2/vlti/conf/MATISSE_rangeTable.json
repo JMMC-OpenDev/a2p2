@@ -3,6 +3,7 @@
     {
         "SEQ.TARG.FLUX.L":            {"default": 3000},
         "SEQ.TARG.FLUX.N":            {"default": 300},
+        "SEQ.TARG.MAG.H":             {"default": 0},
         "SEQ.TARG.MAG.K":             {"default": 0},
         "TEL.TARG.ADDVELALPHA":       {"default": 0, "max": 15, "min": -15},
         "TEL.TARG.ADDVELDELTA":       {"default": 0, "max": 15, "min": -15},
