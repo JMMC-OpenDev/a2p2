@@ -46,21 +46,33 @@ class VltiInstrument(Instrument):
         obsconflist = ob.observationConfiguration
         folderName = obsconflist[0].SCTarget.name
         folderName = re.sub('[^A-Za-z0-9]+', '_', folderName.strip())
+        # prefix with username to make test folder clearer
+        if p2container.isRoot() and self.facility.isTutorialAccount():
+            folderName += "_" + self.facility.a2p2client.preferences.getP2UserCommentName()
 
+
+# seems no more useful because we always create a concatenation or folder below
+        """
         # force a top folder in demo.
         if p2container.isRoot() and self.facility.isTutorialAccount():
             ui.addToLog(
                 "create pre folder (required for tutorial account) ", False)
             folder, _ = api.createFolder(p2container.containerId, folderName)
             p2container.containerId = folder['containerId']
+            """
 
-        # create a concatenation if service mode
-        if p2container.isServiceModeRun():
-            folder, _ = api.createConcatenation(
-                p2container.containerId, folderName)
+        if p2container.isRoot():
+            # create a concatenation if service mode
+            if p2container.isServiceModeRun():
+                folder, _ = api.createConcatenation(
+                    p2container.containerId, folderName)
+                ui.addToLog("concatenation created")
+            else:
+                folder, _ = api.createFolder(p2container.containerId, folderName)
+                ui.addToLog("folder created")
+            p2container.containerId = folder['containerId']
         else:
-            folder, _ = api.createFolder(p2container.containerId, folderName)
-        p2container.containerId = folder['containerId']
+            ui.addToLog("concatenation or folder not created")
 
         ui.addToLog("OB checked / preparing  submission...")
         self.checkOB(ob, p2container)
