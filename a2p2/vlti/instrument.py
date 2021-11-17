@@ -62,14 +62,14 @@ class VltiInstrument(Instrument):
             """
 
         if p2container.isRoot():
-            # create a concatenation if service mode
+            # create a concatenation if service mode (even if we do not have any cal at this stage)
             if p2container.isServiceModeRun():
                 folder, _ = api.createConcatenation(
                     p2container.containerId, folderName)
-                ui.addToLog("concatenation created")
-            else:
+                ui.addToLog(f"concatenation '{folderName}' created")
+            elif self.facility.isTutorialAccount():
                 folder, _ = api.createFolder(p2container.containerId, folderName)
-                ui.addToLog("folder created")
+                ui.addToLog(f"folder '{folderName}' created")
             p2container.containerId = folder['containerId']
         else:
             ui.addToLog("concatenation or folder not created")

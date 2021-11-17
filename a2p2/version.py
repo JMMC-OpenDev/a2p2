@@ -1,4 +1,4 @@
-__version__ = "0.3.3"
+__version__ = "0.3.4"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,14 +21,14 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.3.3": {
+    "0.3.4": {
         "STATUS": [
         ],
         "A2P2": [
-            "Add basic support of Aspro2's model for SAMP interoperability",
         ],
         "VLTI": [
-            "Fix missing import for p2api module"
+            "Sync templates with P109",
+            "Create OB in selected folder: do not create anymore a folder but create a concatenation for SM if a Run's root is selected."
         ],
         "CHARA": [
 
@@ -46,6 +46,23 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },
+    "0.3.3": {
+        "STATUS": [
+        ],
+        "A2P2": [
+            "Add basic support of Aspro2's model for SAMP interoperability",
+        ],
+        "VLTI": [
+            "Fix missing import for p2api module"
+        ],
+        "CHARA": [
+
+        ],
+        "TODO-SCIENCE": [
+        ],
+        "TODO-DEV": [
         ],
     },
     "0.3.2": {
