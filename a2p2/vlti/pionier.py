@@ -74,6 +74,8 @@ class Pionier(VltiInstrument):
             # Set baseline  interferometric array code (should be a keywordlist)
             acqTSF.ISS_BASELINE = [self.getBaselineCode(BASELINE)]
 
+            self.checkIssVltiType(acqTSF)
+
             # define some default values
             DIAMETER = float(self.get(scienceTarget, "DIAMETER", 0.0))
             VIS = 1.0  # FIXME

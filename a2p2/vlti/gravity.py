@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 
 __all__ = []
@@ -84,6 +85,9 @@ class Gravity(VltiInstrument):
 
             # Set baseline  interferometric array code (should be a keywordlist)
             acqTSF.ISS_BASELINE = [self.getBaselineCode(BASELINE)]
+
+            self.checkIssVltiType(acqTSF)
+
 
             # define some default values
             DIAMETER = float(self.get(scienceTarget, "DIAMETER", 0.0))

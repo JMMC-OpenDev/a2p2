@@ -62,6 +62,8 @@ class Matisse(VltiInstrument):
             # Set baseline  interferometric array code (should be a keywordlist)
             acqTSF.ISS_BASELINE = [self.getBaselineCode(BASELINE)]
 
+            self.checkVltiType(acqTSF)
+
             # define some default values
             VIS = 1.0  # FIXME
 

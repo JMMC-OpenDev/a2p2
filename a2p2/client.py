@@ -197,7 +197,7 @@ class A2P2ClientPreferences():
 
     def getPreferences():
         preferences_file = A2P2ClientPreferences.getPreferencesFileName()
-        config = configparser.ConfigParser()
+        config = configparser.ConfigParser(allow_no_value=True)
         config.read(preferences_file)
         return config
 
@@ -213,7 +213,7 @@ class A2P2ClientPreferences():
         if os.path.exists(filename):
             print("%s already exists. Nothing done" % filename)
         else:
-            config = configparser.ConfigParser()
+            config = configparser.ConfigParser(allow_no_value=True)
             #config['DEFAULT'] = {'_noprefyet': '42'}
             config['p2'] = {}
             import getpass
@@ -222,6 +222,14 @@ class A2P2ClientPreferences():
             config['p2']['#password'] = "12345zZ"
             config['p2']['#user_comment_name'] = "changed it if your local USER name is not fine"
             config['p2']['#autologin'] = "yes"
+
+            config['p2.iss.vltitype'] = {}
+            config['p2.iss.vltitype']['# = > please uncomment the default values to add for ISS.VLTITYPE <'] = ""
+            config['p2.iss.vltitype']['# = > all supported will be added for any VLTI instrument if info is not provided by Aspro2 <'] = None
+            config['p2.iss.vltitype']['#snapshot'] = None
+            config['p2.iss.vltitype']['#imaging'] = None
+            config['p2.iss.vltitype']['#time-series'] = None
+            config['p2.iss.vltitype']['#astrometry'] = None
 
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             with open(filename, 'w+') as configfile:
@@ -234,6 +242,13 @@ class A2P2ClientPreferences():
             return self._config[section][key]
         except:
             return default
+
+    def getConfigKeys(self, section, default=None):
+        try:
+            return list(self._config[section].keys())
+        except:
+            return default
+
 
     def getConfigBoolean(self, section, key, default=None):
         try:
