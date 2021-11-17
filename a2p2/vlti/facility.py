@@ -3,6 +3,7 @@
 __all__ = []
 
 import os
+from tkinter.constants import TRUE
 import traceback
 import logging
 
@@ -107,11 +108,11 @@ class VltiFacility(Facility):
             # performs operation
             if not self.isConnected():
                 self.ui.showLoginFrame(ob)
-            elif not self.isReadyToSubmit():
+            elif not self.isReadyToSubmit(ob):
                 # self.a2p2client.ui.addToLog("Receive OB for
                 # '"+ob.instrumentConfiguration.name+"'")
                 self.ui.addToLog(
-                    "Please select a folder (not a concatenation) in the above list. OBs are not shown")
+                    "Please select a folder (not a concatenation) in the above list to submit your science object (OBs are not shown).")
             elif  insname.lower() != self.containerInfo.getInstrument().lower():
                 self.ui.ShowErrorMessage("Aborting: container's instrument '%s' in not applicable for received OB's one '%s'." %(self.containerInfo.getInstrument(),insname))
             else:
@@ -143,8 +144,8 @@ class VltiFacility(Facility):
             self.ui.addToLog(trace, False)
             self.ui.setProgress(0)
 
-    def isReadyToSubmit(self):
-        return self.api and self.containerInfo.isOk()
+    def isReadyToSubmit(self, ob):
+        return self.api and self.containerInfo.isOk(ob)
 
     def isConnected(self):
         return self.connected
@@ -225,16 +226,28 @@ class P2Container:
     def log(self):
         if self.run != self.item and self.item['itemType'] == ITEMTYPE_CONCATENATION:
             self.facility.ui.addToLog(
-                "*** Please do not select a Concatenation and select another container. ***")
+                "*** Please do not select a Concatenation and select another container. Or just append a calibrator. ***")
         else:
             self.facility.ui.addToLog("*** Working with %s ***" % self)
 
-    def isOk(self):
+    def isOk(self, ob):
+        """ Tell if given container is ready to receive content of given OB."""
         if self.run == None:
             return False
         if self.run == self.item:
             return True
-        return self.item['itemType'] != ITEMTYPE_CONCATENATION
+
+        has_calib = False
+        has_science = False
+        for obsConf in ob.observationConfiguration:
+            if 'SCIENCE' in obsConf.type:
+                has_science = True
+            else:
+                has_calib = True
+
+        if has_science:
+            return self.item['itemType'] != ITEMTYPE_CONCATENATION
+        return has_calib
 
     def getInstrument(self):
         return self.run['instrument']
