@@ -55,6 +55,8 @@ class VltiInstrument(Instrument):
         if p2container.isRoot():
             # create a concatenation if service mode (even if we do not have any cal at this stage)
             if p2container.isServiceModeRun():
+                # TODO fix bug when we keep the last selection that is a Concatenation. Concatenation can't be nested.
+                # use parent container  or ask user to choose another container location ?
                 folder, _ = api.createConcatenation(
                     p2container.containerId, folderName)
                 ui.addToLog(f"concatenation '{folderName}' created")

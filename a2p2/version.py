@@ -1,4 +1,4 @@
-__version__ = "0.3.5"
+__version__ = "0.3.6"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,14 +21,13 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.3.5": {
+    "0.3.6": {
         "STATUS": [
         ],
         "A2P2": [
         ],
         "VLTI": [
-            "Accept to add calibrator inside a Concatenation container",
-            "Use p2.iss.vltitype preference keys to set supported value of instrument's acquisition templates. ( run 'a2p2 -c' )"
+            "Disable SEQ.RELOFF.X for GRAVITY dual to make OB compliant"
         ],
         "CHARA": [
 
@@ -46,6 +45,24 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },"0.3.5": {
+        "STATUS": [
+        ],
+        "A2P2": [
+        ],
+        "VLTI": [
+            "Accept to add calibrator inside a Concatenation container",
+            "Use p2.iss.vltitype preference keys to set supported value of instrument's acquisition templates. ( run 'a2p2 -c' )"
+        ],
+        "CHARA": [
+
+        ],
+        "TODO-SCIENCE": [
+
+        ],
+        "TODO-DEV": [
+
         ],
     },
     "0.3.4": {
