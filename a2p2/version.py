@@ -27,7 +27,7 @@ __release_notes__ = {
         "A2P2": [
         ],
         "VLTI": [
-            "Revert SEQ.RELOFF.X/Y = 0.0 for GRAVITY dual_obs_exp template"
+            "Revert SEQ.RELOFF.X/Y = 0.0 (same as default) for GRAVITY dual_obs_exp template"
         ],
         "CHARA": [
         ],
