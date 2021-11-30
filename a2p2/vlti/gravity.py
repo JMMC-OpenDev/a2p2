@@ -386,11 +386,8 @@ class Gravity(VltiInstrument):
         # put values. they are the same except for dual obs science (?)
         values = obsTSF.getDict()
         if dualField and OBJTYPE == 'SCIENCE':
-            # not included in our general TSF
-            # values.update({'SEQ.RELOFF.X': ["0.0"], 'SEQ.RELOFF.Y': ["0.0"]})
-            # GM commented since this keyword type changed and make it refused
-            # TODO ask for inclusion in template descriptions
-            pass
+            values.update({'SEQ.RELOFF.X': [0.0], 'SEQ.RELOFF.Y': [0.0]})
+
         tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
         ui.setProgress(0.5)
 
