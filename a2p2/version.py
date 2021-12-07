@@ -1,4 +1,4 @@
-__version__ = "0.3.7"
+__version__ = "0.3.8"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,13 +21,17 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.3.7": {
+    "0.3.8": {
         "STATUS": [
         ],
         "A2P2": [
         ],
         "VLTI": [
-            "Revert SEQ.RELOFF.X/Y = 0.0 (same as default) for GRAVITY dual_obs_exp template"
+            "Enhance CAL SCI sequence : [CAL1] SCI [CAL2 [SCI CAL3 [...] ] ] ",
+            "Fix COU_AG_PMA and COU_AG_PMD for MATISSE acq template",
+            "Do not throw a dialog for every submitted OBs",
+            "Enhance some messages",
+            # "BugFix to create a folder on non tutorial accounts"
         ],
         "CHARA": [
         ],
@@ -44,6 +48,16 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },"0.3.7": {
+        "STATUS": [
+        ],
+        "A2P2": [
+        ],
+        "VLTI": [
+            "Revert SEQ.RELOFF.X/Y = 0.0 (same as default) for GRAVITY dual_obs_exp template"
+        ],
+        "CHARA": [
         ],
     },"0.3.6": {
         "STATUS": [
