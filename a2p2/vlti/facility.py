@@ -162,7 +162,7 @@ class VltiFacility(Facility):
             return " P2API(%s) connected with %s" % ( self.apitype, self.username )
 
     def connectAPI(self, username, password, ob):
-        if username == TUTORIAL_LOGIN or username == JMMC_LOGIN:
+        if username == TUTORIAL_LOGIN: # or username == JMMC_LOGIN:
             self.apitype = DEMO_APITYPE
         else:
             self.apitype = PRODUCTION_APITYPE
