@@ -101,6 +101,8 @@ class VltiFacility(Facility):
         instrument = self.getInstrument(ob.instrumentConfiguration.name)
         try:
             # run checkOB which may raise some error before connection request
+            # TODO we should test much more because lot of stuff still are beeing processed on live ob creations
+
             instrument.checkOB(ob)
 
             insname = instrument.getShortName()
@@ -112,13 +114,15 @@ class VltiFacility(Facility):
                 # self.a2p2client.ui.addToLog("Receive OB for
                 # '"+ob.instrumentConfiguration.name+"'")
                 self.ui.addToLog(
-                    "Please select a folder (not a concatenation) in the above list to submit your science object (OBs are not shown).")
+                    f"Please select a {insname}'s folder (not a concatenation) in the above list to submit your science object (OBs are not shown).")
             elif  insname.lower() != self.containerInfo.getInstrument().lower():
                 self.ui.ShowErrorMessage("Aborting: container's instrument '%s' in not applicable for received OB's one '%s'." %(self.containerInfo.getInstrument(),insname))
             else:
                 self.ui.addToLog(
-                    "everything ready! Request OB creation inside selected container ")
+                    "Everything ready! Request OB creation inside selected container ")
                 instrument.submitOB(ob, self.containerInfo)
+                self.ui.addToLog(
+                    "Run filled! Please check logs and fix last details on P2 web.")
                 self.refreshTree()
 
         # TODO add P2Error handling P2Error(r.status_code, method, url,
