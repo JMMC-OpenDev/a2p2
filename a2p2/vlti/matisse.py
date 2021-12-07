@@ -34,7 +34,7 @@ class Matisse(VltiInstrument):
 
         instrumentMode = instrumentConfiguration.instrumentMode
 
-        for observationConfiguration in ob.observationConfiguration:
+        for observationConfiguration in self.getSequence(ob):
 
             # create keywords storage objects
             acqTSF = TSF(self, "MATISSE_img_acq.tsf")  # or .tsfx?
@@ -62,7 +62,7 @@ class Matisse(VltiInstrument):
             # Set baseline  interferometric array code (should be a keywordlist)
             acqTSF.ISS_BASELINE = [self.getBaselineCode(BASELINE)]
 
-            self.checkVltiType(acqTSF)
+            self.checkIssVltiType(acqTSF)
 
             # define some default values
             VIS = 1.0  # FIXME
@@ -88,7 +88,7 @@ class Matisse(VltiInstrument):
                 # TODO check if AO coords should be required by template
                 # AORA, AODEC  = self.getCoords(aoTarget,
                 # requirePrecision=False)
-                acqTSF.COU_PMA, acqTSF.COU_PMD = self.getPMCoords(aoTarget)
+                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(aoTarget)
 
             # Guide Star
             gsTarget = ob.get(observationConfiguration, 'GSTarget')

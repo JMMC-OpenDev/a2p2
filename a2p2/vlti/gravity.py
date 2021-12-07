@@ -52,7 +52,7 @@ class Gravity(VltiInstrument):
         else:
             ins_pol = 'IN'
 
-        for observationConfiguration in ob.observationConfiguration:
+        for observationConfiguration in self.getSequence(ob):
 
             # create keywords storage objects
             acqTSF = TSF(self, "GRAVITY_gen_acq.tsf")
@@ -359,6 +359,7 @@ class Gravity(VltiInstrument):
         # and put values
         # start with acqTSF ones and complete manually missing ones
         values = acqTSF.getDict()
+        # TODO move next updates earlier so it can be tested during checkOb phase
         values.update({
             'SEQ.INS.SOBJ.DIAMETER': DIAMETER,
             'SEQ.INS.SOBJ.VIS': VISIBILITY,
@@ -385,6 +386,7 @@ class Gravity(VltiInstrument):
 
         # put values. they are the same except for dual obs science (?)
         values = obsTSF.getDict()
+        # TODO move next updates earlier so it can be tested during checkOb phase
         if dualField and OBJTYPE == 'SCIENCE':
             values.update({'SEQ.RELOFF.X': [0.0], 'SEQ.RELOFF.Y': [0.0]})
 

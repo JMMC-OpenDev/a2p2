@@ -34,7 +34,27 @@ class VltiInstrument(Instrument):
         else:
             return defaultvalue
 
-    # must be defined by each instruments
+
+    def getSequence(self, ob):
+    # We may look at ob.observationSchedule but at present tuime schedule still is computed on a2p2 side
+        sci=[]
+        cal=[]
+        for observationConfiguration in ob.observationConfiguration:
+            if 'SCIENCE' in observationConfiguration.type:
+                sci.append(observationConfiguration)
+            else:
+                cal.append(observationConfiguration)
+        if len(sci)+len(cal) <= 2: # return [CAL] [SCI]
+            return cal+sci[0]
+        # else return CAL1 SCI CAL2 [SCI CAL3] [SCI CAL4]
+        seq=[]
+        for c in cal :
+            seq.append(c)
+            seq+=sci
+        return seq[0:-1]
+
+
+    # checkOB() must be defined by each instruments
     # def checkOB(self, ob, p2container=None):
     # consider dryMode if p2container is None else check again and submit on p2 side
 
@@ -44,6 +64,8 @@ class VltiInstrument(Instrument):
 
         # create new container
         obsconflist = ob.observationConfiguration
+
+        # Aspro2 always send SCI at first position (or CAL if no SCI)
         folderName = obsconflist[0].SCTarget.name
         folderName = re.sub('[^A-Za-z0-9]+', '_', folderName.strip())
         # prefix with username to make test folder clearer
@@ -60,7 +82,7 @@ class VltiInstrument(Instrument):
                 folder, _ = api.createConcatenation(
                     p2container.containerId, folderName)
                 ui.addToLog(f"concatenation '{folderName}' created")
-            elif self.facility.isTutorialAccount():
+            else:
                 folder, _ = api.createFolder(p2container.containerId, folderName)
                 ui.addToLog(f"folder '{folderName}' created")
             p2container.containerId = folder['containerId']
@@ -386,7 +408,8 @@ class VltiInstrument(Instrument):
             msg = 'OB ' + str(obId) + ' submitted successfully on P2\n' + ob[
                 'name'] + ' has WARNING.\n see LOG for details.'
         self.ui.addToLog('\n')
-        self.ui.ShowInfoMessage(msg)
+        #self.ui.ShowInfoMessage(msg)
+        self.ui.addToLog(msg)
         self.ui.addToLog('\n'.join(response['messages']) + '\n\n')
 
 

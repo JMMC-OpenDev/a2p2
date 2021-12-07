@@ -38,7 +38,7 @@ class Pionier(VltiInstrument):
             if disp in instrumentMode[0:len(disp)]:
                 ins_disp = disp
 
-        for observationConfiguration in ob.observationConfiguration:
+        for observationConfiguration in self.getSequence(ob):
 
             # create keywords storage objects
             acqTSF = TSF(self, "PIONIER_acq.tsf")
@@ -263,6 +263,7 @@ class Pionier(VltiInstrument):
         # and put values
         # start with acqTSF ones and complete manually missing ones
         values = acqTSF.getDict()
+        # TODO move next updates earlier so it can be tested during checkOb phase
         values.update({'TEL.COU.GSSOURCE': TEL_COU_GSSOURCE,
                        'TEL.COU.ALPHA': GSRA,
                        'TEL.COU.DELTA': GSDEC,
