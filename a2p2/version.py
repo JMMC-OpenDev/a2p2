@@ -1,4 +1,4 @@
-__version__ = "0.3.9"
+__version__ = "0.3.10"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,13 +21,14 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.3.8": {
+    "0.3.10": {
         "STATUS": [
         ],
         "A2P2": [
+            "Fix bug that occurs when user has no preference file",
+            "Add new serialisation of a2p2.jmmc.Models"
         ],
         "VLTI": [
-            "Bugfix for single CAL SCI",
         ],
         "CHARA": [
         ],
@@ -44,6 +45,20 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },"0.3.9": {
+        "STATUS": [
+        ],
+        "A2P2": [
+        ],
+        "VLTI": [
+            "Bugfix for single CAL SCI",
+        ],
+        "CHARA": [
+        ],
+        "TODO-SCIENCE": [
+        ],
+        "TODO-DEV": [
         ],
     },"0.3.8": {
         "STATUS": [
