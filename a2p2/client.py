@@ -61,7 +61,10 @@ class A2p2Client():
             pass
         else:
             self.ui.addToLog(
-                "No preference file found, please create one so your data persists (launch program with -c option).\n\n")
+                "No preference file found, please create one so your data persists (launch program with -c option).\n")
+
+        self.ui.addToLog("Please often update ( pip install -U [--user] a2p2 ) and don't hesitate to send any feedback or issues!\n\n")
+
 
         self.errors = []
 
