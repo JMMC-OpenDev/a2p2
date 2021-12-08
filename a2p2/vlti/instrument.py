@@ -45,7 +45,7 @@ class VltiInstrument(Instrument):
             else:
                 cal.append(observationConfiguration)
         if len(sci)+len(cal) <= 2: # return [CAL] [SCI]
-            return cal+sci[0]
+            return cal+sci
         # else return CAL1 SCI CAL2 [SCI CAL3] [SCI CAL4]
         seq=[]
         for c in cal :

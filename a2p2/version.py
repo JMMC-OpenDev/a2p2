@@ -1,4 +1,4 @@
-__version__ = "0.3.8"
+__version__ = "0.3.9"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -27,11 +27,7 @@ __release_notes__ = {
         "A2P2": [
         ],
         "VLTI": [
-            "Enhance CAL SCI sequence : [CAL1] SCI [CAL2 [SCI CAL3 [...] ] ] ",
-            "Fix COU_AG_PMA and COU_AG_PMD for MATISSE acq template",
-            "Do not throw a dialog for every submitted OBs",
-            "Enhance some messages",
-            # "BugFix to create a folder on non tutorial accounts"
+            "Bugfix for single CAL SCI",
         ],
         "CHARA": [
         ],
@@ -49,6 +45,20 @@ __release_notes__ = {
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
         ],
+    },"0.3.8": {
+        "STATUS": [
+        ],
+        "A2P2": [
+        ],
+        "VLTI": [
+            "Enhance CAL SCI sequence : [CAL1] SCI [CAL2 [SCI CAL3 [...] ] ] ",
+            "Fix COU_AG_PMA and COU_AG_PMD for MATISSE acq template",
+            "Do not throw a dialog for every submitted OBs",
+            "Enhance some messages",
+            # "BugFix to create a folder on non tutorial accounts"
+        ],
+        "CHARA": [
+        ]
     },"0.3.7": {
         "STATUS": [
         ],
