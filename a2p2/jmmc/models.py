@@ -2,6 +2,7 @@
 
 __all__ = []
 
+import json
 import logging
 
 from .utils import JmmcAPI
@@ -14,15 +15,28 @@ logger = logging.getLogger(__name__)
 #
 
 
-def _model(model, output_mode=None):
-    """ Returns a serialisation of given model to XML by default or another format given to output_mode value (only jsonlike at present time)."""
-    if output_mode:
-        return model
-    else :
-        return _xml_model(model)
+def _model(models, output_mode=None):
+    """ Returns a serialisation of given model(s) to XML by default or another format given to output_mode value (only jsonlike at present time)."""
 
-def _xml_model(model):
-    """ Rough conversion of dict to xml (Aspro2 namespaces)"""
+    # deserialize if models is a string
+    if isinstance(models, str):
+        models=json.loads(models)
+
+    if output_mode:
+        return models
+    else :
+        return _xml_model(models)
+
+def _xml_model(models):
+    """ Rough conversion of dict(s) to xml (Aspro2 namespaces)"""
+
+    if isinstance(models, list):
+        modellist=[]
+        for m in models:
+            modellist.append(_xml_model(m))
+        return "".join(modellist)
+
+    model = models # models is now a single element
     modeltype=model["type"]
     modelname=model["name"]
 
