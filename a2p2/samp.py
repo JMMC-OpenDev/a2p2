@@ -15,12 +15,14 @@ class Receiver(object):
         self.received = False
 
     def receive_call(self, private_key, sender_id, msg_id, mtype, params, extra):
+        self.mtype=mtype
         self.params = params
         self.received = True
         self.client.reply(
             msg_id, {"samp.status": "samp.ok", "samp.result": {}})
 
     def receive_notification(self, private_key, sender_id, mtype, params, extra):
+        self.mtype=mtype
         self.params = params
         self.received = True
 
@@ -47,6 +49,7 @@ class A2p2SampClient():
         # an error is thrown here if no hub is present
 
         # TODO get samp client name and display it in the UI
+        # TODO !! declare mtypes as enum
 
         # Instantiate the receiver
         self.r = Receiver(self.sampClient)
@@ -54,6 +57,10 @@ class A2p2SampClient():
         self.sampClient.bind_receive_call("ob.load.data", self.r.receive_call)
         self.sampClient.bind_receive_notification(
             "ob.load.data", self.r.receive_notification)
+        # Listen for Model related instructions
+        self.sampClient.bind_receive_call("fr.jmmc.litpro.start.setting",self.r.receive_call)
+        self.sampClient.bind_receive_notification(
+            "fr.jmmc.litpro.start.setting",self.r.receive_notification)
 
     def disconnect(self):
         self.sampClient.disconnect()
@@ -82,6 +89,9 @@ class A2p2SampClient():
     def clear_message(self):
         return self.r.clear()
 
+    def has_ob_message(self):
+        return "ob.load.data" in self.r.mtype
+
     def get_ob_url(self):
         url = self.r.params['url']
         if url.startswith("file:///"):
@@ -92,3 +102,10 @@ class A2p2SampClient():
         elif url.startswith("file:/"):  # work arround bugged file urls on *nix
             return url[5:]
         return url
+
+    def has_model_message(self):
+        return "fr.jmmc.litpro.start.setting" in self.r.mtype
+
+    def get_model(self):
+        return self.r.params['model']
+
