@@ -1,4 +1,4 @@
-__version__ = "0.3.10"
+__version__ = "0.4.0"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,7 +21,32 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.3.10": {
+    "0.4.0": {
+        "STATUS": [
+        ],
+        "A2P2": [
+            "First basic support of SAMP messages from Aspro for models",
+            "Support model compositions in models module",
+        ],
+        "VLTI": [
+        ],
+        "CHARA": [
+        ],
+        "TODO-SCIENCE": [
+            "Check DIT table from last template user manuals",
+            "Use a calibrator template for MATISSE (instead of default hyb_obs)",
+            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values"
+        ],
+        "TODO-DEV": [
+            "Support multiple period version (two major at least)",
+            "Add warning if Aspro2's IP versions differs from the selected container",
+            "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
+            "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
+            "Unify ob name creation in vlti instrument createOB()",
+            "Complete test suite with real p2 submission",
+            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },"0.3.10": {
         "STATUS": [
         ],
         "A2P2": [

@@ -14,6 +14,7 @@ from a2p2.gui import MainWindow
 from a2p2.ob import OB
 from a2p2.samp import A2p2SampClient
 from a2p2.vlti.facility import VltiFacility
+from a2p2.jmmc.models import modelsFromXml
 
 
 # prepare global logging
@@ -165,11 +166,21 @@ class A2p2Client():
 
                 if self.a2p2SampClient.has_message():
                     try:
-                        ob = OB(self.a2p2SampClient.get_ob_url())
-                        self.facilityManager.processOB(ob)
+                        if self.a2p2SampClient.has_ob_message():
+                            ob = OB(self.a2p2SampClient.get_ob_url())
+                            self.facilityManager.processOB(ob)
                     except:
                         self.ui.addToLog(
-                            "Exception during ob creation: " + traceback.format_exc(), False)
+                            "Exception during a2p2 ob creation: " + traceback.format_exc(), False)
+                        self.ui.addToLog("Can't process last OB")
+
+                    try:
+                        if self.a2p2SampClient.has_model_message():
+                                m = self.a2p2SampClient.get_model()
+                                self.showModel(m)
+                    except:
+                        self.ui.addToLog(
+                            "Exception during a2p2 ob creation: " + traceback.format_exc(), False)
                         self.ui.addToLog("Can't process last OB")
 
                     # always clear previous received message
@@ -182,6 +193,11 @@ class A2p2Client():
 
     def createPreferencesFile():
         A2P2ClientPreferences.createPreferencesFile()
+
+
+    def showModel(self, xmlmodel):
+        self.ui.addToLog("Received star model")
+        self.ui.addToLog(modelsFromXml(xmlmodel))
 
 
 class A2P2ClientPreferences():
