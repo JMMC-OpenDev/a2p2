@@ -5,28 +5,25 @@ __all__ = []
 import logging
 
 from .utils import JmmcAPI
+from . import PRODLABEL
 
 logger = logging.getLogger(__name__)
-
-
-PRODLABEL = {True: "production", False: "pre-prod"}
-
 
 class Catalog():
     """ Get remote access to read and update catalogs exposed through JMMC's API.
     Credential can be explicitly given but .netrc file will be automagically used on 401.
     """
 
-    # TODO move preprod toggle False by default
-    def __init__(self, catalogName, username=None, password=None, preprod=True, apiUrl=None):
+    def __init__(self, catalogName, username=None, password=None, prod=False, apiUrl=None):
         self.catalogName = catalogName
-        self.prod = not(preprod)
-        # TODO manage here prod & preprod access points
+        self.prod = prod
 
+        # Manage prod & preprod or user provided access points
         if apiUrl:
             self.apiUrl = apiUrl  # trust given url as catalogAPI if value is provided
         elif self.prod:
             self.apiUrl = ""  # no api in production yet
+            raise Warning("sorry, no api for production yet")
         else:
             self.apiUrl = "https://oidb-beta.jmmc.fr/restxq/catalogs"
 
@@ -73,4 +70,4 @@ class Catalog():
             Values is an array of row to add. id column values will be ignored.
             usage: addCatalogRows([ { "id":42, "col_a":"a" }, { "id":24, "col_b":"b" } ])
         """
-        return self.api._post("/%s" % (self.catalogName), values)
+        return self.api._post("/%s" % (self.catalogName), json=values)

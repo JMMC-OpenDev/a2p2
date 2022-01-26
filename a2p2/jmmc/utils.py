@@ -69,10 +69,35 @@ class JmmcAPI():
     def _post(self, url, json):
         return self._request('POST', url, json)
 
-    def _request(self, method, url, json=None):
+    def _post(self, url, **kwargs):
+        return self._request2('POST', url, **kwargs)
+
+    def _request2(self, method, url, **kwargs):
         logger.info("performing %s request on %s" % (method, self.rootURL+url))
         r = self.requests_session.request(
-            method, self.rootURL+url, auth=self.auth, json=json)
+            method, self.rootURL+url, **kwargs)
+        # handle response if any or throw an exception
+        if (r.status_code == 204):  # No Content : everything is fine
+            return
+        elif 200 <= r.status_code < 300:
+            if 'Content-Type' in r.headers.keys() and 'application/json' in r.headers['Content-Type']:
+                return r.json()
+            else:
+                return r.content
+        # TODO enhance error handling ? Throw an exception ....
+        error = []
+        error.append("status_code is %s"%r.status_code)
+        if r.reason :
+            error.append(r.reason)
+        if "X-Http-Error-Description" in r.headers.keys():
+            error.append(r.headers["X-Http-Error-Description"])
+
+        raise Exception(error)
+
+    def _request(self, method, url, json=None, data=None, files=None):
+        logger.info("performing %s request on %s" % (method, self.rootURL+url))
+        r = self.requests_session.request(
+            method, self.rootURL+url, auth=self.auth, json=json, data=data, files=files)
         # handle response if any or throw an exception
         if (r.status_code == 204):  # No Content : everything is fine
             return

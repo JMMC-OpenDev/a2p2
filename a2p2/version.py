@@ -1,4 +1,4 @@
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,75 +21,46 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.4.0": {
+    "0.4.1": {
         "STATUS": [
         ],
+        "A2P2": [
+            "Add version alpha of a2p2.fr.webservices.Calliper client",
+        ],
+        "VLTI": [
+        ],
+        "CHARA": [
+        ],
+        "TODO-SCIENCE": [
+            "Check DIT table from the last template user manuals",
+            "Use a calibrator template for MATISSE (instead of default hyb_obs)",
+            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values"
+        ],
+        "TODO-DEV": [
+            "Support multiple period version (two major at least)",
+            "Add warning if Aspro2's IP versions differs from the selected container",
+            "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
+            "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
+            "Unify ob name creation in vlti instrument createOB()",
+            "Complete test suite with real p2 submission",
+            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    }, "0.4.0": {
         "A2P2": [
             "First basic support of SAMP messages from Aspro for models",
             "Support model compositions in models module",
         ],
-        "VLTI": [
-        ],
-        "CHARA": [
-        ],
-        "TODO-SCIENCE": [
-            "Check DIT table from last template user manuals",
-            "Use a calibrator template for MATISSE (instead of default hyb_obs)",
-            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values"
-        ],
-        "TODO-DEV": [
-            "Support multiple period version (two major at least)",
-            "Add warning if Aspro2's IP versions differs from the selected container",
-            "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
-            "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
-            "Unify ob name creation in vlti instrument createOB()",
-            "Complete test suite with real p2 submission",
-            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
-        ],
-    },"0.3.10": {
-        "STATUS": [
-        ],
+    }, "0.3.10": {
+
         "A2P2": [
             "Fix bug that occurs when user has no preference file",
             "Add new serialisation of a2p2.jmmc.Models"
         ],
-        "VLTI": [
-        ],
-        "CHARA": [
-        ],
-        "TODO-SCIENCE": [
-            "Check DIT table from last template user manuals",
-            "Use a calibrator template for MATISSE (instead of default hyb_obs)",
-            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values"
-        ],
-        "TODO-DEV": [
-            "Support multiple period version (two major at least)",
-            "Add warning if Aspro2's IP versions differs from the selected container",
-            "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
-            "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
-            "Unify ob name creation in vlti instrument createOB()",
-            "Complete test suite with real p2 submission",
-            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
-        ],
-    },"0.3.9": {
-        "STATUS": [
-        ],
-        "A2P2": [
-        ],
+    }, "0.3.9": {
         "VLTI": [
             "Bugfix for single CAL SCI",
         ],
-        "CHARA": [
-        ],
-        "TODO-SCIENCE": [
-        ],
-        "TODO-DEV": [
-        ],
-    },"0.3.8": {
-        "STATUS": [
-        ],
-        "A2P2": [
-        ],
+    }, "0.3.8": {
         "VLTI": [
             "Enhance CAL SCI sequence : [CAL1] SCI [CAL2 [SCI CAL3 [...] ] ] ",
             "Fix COU_AG_PMA and COU_AG_PMD for MATISSE acq template",
@@ -97,159 +68,67 @@ __release_notes__ = {
             "Enhance some messages",
             # "BugFix to create a folder on non tutorial accounts"
         ],
-        "CHARA": [
-        ]
-    },"0.3.7": {
-        "STATUS": [
-        ],
-        "A2P2": [
-        ],
+
+    }, "0.3.7": {
         "VLTI": [
             "Revert SEQ.RELOFF.X/Y = 0.0 (same as default) for GRAVITY dual_obs_exp template"
         ],
-        "CHARA": [
-        ],
-    },"0.3.6": {
-        "STATUS": [
-        ],
-        "A2P2": [
-        ],
+    }, "0.3.6": {
         "VLTI": [
             "Disable SEQ.RELOFF.X for GRAVITY dual to make OB compliant"
         ],
-        "CHARA": [
-
-        ],
-        "TODO-SCIENCE": [
-        ],
-        "TODO-DEV": [
-        ],
-    },"0.3.5": {
-        "STATUS": [
-        ],
-        "A2P2": [
-        ],
+    }, "0.3.5": {
         "VLTI": [
             "Accept to add calibrator inside a Concatenation container",
             "Use p2.iss.vltitype preference keys to set supported value of instrument's acquisition templates. ( run 'a2p2 -c' )"
         ],
-        "CHARA": [
-
-        ],
-        "TODO-SCIENCE": [
-
-        ],
-        "TODO-DEV": [
-
-        ],
     },
     "0.3.4": {
-        "STATUS": [
-        ],
-        "A2P2": [
-        ],
         "VLTI": [
             "Sync templates with P109",
             "Create OB in selected folder: do not create anymore a folder but create a concatenation for SM if a Run's root is selected."
         ],
-        "CHARA": [
-        ],
-        "TODO-SCIENCE": [
-        ],
-        "TODO-DEV": [
-        ],
     },
     "0.3.3": {
-        "STATUS": [
-        ],
         "A2P2": [
             "Add basic support of Aspro2's model for SAMP interoperability",
         ],
         "VLTI": [
             "Fix missing import for p2api module"
         ],
-        "CHARA": [
-
-        ],
-        "TODO-SCIENCE": [
-        ],
-        "TODO-DEV": [
-        ],
     },
     "0.3.2": {
-        "STATUS": [
-        ],
         "A2P2": [
             "Improve setup.py that now requires python 3+ and a fresh version of astropy",
         ],
         "VLTI": [
             #            "revert back to p2 requests use which now reuses connections",
         ],
-        "CHARA": [
-
-        ],
     },
     "0.3.1": {
-        "STATUS": [
-        ],
         "A2P2": [
             "Bug fix for authenticated Catalog access",
         ],
-        "VLTI": [
-        ],
-        "CHARA": [
-        ],
-        "TODO-SCIENCE": [
-        ],
-        "TODO-DEV": [
-        ],
     },
     "0.3.0": {
-        "STATUS": [
-        ],
         "A2P2": [
             "Give a try to embedd some code to interact with JMMC services",
         ],
         "VLTI": [
             #            "revert back to p2 requests use which now reuses connections",
         ],
-        "CHARA": [
-
-        ],
-        "TODO-SCIENCE": [
-        ],
-        "TODO-DEV": [
-        ],
     },
     "0.2.15": {
-        "STATUS": [
-        ],
-        "A2P2": [
-        ],
         "VLTI": [
             #            "add a wrapper on p2 to make run's tree faster (~2.5x)",
-        ],
-        "CHARA": [
-        ],
-        "TODO-SCIENCE": [
-        ],
-        "TODO-DEV": [
         ],
     },
     "0.2.14": {
         "STATUS": [
             "BugFix: ask for container Name only if one is selected"
         ],
-        "A2P2": [
-        ],
-        "VLTI": [
-        ],
-        "CHARA": [
-        ],
     },
     "0.2.13": {
-        "STATUS": [
-        ],
         "A2P2": [
             "A2P2 is no longer python2 compatible. Hope it will be ok for everybody ? Send an issue else ;)",
             "Fix generated release note order according to semver values",
@@ -260,64 +139,28 @@ __release_notes__ = {
             "Conf updated with IPs 106.25",
             "BugFix: OB no more sent to P2 if OB's instrument is not the same than p2 selected container"
         ],
-        "CHARA": [
-        ],
     },
     "0.2.12": {
-        "STATUS": [
-        ],
         "A2P2": [
             "Fix import in main console script"
         ],
-        "VLTI": [
-        ],
-        "CHARA": [
-        ],
     },
     "0.2.11": {
-        "STATUS": [
-        ],
         "A2P2": [
             "enhance setup.py so it install Windows special-cases .exe files"
         ],
-        "VLTI": [
-        ],
-        "CHARA": [
-        ],
     },
     "0.2.10": {
-        "STATUS": [
-        ],
         "A2P2": [
             "Patch bad SAMP url handling on Windows"
         ],
-        "VLTI": [
-        ],
-        "CHARA": [
-        ],
     },
     "0.2.9": {
-        "STATUS": [
-        ],
-        "A2P2": [
-
-        ],
         "VLTI": [
             "Fix bug that prevent to create any folder or concatenation at RUNS's root"
         ],
-        "CHARA": [
-
-        ],
-        "TODO-SCIENCE": [
-
-        ],
-        "TODO-DEV": [
-
-        ],
     },
     "0.2.8": {
-        "STATUS": [
-        ],
         "A2P2": [
             "Fix release notes order in the GUI",
             "Handle special jmmc account, kindly set by ESO colleagues to perfom future tests as closed as possible to the real UX"
@@ -328,10 +171,6 @@ __release_notes__ = {
         ],
         "CHARA": [
         ],
-        "TODO-SCIENCE": [
-        ],
-        "TODO-DEV": [
-        ]
     }, "0.2.7": {
         "STATUS": [
             "This version get lot of changes and may contain bugs or missing features, please provide any feedback to improve and prepare a better future release !"
@@ -349,96 +188,41 @@ __release_notes__ = {
             "Support Concatenations (also shown in the tree panel)",
             "Show type in the container chooser instead of containerID"
         ],
-        "CHARA": [
-        ],
-        "TODO-SCIENCE": [
-            "Complete/fix GRAVITY DIT table with P105 changes that will come in the next template user manual",
-            "Use a calibrator template for MATISSE (instead of default hyb_obs)",
-            "flag ~important~ keyword that MUST be set in a2p2 code to avoid default"
-        ],
-        "TODO-DEV": [
-            "Support numlist keyword : eg. SEQ.HWPOFF",
-            "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
-            "Do not set default values in a2p2 if not set",
-            "unify ob name creation in vlti instrument createOB()"
-        ]
     }, "0.2.6": {
-        "A2P2": [
-
-        ],
         "VLTI": [
             "Support baseline back again (single one at present)"
         ],
-        "CHARA": [
-
-        ]
     },
     "0.2.5": {
-        "A2P2": [
-
-        ],
         "VLTI": [
             "Add missing template name in log",
             "Fix error removing baseline after constraint changes on P2 side. Next a2p2 version should add them back in acq templates"
         ],
-        "CHARA": [
-
-        ]
     },
     "0.2.4": {
-        "A2P2": [
-
-        ],
         "VLTI": [
             "Fix bug / wrong keys"
         ],
-        "CHARA": [
-
-        ]
     },
     "0.2.3": {
-        "A2P2": [
-
-        ],
         "VLTI": [
             "Hide password in login frame"
         ],
-        "CHARA": [
-
-        ]
     },
     "0.2.2": {
-        "A2P2": [
-
-        ],
         "VLTI": [
             "ignore default time constraints computed by Aspro"
         ],
-        "CHARA": [
-
-        ]
     },
     "0.2.1": {
-        "A2P2": [
-
-        ],
         "VLTI": [
             "fix support for a list of multiples time constraints"
         ],
-        "CHARA": [
-
-        ]
     },
     "0.2.0": {
-        "A2P2": [
-
-        ],
         "VLTI": [
             "bug fix"
         ],
-        "CHARA": [
-
-        ]
     },
     "0.1.6": {
         "A2P2": [
@@ -448,20 +232,11 @@ __release_notes__ = {
             "general config updates",
             "add PIONIER"
         ],
-        "CHARA": [
-
-        ]
     },
     "0.1.5": {
-        "A2P2": [
-
-        ],
         "VLTI": [
             "bugfix for dualfield cases"
         ],
-        "CHARA": [
-
-        ]
     },
     "0.1.4": {
         "A2P2": [
