@@ -1,4 +1,4 @@
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,11 +21,11 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.4.1": {
+    "0.4.2": {
         "STATUS": [
         ],
         "A2P2": [
-            "Add version alpha of a2p2.fr.webservices.Calliper client",
+            "Add option to select public CatalogAPI server",
         ],
         "VLTI": [
         ],
@@ -44,6 +44,16 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },"0.4.1": {
+        "STATUS": [
+        ],
+        "A2P2": [
+            "Add version alpha of a2p2.fr.webservices.Calliper client",
+        ],
+        "VLTI": [
+        ],
+        "CHARA": [
         ],
     }, "0.4.0": {
         "A2P2": [
