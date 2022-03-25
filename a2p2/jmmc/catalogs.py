@@ -11,20 +11,7 @@ logger = logging.getLogger(__name__)
 
 class Catalog():
     """ Get remote access to read and update catalogs exposed through JMMC's API.
-    Credential can be explicitly g"TODO-SCIENCE": [
-            "Check DIT table from the last template user manuals",
-            "Use a calibrator template for MATISSE (instead of default hyb_obs)",
-            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values"
-        ],
-        "TODO-DEV": [
-            "Support multiple period version (two major at least)",
-            "Add warning if Aspro2's IP versions differs from the selected container",
-            "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
-            "Optimize VLTI run chooser : DEMO tests suffer from a long run filtering",
-            "Unify ob name creation in vlti instrument createOB()",
-            "Complete test suite with real p2 submission",
-            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
-        ],iven but .netrc file will be automagically used on 401.
+    Credential can be explicitly given but .netrc file will be automagically used on 401.
     """
 
     def __init__(self, catalogName, username=None, password=None, prod=False, apiUrl=None):
