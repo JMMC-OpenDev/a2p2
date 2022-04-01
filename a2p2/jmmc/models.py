@@ -61,18 +61,25 @@ def _model(models, output_mode=None):
     else :
         return _xml_model(models)
 
-def _xml_model(models):
-    """ Rough conversion of dict(s) to xml (Aspro2 namespaces)"""
+def _xml_model(models, position=1):
+    """ Rough conversion of dict(s) to xml (Aspro2 namespaces)
+    if name key is not provided, position value will be used to compute suffix(es)"""
 
     if isinstance(models, list):
         modellist=[]
+        pos=1
         for m in models:
-            modellist.append(_xml_model(m))
+            modellist.append(_xml_model(m, pos))
+            pos+=1 # do not use models.index(m) since same str components would get the same index
         return "".join(modellist)
 
     model = models # models is now a single element
     modeltype=model["type"]
-    modelname=model["name"]
+    if "name" in model.keys():
+        modelname=model["name"]
+    else:
+        modelname=modeltype+str(position)
+
 
     params=""
     paramNames=[ k for k in model.keys() if not k in ("type", "name")]

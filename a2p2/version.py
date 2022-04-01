@@ -1,4 +1,4 @@
-__version__ = "0.4.2"
+__version__ = "0.4.3"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,11 +21,11 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.4.2": {
+    "0.4.3": {
         "STATUS": [
         ],
         "A2P2": [
-            "Add option to select public CatalogAPI server",
+            "Enhance a2p2.jmmc.models._model so it automagically compute component names >{(())°>",
         ],
         "VLTI": [
         ],
@@ -45,6 +45,11 @@ __release_notes__ = {
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
         ],
+    },"0.4.2": {
+        "A2P2": [
+            "Add option to select public CatalogAPI server",
+        ],
+
     },"0.4.1": {
         "STATUS": [
         ],

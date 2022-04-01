@@ -10,13 +10,15 @@ from a2p2.jmmc import Catalog
 oidbValidId = 38681
 
 spicaCatName = "spica"
-spicaCatName = "spica_2021_09_21"
+spicaCatName = "spica_2021_10_04"
 
 
 class CustomCatalog(Catalog):
     def __init__(self, catalogName, username=None, password=None):
         Catalog.__init__(self, catalogName,username=username, password=password,
-                         apiUrl="http://localhost:8080/exist/restxq/catalogs")
+                         apiUrl="https://oidb.jmmc.fr/restxq/catalogs") 
+#                         apiUrl="https://oidb-beta.jmmc.fr/restxq/catalogs") 
+#                         apiUrl="http://localhost:8080/exist/restxq/catalogs")
 #                )
 
 
@@ -57,16 +59,20 @@ def test_public():
 
 def test_simple_update():
     c = CustomCatalog(spicaCatName)
+    priority_org = c.getRow(1)["priority_pi"]
     v=2
     c.updateRow(1, { "priority_pi" : v } )
     priority = c.getRow(1)["priority_pi"]
+    c.updateRow(1, { "priority_pi" : priority_org } )
     assert priority==v
 
 def test_simple_update_with_str_as_json_input():
     c = CustomCatalog(spicaCatName)
+    priority_org = c.getRow(1)["priority_pi"]
     v=2
     c.updateRow(1, '{"priority_pi":%d}'%v)
     priority = c.getRow(1)["priority_pi"]
+    c.updateRow(1, { "priority_pi" : priority_org } )
     assert priority==v
 
 
