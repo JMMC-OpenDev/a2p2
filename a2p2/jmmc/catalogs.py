@@ -4,10 +4,13 @@ __all__ = []
 
 import logging
 
+from ..client import A2P2ClientPreferences
+
 from .utils import JmmcAPI
 from . import PRODLABEL
 
 logger = logging.getLogger(__name__)
+
 
 class Catalog():
     """ Get remote access to read and update catalogs exposed through JMMC's API.
@@ -40,8 +43,22 @@ class Catalog():
         return self.api._get("/meta/%s" % self.catalogName)
 
     def pis(self):
-        """ Get PIs from catalog and check for associated JMMC login """
-        return self.api._get("/accounts/%s" % self.catalogName)
+        """ Get PIs from catalog and check for associated JMMC login in OiDB datapi table."""
+        return self.api._get("/accounts/%s" % self.catalogName)["pi"]
+
+    def piname(self, jmmcLogin=None):
+        """ Get the piname associated to the given jmmcLogin.
+         If jmmcLogin parameter is not provided, try to get jmmc.login preferences."""
+        if not jmmcLogin:
+            prefs = A2P2ClientPreferences()
+            jmmcLogin = prefs.getJmmcLogin()
+        if not jmmcLogin:
+            raise Exception(
+                "missing login parameter or jmmc.login preference.")
+        pis = self.pis()
+        for pi in pis:
+            if "login" in pi and pi["login"] == jmmcLogin:
+                return pi["name"]
 
     def getRow(self, id):
         """ Get a single catalog record for the given id.

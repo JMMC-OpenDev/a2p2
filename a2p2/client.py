@@ -14,7 +14,7 @@ from a2p2.gui import MainWindow
 from a2p2.ob import OB
 from a2p2.samp import A2p2SampClient
 from a2p2.vlti.facility import VltiFacility
-from a2p2.jmmc.models import modelsFromXml
+
 
 
 # prepare global logging
@@ -196,6 +196,7 @@ class A2p2Client():
 
 
     def showModel(self, xmlmodel):
+        from a2p2.jmmc.models import modelsFromXml
         self.ui.addToLog("Received star model")
         self.ui.addToLog(modelsFromXml(xmlmodel))
 
@@ -228,27 +229,49 @@ class A2P2ClientPreferences():
 
     def createPreferencesFile():
         filename = A2P2ClientPreferences.getPreferencesFileName()
-
         if os.path.exists(filename):
-            print("%s already exists. Nothing done" % filename)
+            print(f"{filename} already exists. Nothing done")
+            p=A2P2ClientPreferences()
+            versionInPref=p.getA2P2Version()
+            if __version__ != versionInPref:
+                print(f"💡 You may try to backup this file (V{versionInPref}) and merge with a new generated one for V{__version__}.")
         else:
+            import getpass
+
             config = configparser.ConfigParser(allow_no_value=True)
             #config['DEFAULT'] = {'_noprefyet': '42'}
+
+            config['a2p2'] = {}
+            s = config['a2p2']
+            s['# A2P2 SECTION'] = ""
+            s['# = > please do not modify next properties unless you handle the possible cAtAstrOphE 🔥 ? <'] = ""
+            s['version'] = __version__
+
+
+            config['jmmc'] = {}
+            s = config['jmmc']
+            s['# JMMC SECTION'] = ""
+            s['# = > please uncomment and update next properties to make it active <'] = ""
+            s['#login'] = "my.email@my.lab"
+            s['#password'] = "12345zZ"
+
             config['p2'] = {}
-            import getpass
-            config['p2']['# = > please uncomment and update next properties to make it active <'] = ""
-            config['p2']['#username'] = getpass.getuser()
-            config['p2']['#password'] = "12345zZ"
-            config['p2']['#user_comment_name'] = "changed it if your local USER name is not fine"
-            config['p2']['#autologin'] = "yes"
+            s=config['p2']
+            s['# ESO P2 SECTION'] = ""
+            s['# = > please uncomment and update next properties to make it active <'] = ""
+            s['#username'] = getpass.getuser()
+            s['#password'] = "12345zZ"
+            s['#user_comment_name'] = "changed it if your local USER name is not fine"
+            s['#autologin'] = "yes"
 
             config['p2.iss.vltitype'] = {}
-            config['p2.iss.vltitype']['# = > please uncomment the default values to add for ISS.VLTITYPE <'] = ""
-            config['p2.iss.vltitype']['# = > all supported will be added for any VLTI instrument if info is not provided by Aspro2 <'] = None
-            config['p2.iss.vltitype']['#snapshot'] = None
-            config['p2.iss.vltitype']['#imaging'] = None
-            config['p2.iss.vltitype']['#time-series'] = None
-            config['p2.iss.vltitype']['#astrometry'] = None
+            s=config['p2.iss.vltitype']
+            s['# = > please uncomment the default values to add for ISS.VLTITYPE <'] = ""
+            s['# = > all supported will be added for any VLTI instrument if info is not provided by Aspro2 <'] = None
+            s['#snapshot'] = None
+            s['#imaging'] = None
+            s['#time-series'] = None
+            s['#astrometry'] = None
 
             os.makedirs(os.path.dirname(filename), exist_ok=True)
             with open(filename, 'w+') as configfile:
@@ -275,13 +298,25 @@ class A2P2ClientPreferences():
         except:
             return default
 
-    # retrieve P2 username in config or use default demo account
+    # Retrieve A2P2 prefs
+    def getA2P2Version(self):
+        return self.getConfig("a2p2", "version", 'missing')
 
+    # Retrieve JMMC prefs
+    def getJmmcLogin(self):
+        return self.getConfig("jmmc", "login", None)
+
+    def getJmmcPassword(self):
+        return self.getConfig("jmmc", "password", None)
+
+
+    # Retrieve P2 prefs
     def getP2Username(self):
+        """ Get P2 username in config or use default demo account """
         return self.getConfig("p2", "username", '52052')
 
-    # retrieve P2 password in config or use default demo account
     def getP2Password(self):
+        """Get P2 password in config or use default demo account"""
         return self.getConfig("p2", "password", 'tutorial')
 
     def getP2UserCommentName(self):

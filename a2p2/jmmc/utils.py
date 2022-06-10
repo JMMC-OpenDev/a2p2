@@ -4,6 +4,8 @@ from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 from requests.auth import HTTPBasicAuth
 import requests
+
+from a2p2.client import A2P2ClientPreferences
 __all__ = []
 
 import logging
@@ -49,8 +51,19 @@ class JmmcAPI():
     def __init__(self, rootURL, username=None, password=None):
         self.rootURL = rootURL
 
-        # credentials can be given by hand but .netrc files automatically are used on 401
+        # credentials can be given :
+        # by parameters
+        # if username or password is None, try to get it from the a2p2 preferences ( run: a2p2 -c )
+        # if username or password still is None keep auth to None.
+        # a None auth will search for ~/.netrc files trying to fix 401 accesses
 
+        prefs = A2P2ClientPreferences()
+        if not username :
+            username = prefs.getJmmcLogin()
+        if not password :
+            password = prefs.getJmmcPassword()
+
+        # if we got complete credential
         if username and password:
             self.auth = HTTPBasicAuth(username, password)
         else:

@@ -1,4 +1,4 @@
-__version__ = "0.4.3"
+__version__ = "0.4.4"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,11 +21,12 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.4.3": {
+    "0.4.4": {
         "STATUS": [
         ],
         "A2P2": [
-            "Enhance a2p2.jmmc.models._model so it automagically compute component names >{(())°>",
+            "add Catalog.piname() to get a pi name for a given jmmc account looking at a given catalog (jmmc.login preference is used without parameter)",
+            "Add new preference to put jmmc account credentials",
         ],
         "VLTI": [
         ],
@@ -44,6 +45,16 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },"0.4.3": {
+        "STATUS": [
+        ],
+        "A2P2": [
+            "Enhance a2p2.jmmc.models._model so it automagically computes component names >{(())°>",
+        ],
+        "VLTI": [
+        ],
+        "CHARA": [
         ],
     },"0.4.2": {
         "A2P2": [
