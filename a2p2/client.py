@@ -261,8 +261,9 @@ class A2P2ClientPreferences():
             s['# = > please uncomment and update next properties to make it active <'] = ""
             s['#username'] = getpass.getuser()
             s['#password'] = "12345zZ"
-            s['#user_comment_name'] = "changed it if your local USER name is not fine"
             s['#autologin'] = "yes"
+            s['# = > please change next properties to change the name recorded in the OB comments <'] = ""
+            s['user_comment_name'] = f"{getpass.getuser()}"
 
             config['p2.iss.vltitype'] = {}
             s=config['p2.iss.vltitype']
@@ -277,7 +278,7 @@ class A2P2ClientPreferences():
             with open(filename, 'w+') as configfile:
                 config.write(configfile)
 
-            print("%s template created. Please adjust." % filename)
+            print("'%s' template file created to store preferences. Please check and adjust it's content." % filename)
 
     def getConfig(self, section, key, default=None):
         try:
