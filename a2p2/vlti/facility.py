@@ -122,7 +122,7 @@ class VltiFacility(Facility):
                     "Everything ready! Request OB creation inside selected container ")
                 instrument.submitOB(ob, self.containerInfo)
                 self.ui.addToLog(
-                    "Run filled! Please check logs and fix last details on P2 web.")
+                    "OB submitted! Please check logs and fix last details on P2 web.")
                 self.refreshTree()
 
         # TODO add P2Error handling P2Error(r.status_code, method, url,
