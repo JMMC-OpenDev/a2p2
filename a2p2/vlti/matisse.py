@@ -8,6 +8,7 @@ from a2p2.vlti.instrument import OBConstraints
 from a2p2.vlti.instrument import OBTarget
 from a2p2.vlti.instrument import TSF
 from a2p2.vlti.instrument import VltiInstrument
+import logging
 
 HELPTEXT = """
     Please define MATISSE instrument help in a2p2/vlti/matisse.py
@@ -33,20 +34,27 @@ class Matisse(VltiInstrument):
             tel = "AT"
 
         instrumentMode = instrumentConfiguration.instrumentMode
+        fringeTrackerMode = "GRA4MAT" in instrumentConfiguration.fringeTrackerMode
+        if fringeTrackerMode:
+            tsfSuffix = "_ft"
+            ui.addToLog("OB requested with GRA4MAT")
+        else:
+            tsfSuffix = ""
+            ui.addToLog("OB requested without GRA4MAT")
 
         for observationConfiguration in self.getSequence(ob):
 
             # create keywords storage objects
-            acqTSF = TSF(self, "MATISSE_img_acq.tsf")  # or .tsfx?
-            obsTSF = TSF(self, "MATISSE_hyb_obs.tsf")
+            acqTSF = TSF(self, f"MATISSE_img_acq{tsfSuffix}.tsf")  # or .tsfx?
+            obsTSF = TSF(self, f"MATISSE_hyb_obs{tsfSuffix}.tsf")
 
             obTarget = OBTarget()
             obConstraints = OBConstraints(self)
 
             if 'SCIENCE' in observationConfiguration.type:
-                OBJTYPE = 'SCIENCE'
+                obsTSF.DPR_CATG = 'SCIENCE' # Default OB are CALIB
             else:
-                OBJTYPE = 'CALIBRATOR'
+                obsTSF.DPR_CATG = 'CALIB'
 
             scienceTarget = observationConfiguration.SCTarget
 
@@ -68,35 +76,52 @@ class Matisse(VltiInstrument):
             VIS = 1.0  # FIXME
 
             # Retrieve Fluxes
-            COU_GS_MAG = self.getFlux(scienceTarget, "V")
+            acqTSF.SEQ_TARG_FLUX_L = self.getFlux(scienceTarget, "L_JY")
+            acqTSF.SEQ_TARG_FLUX_N = self.getFlux(scienceTarget, "N_JY")
+            acqTSF.SEQ_TARG_MAG_K = self.getFlux(scienceTarget, "K")
+            # H is only present in _ft template
+            if fringeTrackerMode:
+                try:
+                    acqTSF.SEQ_TARG_MAG_H = self.getFlux(scienceTarget, "H")
+                except:
+                    ui.addToLog("H mag is missing. default value will be used",
+                                displayString=True, level=logging.WARNING)
 
-            # setup some default values, to be changed below
-            COU_AG_GSSOURCE = 'SCIENCE'  # by default
-            GSRA = '00:00:00.000'
-            GSDEC = '00:00:00.000'
-            dualField = False
-
-            # initialize FT variables (must exist)
-            # TODO remove next lines using a dual_acq TSF that would handle
-            # them
-
+            # TODO : make AO & GS more consistent ( on Aspro2 side ? )
             # AO target
             aoTarget = ob.get(observationConfiguration, "AOTarget")
             if aoTarget != None:
-                AONAME = aoTarget.name
-                COU_AG_GSSOURCE = 'SETUPFILE'  # since we have an AO
+                acqTSF.COU_AG_GSSOURCE = 'SETUPFILE'  # since we have an AO
                 # TODO check if AO coords should be required by template
                 # AORA, AODEC  = self.getCoords(aoTarget,
                 # requirePrecision=False)
-                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(aoTarget)
+                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(
+                    aoTarget)
 
             # Guide Star
             gsTarget = ob.get(observationConfiguration, 'GSTarget')
             if gsTarget != None:
-                COU_GS_SOURCE = 'SETUPFILE'  # since we have an GS
-                GSRA, GSDEC = self.getCoords(gsTarget, requirePrecision=False)
-                # no PMRA, PMDE for GS !!
-                COU_GS_MAG = float(gsTarget.FLUX_V)
+                acqTSF.COU_AG_GSSOURCE = 'SETUPFILE'  # since we have a GS
+                # special hack waiting for uniform way
+                alpha, delta = self.getCoords(gsTarget, requirePrecision=False)
+                acqTSF.COU_AG_ALPHA, acqTSF.COU_AG_DELTA = alpha.replace(":",""), delta.replace(":","")
+                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords( gsTarget )
+
+                # no PMRA, PMDE for GS ??
+
+                acqTSF.COU_GS_MAG = self.getFlux(gsTarget, "V")
+                try:
+                    if "AT" in tel: # try better band observing on UT
+                        acqTSF.COU_GS_MAG = self.getFlux(gsTarget, "G")
+                except:
+                    ui.addToLog("G mag can't be retreived for AT on the guide star. Use V instead")
+            else:
+                acqTSF.COU_GS_MAG = self.getFlux(scienceTarget, "V")
+                try:
+                    if "AT" in tel: # try better band observing on UT
+                        acqTSF.COU_GS_MAG = self.getFlux(scienceTarget, "G")
+                except:
+                    ui.addToLog("G mag can't be retreived for AT on the science star. Use V instead")
 
             # LST interval
             try:
@@ -133,8 +158,8 @@ class Matisse(VltiInstrument):
                 ui.addToLog(acqTSF, False)
                 ui.addToLog(obsTSF, False)
             else:
-                self.createMatisseOB(p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-                                     COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, LSTINTERVAL)
+                self.createMatisseOB(p2container, obTarget, obConstraints, acqTSF, obsTSF, instrumentMode,
+                                     LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
 
     def formatRangeTable(self):
@@ -160,17 +185,6 @@ class Matisse(VltiInstrument):
                 buffer += "\n"
         return buffer
 
-    def getMatisseTemplateName(self, templateType, OBJTYPE):
-        objType = "calibrator"
-        if OBJTYPE and "SCI" in OBJTYPE:
-            objType = "science"
-        if OBJTYPE:
-            return "_".join((self.getShortName(), templateType, objType))
-        return "_".join((self.getShortName(), templateType))
-
-    def getMatisseObsTemplateName(self, OBJTYPE):
-        return self.getMatisseTemplateName("obs", OBJTYPE)
-
     def formatDitTable(self):
         #    fluxTable = self.getDitTable()
         buffer = '   Tel | Spec |  spec band  | Flux (Jy)    | tau(ms)\n'
@@ -190,8 +204,8 @@ class Matisse(VltiInstrument):
         return buffer
 
     def createMatisseOB(
-            self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-            COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, LSTINTERVAL):
+            self, p2container, obTarget, obConstraints, acqTSF, obsTSF, instrumentMode,
+            LSTINTERVAL):
 
         api = self.facility.getAPI()
         ui = self.ui
@@ -204,7 +218,7 @@ class Matisse(VltiInstrument):
         # create new OB in container:
         # TODO use a common function for next lines
         goodName = re.sub('[^A-Za-z0-9]+', '_', obTarget.name)
-        OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_MATISSE_' + \
+        OBS_DESCR = obsTSF.DPR_CATG[0:3] + '_' + goodName + '_MATISSE_' + \
             acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
 
         ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
@@ -233,29 +247,16 @@ class Matisse(VltiInstrument):
         self.saveSiderealTimeConstraints(api, obId, LSTINTERVAL)
         ui.setProgress(0.2)
 
-        # then, attach acquisition template(s)
-        tpl, tplVersion = api.createTemplate(obId, 'MATISSE_img_acq')
-        # and put values
-        # start with acqTSF ones and complete manually missing ones
-        values = acqTSF.getDict()
-        values.update({'COU.AG.GSSOURCE': COU_AG_GSSOURCE,
-                       'COU.AG.ALPHA': GSRA,
-                       'COU.AG.DELTA': GSDEC,
-                       'COU.GS.MAG': round(COU_GS_MAG, 3),
-                       'TEL.TARG.PARALLAX': 0.0
-                       })
-
-        tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
+        # then, attach acquisition & observation template and put associated values
+        tpl, tplVersion = api.createTemplate(obId, acqTSF.getP2Name())
+        tpl, tplVersion = api.setTemplateParams(
+            obId, tpl, acqTSF.getDict(), tplVersion)
         ui.setProgress(0.3)
 
-        # was :
-        # tpl, tplVersion = api.createTemplate(obId, self.getMatisseObsTemplateName(OBJTYPE))
         tpl, tplVersion = api.createTemplate(obId, obsTSF.getP2Name())
         ui.setProgress(0.4)
-
-        # put values. they are the same except for dual obs science (?)
-        values = obsTSF.getDict()
-        tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
+        tpl, tplVersion = api.setTemplateParams(
+            obId, tpl, obsTSF.getDict(), tplVersion)
         ui.setProgress(0.5)
 
         # verify OB online
