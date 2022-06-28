@@ -92,7 +92,7 @@ class VltiInstrument(Instrument):
         ui.addToLog("OB checked / preparing  submission...")
         self.checkOB(ob, p2container)
 
-    def getCoords(self, target, requirePrecision=True):
+    def getCoords(self, target, requirePrecision=True ):
         """
         Format coordinates from given target to be VLTI compliant.
         Throws an exception if requirePrecision is true and given inputs have less than 3 (RA) or 2 (DEC) digits.
@@ -132,9 +132,13 @@ class VltiInstrument(Instrument):
         """
         Returns Flux as float values rounded to 3 decimal digits.
 
-        flux in 'V', 'J', 'H'...
+        flux in 'V', 'J', 'H'...²²²²
         """
-        return round(float(getattr(target, "FLUX_" + flux)), 3)
+        try:
+            return round(float(getattr(target, "FLUX_" + flux)), 3)
+        except:
+            raise ValueError(
+                f"Missing {flux} flux for target { getattr(target,'name') }")
 
     def getBaselineCode(self, baseline):
         # as of P104
@@ -259,6 +263,14 @@ class VltiInstrument(Instrument):
             return value >= rangeTable[_tpl][key]['min'] and \
                 value <= rangeTable[_tpl][key]['max']
         if 'list' in rangeTable[_tpl][key].keys():
+            #
+            # hack set to check for coordinates convention define by p2
+            # vlue will be checked by p2 later...
+            if "ra" in rangeTable[_tpl][key]['list']:
+                return True
+            if "dec" in rangeTable[_tpl][key]['list']:
+                return True
+
             #            return value in rangeTable[_tpl][key]['list']
             if type(value) is list:
                 for v in value:
