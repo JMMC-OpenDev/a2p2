@@ -1,4 +1,4 @@
-__version__ = "0.4.4"
+__version__ = "0.4.5"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,21 +21,27 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.4.4": {
+    "0.4.5": {
         "STATUS": [
         ],
         "A2P2": [
-            "add Catalog.piname() to get a pi name for a given jmmc account looking at a given catalog (jmmc.login preference is used without parameter)",
-            "Add new preference to put jmmc account credentials",
+            "clarify some text in the default generated preference file",
         ],
         "VLTI": [
+            "Change log message : Run filled -> OB transmitted",
+            "Missing flux error message enhanced : show associated target name",
+            "Handle ALPHA DELTA coordinates of associated guide star"
+            "MATISSE: Handle Aspro2's frindge tracker mode : None or GRA4MAT",
+            "MATISSE: Define DPR.CATG  (always was CALIB)",
+            "MATISSE: Use V band for COU.GS.MAG or try G one on ATs."
         ],
         "CHARA": [
         ],
         "TODO-SCIENCE": [
-            "Check DIT table from the last template user manuals",
-            "Use a calibrator template for MATISSE (instead of default hyb_obs)",
-            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values"
+            "Merge AO or GS in a same code section for every instruments",
+            "Perform a cleanup on PIONIER and try to gaterh common code",
+            "Check DIT table from the last template user manuals (especially MATISSE)",
+            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values?"
         ],
         "TODO-DEV": [
             "Support multiple period version (two major at least)",
@@ -46,30 +52,22 @@ __release_notes__ = {
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
         ],
-    },"0.4.3": {
-        "STATUS": [
+    },"0.4.4": {
+        "A2P2": [
+            "add Catalog.piname() to get a pi name for a given jmmc account looking at a given catalog (jmmc.login preference is used without parameter)",
+            "Add new preference to put jmmc account credentials",
         ],
+    },"0.4.3": {
         "A2P2": [
             "Enhance a2p2.jmmc.models._model so it automagically computes component names >{(())°>",
-        ],
-        "VLTI": [
-        ],
-        "CHARA": [
         ],
     },"0.4.2": {
         "A2P2": [
             "Add option to select public CatalogAPI server",
         ],
-
     },"0.4.1": {
-        "STATUS": [
-        ],
         "A2P2": [
             "Add version alpha of a2p2.fr.webservices.Calliper client",
-        ],
-        "VLTI": [
-        ],
-        "CHARA": [
         ],
     }, "0.4.0": {
         "A2P2": [
