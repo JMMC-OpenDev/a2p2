@@ -63,8 +63,7 @@ class Gravity(VltiInstrument):
             obConstraints = OBConstraints(self)
 
             # set common properties if any
-            if ins_spec_res:
-                acqTSF.INS_SPEC_RES = ins_spec_res
+            acqTSF.INS_SPEC_RES = ins_spec_res
             acqTSF.INS_FT_POL = ins_pol
             acqTSF.INS_SPEC_POL = ins_pol
 
@@ -88,42 +87,36 @@ class Gravity(VltiInstrument):
 
             self.checkIssVltiType(acqTSF)
 
-
             # define some default values
-            DIAMETER = float(self.get(scienceTarget, "DIAMETER", 0.0))
-            VIS = 1.0  # FIXME
+            acqTSF.SEQ_INS_SOBJ_DIAMETER = float(self.get(scienceTarget, "DIAMETER", 0.0))
+
+            # TODO compute value
+            VISIBILITY = 1.0
+            acqTSF.SEQ_INS_SOBJ_VIS = VISIBILITY
 
             # Retrieve Fluxes
-            COU_GS_MAG = self.getFlux(scienceTarget, "V")
+            acqTSF.COU_GS_MAG = self.getFlux(scienceTarget, "V")
             acqTSF.SEQ_INS_SOBJ_MAG = self.getFlux(scienceTarget, "K")
             acqTSF.SEQ_FI_HMAG = self.getFlux(scienceTarget, "H")
 
             # setup some default values, to be changed below
-            COU_AG_GSSOURCE = 'SCIENCE'  # by default
             GSRA = '00:00:00.000'
             GSDEC = '00:00:00.000'
             dualField = False
             dualFieldDistance = 0.0  # needed as must exist for the argument list of createGravityOB
 
-            # initialize FT variables (must exist)
-            # TODO remove next lines using a dual_acq TSF that would handle
-            # them
-            SEQ_FT_ROBJ_NAME = ""
-            SEQ_FT_ROBJ_MAG = -99.99
-            SEQ_FT_ROBJ_DIAMETER = -1.0
-            SEQ_FT_ROBJ_VIS = -1.0
 
             # if FT Target is not ScTarget, we are in dual-field (TBD)
             ftTarget = ob.get(observationConfiguration, "FTTarget")
             if ftTarget != None:
-                SEQ_FT_ROBJ_NAME = ftTarget.name
+                acqTSF.SEQ_FT_ROBJ_NAME = ftTarget.name
                 FTRA, FTDEC = self.getCoords(ftTarget)
                 # no PMRA, PMDE for FT !!
                 SEQ_FI_HMAG = float(ftTarget.FLUX_H)
                 # just to say we must treat the case there
                 # is no FT Target
-                SEQ_FT_ROBJ_MAG = self.getFlux(ftTarget, "K")
-                SEQ_FT_ROBJ_DIAMETER = 0.0  # FIXME
+                acqTSF.SEQ_FT_ROBJ_MAG = self.getFlux(ftTarget, "K")
+                #acqTSF.SEQ_FT_ROBJ_DIAMETER = 0.0  # FIXME
                 SEQ_FT_ROBJ_VIS = 1.0  # FIXME
                 dualField = True
 
@@ -143,26 +136,30 @@ class Gravity(VltiInstrument):
                 elif np.abs(dualFieldDistance[0]) > SCtoREFmaxDist:
                     raise ValueError("Dual-Field distance of two stars is  > " + str(
                         SCtoREFmaxDist) + " mas, Please Correct.")
+                acqTSF.SEQ_INS_SOBJ_X=dualFieldDistance[0]
+                acqTSF.SEQ_INS_SOBJ_Y= dualFieldDistance[1]
+
+                acqTSF.SEQ_FT_ROBJ_VIS= SEQ_FT_ROBJ_VIS
+                acqTSF.SEQ_FT_MODE= "AUTO"
+
 
             # AO target
             aoTarget = ob.get(observationConfiguration, "AOTarget")
             if aoTarget != None:
                 AONAME = aoTarget.name
-                COU_AG_GSSOURCE = 'SETUPFILE'  # since we have an AO
-                GSRA, GSDEC = self.getCoords(aoTarget, requirePrecision=False)
-                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(
-                    aoTarget)
+                acqTSF.COU_AG_GSSOURCE = 'SETUPFILE'  # since we have an AO
+                acqTSF.COU_AG_ALPHA, acqTSF.COU_AG_DELTA = self.getCoords(aoTarget, requirePrecision=False)
+                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(aoTarget)
                 # Case of CIAO to be implemented...based on v and k magnitudes?
-                COU_GS_MAG = float(aoTarget.FLUX_V)
+                acqTSF.COU_GS_MAG = float(aoTarget.FLUX_V)
 
             # Guide Star
             gsTarget = ob.get(observationConfiguration, 'GSTarget')
             if gsTarget != None and aoTarget == None:
-                COU_AG_SOURCE = 'SETUPFILE'  # since we have an GS
-                GSRA, GSDEC = self.getCoords(gsTarget, requirePrecision=False)
-                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(
-                    gsTarget)
-                COU_GS_MAG = float(gsTarget.FLUX_V)
+                acqTSF.COU_AG_SOURCE = 'SETUPFILE'  # since we have an GS
+                acqTSF.COU_AG_ALPHA, acqTSF.COU_AG_DELTA = self.getCoords(gsTarget, requirePrecision=False)
+                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(gsTarget)
+                acqTSF.COU_GS_MAG = float(gsTarget.FLUX_V)
 
             # LST interval
             try:
@@ -234,9 +231,7 @@ class Gravity(VltiInstrument):
                 ui.addToLog(obsTSF, False)
             else:
                 self.createGravityOB(p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-                                     DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance,
-                                     SEQ_FT_ROBJ_NAME, SEQ_FT_ROBJ_MAG, SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS,
-                                     LSTINTERVAL)
+                                    dualField, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
 
     def formatRangeTable(self):
@@ -308,16 +303,11 @@ class Gravity(VltiInstrument):
 
     def createGravityOB(
             self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-            DIAMETER, COU_AG_GSSOURCE, GSRA, GSDEC, COU_GS_MAG, dualField, dualFieldDistance, SEQ_FT_ROBJ_NAME,
-            SEQ_FT_ROBJ_MAG,
-            SEQ_FT_ROBJ_DIAMETER, SEQ_FT_ROBJ_VIS, LSTINTERVAL):
+            dualField, LSTINTERVAL):
 
         api = self.facility.getAPI()
         ui = self.ui
         ui.setProgress(0.1)
-
-        # TODO compute value
-        VISIBILITY = 1.0
 
         # everything seems OK
         # create new OB in container:
@@ -359,24 +349,6 @@ class Gravity(VltiInstrument):
         # and put values
         # start with acqTSF ones and complete manually missing ones
         values = acqTSF.getDict()
-        # TODO move next updates earlier so it can be tested during checkOb phase
-        values.update({
-            'SEQ.INS.SOBJ.DIAMETER': DIAMETER,
-            'SEQ.INS.SOBJ.VIS': VISIBILITY,
-            'COU.AG.GSSOURCE': COU_AG_GSSOURCE,
-            'COU.AG.ALPHA': GSRA,
-            'COU.AG.DELTA': GSDEC,
-            'COU.GS.MAG': round(COU_GS_MAG, 3),
-            'TEL.TARG.PARALLAX': 0.0
-        })
-        if dualField:
-            values.update({'SEQ.INS.SOBJ.X': dualFieldDistance[0],
-                           'SEQ.INS.SOBJ.Y': dualFieldDistance[1],
-                           'SEQ.FT.ROBJ.NAME': SEQ_FT_ROBJ_NAME,
-                           'SEQ.FT.ROBJ.MAG': round(SEQ_FT_ROBJ_MAG, 3),
-                           'SEQ.FT.ROBJ.DIAMETER': SEQ_FT_ROBJ_DIAMETER,
-                           'SEQ.FT.ROBJ.VIS': SEQ_FT_ROBJ_VIS,
-                           'SEQ.FT.MODE': "AUTO"})
         tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
         ui.setProgress(0.3)
 
