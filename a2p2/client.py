@@ -136,7 +136,7 @@ class A2p2Client():
 
         # We now run the loop to wait for the message in a try/finally block so that if
         # the program is interrupted e.g. by control-C, the client terminates
-        # gracefully.
+        # gracefully. ( but sometimes fails inside tkinter/__init__.py CallWrapper/__call__() )
 
         # We test every 1s to see if the hub has sent a message
         delay = 0.1
@@ -190,6 +190,10 @@ class A2p2Client():
                     loop_cnt = -1
             except KeyboardInterrupt:
                 loop_cnt = -1
+        print("\nDisconnecting SAMP ...")
+        self.a2p2SampClient.disconnect()
+        print("Bye!")
+
 
     def createPreferencesFile():
         A2P2ClientPreferences.createPreferencesFile()
