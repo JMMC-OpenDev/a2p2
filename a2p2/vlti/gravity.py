@@ -97,7 +97,10 @@ class Gravity(VltiInstrument):
             # Retrieve Fluxes
             acqTSF.COU_GS_MAG = self.getFlux(scienceTarget, "V")
             acqTSF.SEQ_INS_SOBJ_MAG = self.getFlux(scienceTarget, "K")
-            acqTSF.SEQ_FI_HMAG = self.getFlux(scienceTarget, "H")
+            if ob.getPeriod() >= 110:
+                acqTSF.SEQ_INS_SOBJ_HMAG = self.getFlux(scienceTarget, "H")
+            else:
+                acqTSF.SEQ_FI_HMAG = self.getFlux(scienceTarget, "H")
 
             # setup some default values, to be changed below
             GSRA = '00:00:00.000'
@@ -112,6 +115,10 @@ class Gravity(VltiInstrument):
                 acqTSF.SEQ_FT_ROBJ_NAME = ftTarget.name
                 FTRA, FTDEC = self.getCoords(ftTarget)
                 # no PMRA, PMDE for FT !!
+                if ob.getPeriod() >= 110:
+                    acqTSF.SEQ_INS_SOBJ_HMAG = self.getFlux(ftTarget, "H")
+                else:
+                    acqTSF.SEQ_FI_HMAG = self.getFlux(ftTarget, "H")
                 SEQ_FI_HMAG = float(ftTarget.FLUX_H)
                 # just to say we must treat the case there
                 # is no FT Target

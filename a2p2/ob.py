@@ -6,6 +6,7 @@ import logging
 import json
 import xml.etree.ElementTree as ET
 from collections import defaultdict, namedtuple, OrderedDict
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -80,6 +81,14 @@ class OB():
                 fluxes[k[5:]] = els[k]  # remove FLUX_ prefix for dict key
 
         return OrderedDict(sorted(fluxes.items(), key=lambda t: order.find(t[0])))
+
+    def getPeriod(self):
+        """
+        Return period given by Aspro2 as integer.
+        """
+        # use re to remove alpha characters from "Period 109" and make.
+        return int(re.sub(r"\D", "", self.interferometerConfiguration.version))
+
 
     def get(self, obj, fieldname, defaultvalue=None):
         if fieldname in obj._fields:

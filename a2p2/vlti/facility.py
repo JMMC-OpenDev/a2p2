@@ -100,7 +100,7 @@ class VltiFacility(Facility):
 
         # OB is checked and submitted by instrument
         instrument = self.getInstrument(ob.instrumentConfiguration.name)
-        period = int(re.sub(r"\D", "", ob.interferometerConfiguration.version)) # remove alpha characters from "Period 109"
+        period = ob.getPeriod()
         self.ui.addToLog(f"Request OB creation for P{period}")
 
         try:
