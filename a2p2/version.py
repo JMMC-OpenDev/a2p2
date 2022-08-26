@@ -25,10 +25,12 @@ __release_notes__ = {
         "STATUS": [
         ],
         "A2P2": [
-            "huge speedup of ESO P2 runs treeview",
+            "Huge speedup of ESO P2 runs treeview",
+            "Explicit SAMP unregister reduce risk of SAMP ghosts",
         ],
         "VLTI": [
             "Check consistency between Aspro2 inteferometer period and RUN's IP version",
+            "Handle use SEQ.INS.SOBJ.HMAG after P110 instead of SEQ.FI.HMAG",
         ],
         "CHARA": [
         ],
