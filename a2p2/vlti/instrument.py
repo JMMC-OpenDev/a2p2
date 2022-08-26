@@ -85,12 +85,21 @@ class VltiInstrument(Instrument):
             else:
                 folder, _ = api.createFolder(p2container.containerId, folderName)
                 ui.addToLog(f"folder '{folderName}' created")
+
+            # update parent tree since we created a new subfolder
+            ui.updateTree(p2container.run, p2container.containerId)
+
             p2container.containerId = folder['containerId']
+
         else:
             ui.addToLog("concatenation or folder not created")
 
         ui.addToLog("OB checked / preparing  submission...")
         self.checkOB(ob, p2container)
+
+        ## refresh and select last created element tree
+        self.ui.updateTree(p2container.run, p2container.containerId)
+        self.ui.selectTreeItem(p2container.containerId)
 
     def getCoords(self, target, requirePrecision=True ):
         """
@@ -132,7 +141,7 @@ class VltiInstrument(Instrument):
         """
         Returns Flux as float values rounded to 3 decimal digits.
 
-        flux in 'V', 'J', 'H'...²²²²
+        flux in 'V', 'J', 'H'...
         """
         try:
             return round(float(getattr(target, "FLUX_" + flux)), 3)

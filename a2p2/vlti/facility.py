@@ -6,6 +6,7 @@ import os
 from tkinter.constants import TRUE
 import traceback
 import logging
+import re
 
 import p2api
 
@@ -99,6 +100,9 @@ class VltiFacility(Facility):
 
         # OB is checked and submitted by instrument
         instrument = self.getInstrument(ob.instrumentConfiguration.name)
+        period = int(re.sub(r"\D", "", ob.interferometerConfiguration.version)) # remove alpha characters from "Period 109"
+        self.ui.addToLog(f"Request OB creation for P{period}")
+
         try:
             # run checkOB which may raise some error before connection request
             # TODO we should test much more because lot of stuff still are beeing processed on live ob creations
@@ -116,14 +120,17 @@ class VltiFacility(Facility):
                 self.ui.addToLog(
                     f"Please select a {insname}'s folder (not a concatenation) in the above list to submit your science object (OBs are not shown).")
             elif  insname.lower() != self.containerInfo.getInstrument().lower():
-                self.ui.ShowErrorMessage("Aborting: container's instrument '%s' in not applicable for received OB's one '%s'." %(self.containerInfo.getInstrument(),insname))
+                self.ui.ShowErrorMessage(f"Aborting: container's instrument '{self.containerInfo.getInstrument()}' in not applicable for received OB's one '{insname}'.")
+            elif  period != int(self.containerInfo.getIpVersion()):
+                self.ui.ShowErrorMessage(f"Aborting: container's IpVersion '{self.containerInfo.getIpVersion()}' in not applicable for received OB's one '{period}', please change it in Aspro2.")
             else:
                 self.ui.addToLog(
                     "Everything ready! Request OB creation inside selected container ")
                 instrument.submitOB(ob, self.containerInfo)
                 self.ui.addToLog(
                     "OB submitted! Please check logs and fix last details on P2 web.")
-                self.refreshTree()
+
+
 
         # TODO add P2Error handling P2Error(r.status_code, method, url,
         # r.json()['error'])
@@ -228,11 +235,13 @@ class P2Container:
         self.log()
 
     def log(self):
+        logmsg = f"*** Working with {self} ***"
         if self.run != self.item and self.item['itemType'] == ITEMTYPE_CONCATENATION:
             self.facility.ui.addToLog(
                 "*** Please do not select a Concatenation and select another container. Or just append a calibrator. ***")
+            logger.info(logmsg)
         else:
-            self.facility.ui.addToLog("*** Working with %s ***" % self)
+            self.facility.ui.addToLog(logmsg)
 
     def isOk(self, ob):
         """ Tell if given container is ready to receive content of given OB."""
@@ -255,6 +264,9 @@ class P2Container:
 
     def getInstrument(self):
         return self.run['instrument']
+
+    def getIpVersion(self):
+        return self.run['ipVersion']
 
     def isRoot(self):
         return self.item.keys() != None and 'pi' in self.item.keys()

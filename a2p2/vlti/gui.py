@@ -57,7 +57,7 @@ class VltiUI(FacilityUI):
         self.treeFrame.tkraise()
 
     def fillTree(self, runs):
-        logger.debug("Start filling tree")
+        logger.debug("Start filling tree with {len(run)} runs")
         if len(runs) == 0:
             self.ShowErrorMessage(
                 "No Runs defined, impossible to program ESO's P2 interface.")
@@ -74,24 +74,29 @@ class VltiUI(FacilityUI):
             if self.facility.hasSupportedInsname(run['instrument']):
                 cid = run['containerId']
                 self._insertInTree('', run['progId'], cid, run, run)
-                # if folders, add them recursively
-                folders = getFolders(self.facility.api, cid)
-                if len(folders) > 0:
-                    try:
-                        self.folder_explore(folders, cid, run)
-                    except:
-                        pass
 
-    def folder_explore(self, folders, contid, run):
-        for folder in folders:
-            self._insertInTree(
-                contid, folder['name'], folder['containerId'], run, folder)
-            folders2 = getFolders(self.facility.api, folder['containerId'])
-            if len(folders2) > 0:
-                try:
-                    self.folder_explore(folders2, folder['containerId'], run)
-                except:
-                    pass
+    def updateTree(self, run, containerId):
+        logger.debug(f"updateTree with run : {run}\n and containerId: {containerId}")
+        items, _ = self.facility.api.getItems(containerId)
+        logger.debug(f"sub items are {items}")
+        logger.debug(f"item keys in tree: {self.treeItemToP2Items.keys()}")
+        for item in items:
+            if item['itemType'] in ['Folder', 'Concatenation', 'Group']:
+                if str(item['containerId']) in self.treeItemToP2Items.keys():
+                    logger.debug(f"Item {item['containerId']} already in tree")
+                else:
+                    logger.debug(f"adding in tree : {item}")
+                    self._insertInTree(containerId, item['name'], item['containerId'], run, item)
+            else:
+                logger.debug(f"not inserted in tree : {item}")
+        # TODO get children of our tree and remove part non present in items
+
+    def selectTreeItem(self, containerId):
+        item=str(containerId)
+        self.tree.selection_set(item)
+        self.tree.see(item)
+        self.facility.containerInfo.store(self.treeItemToRuns[item], self.treeItemToP2Items[item])
+
 
     def _insertInTree(self, parentContainerID, name, containerID, run, item):
         instrument = run['instrument']
@@ -110,12 +115,31 @@ class VltiUI(FacilityUI):
         self.treeItemToRuns[e] = run
         self.treeItemToP2Items[e] = item
 
+        # add a dummy child so we can show to the user he has to walk into the tree
+        if run['itemCount'] > 0:
+            self.tree.insert(containerID, 'end', f"{containerID}_fillme", values=[])
+        # return new tree item
+        return e
+
     def on_tree_selection_changed(self, selection):
+        logger.debug(f"tree selection change: {selection}")
         curItem = self.tree.focus()
         ret = self.tree.item(curItem)
         if len(ret['values']) > 0:
             self.facility.containerInfo.store(
                 self.treeItemToRuns[curItem], self.treeItemToP2Items[curItem])
+
+    def on_tree_open(self, selection):
+        curItem = self.tree.focus()
+        curChildren = self.tree.get_children(curItem)
+        firstChild = curChildren[0]
+        if not firstChild in self.treeItemToRuns.keys():
+            self.tree.delete(firstChild)
+
+            parentRun = self.treeItemToRuns[curItem]
+            parentContainer = self.treeItemToP2Items[curItem]
+            parentContainerID = parentContainer['containerId']
+            self.updateTree(parentRun, parentContainerID)
 
     def isBusy(self):
         self.tree.configure(selectmode='none')
@@ -143,6 +167,8 @@ class TreeFrame(Frame):
         self.tree.heading('#0', text='Project ID', anchor='w')
         self.tree.heading('#1', text='Instrument', anchor='w')
         self.tree.heading('#2', text='Container type', anchor='w')
+        self.tree.bind(
+            '<<TreeviewOpen>>', self.vltiUI.on_tree_open)
         self.tree.bind(
             '<ButtonRelease-1>', self.vltiUI.on_tree_selection_changed)
 

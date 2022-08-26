@@ -1,4 +1,4 @@
-__version__ = "0.4.5"
+__version__ = "0.4.6"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,19 +21,14 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.4.5": {
+    "0.4.6": {
         "STATUS": [
         ],
         "A2P2": [
-            "clarify some text in the default generated preference file",
+            "huge speedup of ESO P2 runs treeview",
         ],
         "VLTI": [
-            "Change log message : Run filled -> OB transmitted",
-            "Missing flux error message enhanced : show associated target name",
-            "Handle ALPHA DELTA coordinates of associated guide star"
-            "MATISSE: Handle Aspro2's frindge tracker mode : None or GRA4MAT",
-            "MATISSE: Define DPR.CATG  (always was CALIB)",
-            "MATISSE: Use V band for COU.GS.MAG or try G one on ATs."
+            "Check consistency between Aspro2 inteferometer period and RUN's IP version",
         ],
         "CHARA": [
         ],
@@ -41,7 +36,7 @@ __release_notes__ = {
             "Merge AO or GS in a same code section for every instruments",
             "Perform a cleanup on PIONIER and try to gaterh common code",
             "Check DIT table from the last template user manuals (especially MATISSE)",
-            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values?"
+            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values?",
         ],
         "TODO-DEV": [
             "Support multiple period version (two major at least)",
@@ -51,6 +46,19 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },"0.4.5": {
+        "A2P2": [
+            "clarify some text in the default generated preference file",
+        ],
+        "VLTI": [
+            "Change log message : Run filled -> OB transmitted",
+            "Missing flux error message enhanced : show associated target name",
+            "Handle ALPHA DELTA coordinates of associated guide star",
+            "MATISSE: handle Aspro2's frindge tracker mode : None or GRA4MAT",
+            "MATISSE: define DPR.CATG  (always was CALIB)",
+            "MATISSE: use V band for COU.GS.MAG or try G one on ATs.",
+            "GRAVITY: include dual keywords in gravity_rangeTable",
         ],
     },"0.4.4": {
         "A2P2": [
