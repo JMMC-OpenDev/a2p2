@@ -12,21 +12,12 @@ from a2p2 import A2p2Client
 
 FIXTURE_DIR = os.path.join( os.path.dirname(os.path.realpath(__file__)) )
 
-ALL_OBXML_VALUE_ERROR = pytest.mark.datafiles(
-    os.path.join(FIXTURE_DIR,"aspro-sample-bad-coords.obxml", ''),
-    os.path.join(FIXTURE_DIR,"aspro-sample-bad-k.obxml", ''),
-    os.path.join(FIXTURE_DIR,"aspro-sample.obxml", ''),
-    os.path.join(FIXTURE_DIR,"aspro-sample-bad-insmode.obxml", ''),
+@pytest.mark.datafiles(
+    os.path.join(FIXTURE_DIR,"aspro-sample-bad-coords.obxml"),
+    os.path.join(FIXTURE_DIR,"aspro-sample-bad-k.obxml"),
+    os.path.join(FIXTURE_DIR,"aspro-sample.obxml"),
+    os.path.join(FIXTURE_DIR,"aspro-sample-bad-insmode.obxml"),
 )
-
-ALL_OBXML_GENERAL_ERROR = pytest.mark.datafiles(
-)
-
-ALL_OBXML_NO_ERROR = pytest.mark.datafiles(
-)
-
-
-@ALL_OBXML_VALUE_ERROR
 def test_obxml_value_error(datafiles):
     a2p2c=A2p2Client(True)
 
