@@ -184,21 +184,23 @@ class Pionier(VltiInstrument):
         return buffer
 
     def formatDitTable(self):
-        ditTable = self.getDitTable()
-        buffer = '   Tel | Spec |  Pol  |     H   | DIT(s)\n'
-        buffer += '--------------------------------------------------------\n'
-        for tel in ['AT']:
-            for spec in ['GRISM', 'FREE']:
-                for pol in ['IN', 'OUT']:
-                    for i in range(len(ditTable[tel][spec][pol]['DIT'])):
-                        buffer += ' %3s | %4s | %3s | %2s |' % (tel,
-                                                                spec, pol, tel)
-                        buffer += ' %4.1f <K<= %3.1f | %4.1f' % (ditTable[tel][spec][pol]['MAG'][i],
-                                                                 ditTable[tel][spec][
-                                                                     pol]['MAG'][i + 1],
-                                                                 ditTable[tel][spec][pol]['DIT'][i])
-                        buffer += "\n"
-            Hut = ditTable[tel]['Hut']
+        buffer = ' No dit table in use \n'
+
+#        ditTable = self.getDitTable()
+#        buffer = '   Tel | Spec |  Pol  |     H   | DIT(s)\n'
+#        buffer += '--------------------------------------------------------\n'
+#        for tel in ['AT']:
+#           for spec in ['GRISM', 'FREE']:
+#                for pol in ['IN', 'OUT']:
+#                    for i in range(len(ditTable[tel][spec][pol]['DIT'])):
+#                        buffer += ' %3s | %4s | %3s | %2s |' % (tel,
+#                                                                spec, pol, tel)
+#                        buffer += ' %4.1f <K<= %3.1f | %4.1f' % (ditTable[tel][spec][pol]['MAG'][i],
+#                                                                 ditTable[tel][spec][
+#                                                                     pol]['MAG'][i + 1],
+#                                                                 ditTable[tel][spec][pol]['DIT'][i])
+#                        buffer += "\n"
+#            Hut = ditTable[tel]['Hut']
         return buffer
 
     def getPionierTemplateName(self, templateType, OBJTYPE):

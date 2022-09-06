@@ -1,4 +1,4 @@
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,7 +21,7 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.5.0": {
+    "0.5.1": {
         "STATUS": [
         ],
         "A2P2": [
@@ -44,6 +44,7 @@ __release_notes__ = {
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
         ],
+    },"0.5.0": {
     },"0.4.6": {
         "STATUS": [
         ],
