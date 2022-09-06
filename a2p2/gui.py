@@ -199,7 +199,7 @@ class MainWindow():
         else:
             showwarning("Warning", text)
         self.addToLog("Warning message")
-        self.addToLog(text, False, loggin.WARNING)
+        self.addToLog(text, False, logging.WARNING)
 
     def ShowInfoMessage(self, text):
         if self.a2p2client.fakeAPI:
