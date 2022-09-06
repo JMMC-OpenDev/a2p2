@@ -194,7 +194,7 @@ class Gravity(VltiInstrument):
 
             # compute dit, ndit, nexp
             dit = self.getDit(tel, acqTSF.INS_SPEC_RES, acqTSF.INS_SPEC_POL,
-                              acqTSF.SEQ_INS_SOBJ_MAG, dualField, showWarning=(p2container == None))
+                              acqTSF.SEQ_INS_SOBJ_MAG, dualField, targetName=scienceTarget.name.strip(),  showWarning=(p2container == None))
             ndit = 300 / dit
             if ndit < 10:
                 ndit = 10

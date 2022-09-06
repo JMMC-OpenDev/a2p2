@@ -187,7 +187,8 @@ class Matisse(VltiInstrument):
 
     def formatDitTable(self):
         #    fluxTable = self.getDitTable()
-        buffer = '   Tel | Spec |  spec band  | Flux (Jy)    | tau(ms)\n'
+        buffer = ' No dit table in use \n'
+        #buffer = '   Tel | Spec |  spec band  | Flux (Jy)    | tau(ms)\n'
         #    buffer += '--------------------------------------------------------\n'
         #    for tel in ['AT']:
         #        for spec in ['Low','Med']:

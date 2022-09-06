@@ -1,4 +1,4 @@
-__version__ = "0.4.6"
+__version__ = "0.5.0"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,7 +21,30 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.4.6": {
+    "0.5.0": {
+        "STATUS": [
+        ],
+        "A2P2": [
+        ],
+        "VLTI": [
+            "Update DIT tables to last instrument template (version is stored in the table config to report warning)",
+            "Do not stop OB creation if K mag is out of range during DIT calculation but show a warning",
+        ],
+        "CHARA": [
+        ],
+        "TODO-SCIENCE": [
+            "Merge AO or GS in a same code section for every instruments",
+            "Check DIT table from the last template user manuals (especially MATISSE) and remove PIONIER's one",
+            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values?",
+        ],
+        "TODO-DEV": [
+            "Support multiple period version (two major at least)",
+            "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
+            "Unify ob name creation in vlti instrument createOB()",
+            "Complete test suite with real p2 submission",
+            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },"0.4.6": {
         "STATUS": [
         ],
         "A2P2": [
@@ -33,19 +56,6 @@ __release_notes__ = {
             "Handle use SEQ.INS.SOBJ.HMAG after P110 instead of SEQ.FI.HMAG",
         ],
         "CHARA": [
-        ],
-        "TODO-SCIENCE": [
-            "Merge AO or GS in a same code section for every instruments",
-            "Perform a cleanup on PIONIER and try to gaterh common code",
-            "Check DIT table from the last template user manuals (especially MATISSE)",
-            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values?",
-        ],
-        "TODO-DEV": [
-            "Support multiple period version (two major at least)",
-            "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
-            "Unify ob name creation in vlti instrument createOB()",
-            "Complete test suite with real p2 submission",
-            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
         ],
     },"0.4.5": {
         "A2P2": [
