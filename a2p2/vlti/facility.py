@@ -108,13 +108,20 @@ class VltiFacility(Facility):
             # TODO we should test much more because lot of stuff still are beeing processed on live ob creations
 
             instrument.checkOB(ob)
+            # check for warnings and abort if requested by user
+            if len(instrument.warnings)>0:
+                linesep="\n  -  "
+                version=instrument.getDitTable()["VERSION"]
+                answer = self.ui.AskYesNoMessage(f"According to the template manual {version} :\n \n  -  {linesep.join(instrument.warnings)}\n\nClick \"Yes\" to proceed \"No\" to abort the submission")
+                instrument.warnings.clear()
+                if answer == False:
+                    self.ui.addToLog("Submission has been marked to be aborted - do not proceed")
+                    return
 
             insname = instrument.getShortName()
 
             # performs operation
-            if instrument.abortOB:
-                instrument.submitOB(ob, self.containerInfo)
-            elif not self.isConnected():
+            if not self.isConnected():
                 self.ui.showLoginFrame(ob)
             elif not self.isReadyToSubmit(ob):
                 # self.a2p2client.ui.addToLog("Receive OB for
@@ -126,6 +133,7 @@ class VltiFacility(Facility):
             elif  period != int(self.containerInfo.getIpVersion()):
                 self.ui.ShowErrorMessage(f"Aborting: container's IpVersion '{self.containerInfo.getIpVersion()}' in not applicable for received OB's one '{period}', please change it in Aspro2.")
             else:
+                ui.addToLog("Everything ready! Request OB creation inside selected container")
                 instrument.submitOB(ob, self.containerInfo)
 
 

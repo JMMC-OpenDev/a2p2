@@ -29,8 +29,9 @@ class VltiInstrument(Instrument):
         self.rangeTable = None
         self.ditTable = None
 
-        # flags
-        self.abortOB = False
+        # warnings
+        self.warnings = []
+        self.errors = []
 
     def get(self, obj, fieldname, defaultvalue):
         if fieldname in obj._fields:
@@ -63,13 +64,6 @@ class VltiInstrument(Instrument):
     def submitOB(self, ob, p2container):
         api = self.facility.getAPI()
         ui = self.ui
-
-        ui.addToLog("abortOB={self.abortOB}")
-        if self.abortOB :
-            self.abortOB=False
-            ui.addToLog("Submission has been marked to be aborted - do not proceed")
-            return
-        ui.addToLog("Everything ready! Request OB creation inside selected container ")
 
         # create new container
         obsconflist = ob.observationConfiguration
@@ -111,10 +105,6 @@ class VltiInstrument(Instrument):
         ui.updateTree(p2container.run, p2container.containerId)
         ui.selectTreeItem(p2container.containerId)
         ui.addToLog("OB submitted! Please check logs and fix last details on P2 web.")
-
-
-    def abortOBSubmission(self):
-        self.abortOB = True
 
     def getCoords(self, target, requirePrecision=True):
         """
@@ -231,7 +221,6 @@ class VltiInstrument(Instrument):
         # if spec == "LOW":
         #    spec="HIGH"
         ditTable = self.getDitTable()
-        version = ditTable["VERSION"]
         mags = ditTable["AT"][spec][pol]['MAG']
         dits = ditTable["AT"][spec][pol]['DIT']
         if dualFeed:
@@ -252,11 +241,7 @@ class VltiInstrument(Instrument):
             kmax = max(kmax, mags[i + 1] + dK)
 
         if showWarning:
-            answer = self.ui.AskYesNoMessage(
-                f"According to the template manual {version} :\n   K mag ({K})  is out of ranges [{kmin},{kmax}]\n for this mode ( ∆K={dK} tel={tel}, spec={spec}, pol={pol}, dualFeed={dualFeed}) \n  for target '{targetName}'\n\nClick \"OK\" to proceed \"NO\" to abort the submission")
-            if answer == False:
-                self.abortOBSubmission()
-                self.ui.addToLog("Request to abort submission")
+            self.warnings.append(f"K mag ({K})  is out of range [{kmin},{kmax}]\n mode ( ∆K={dK} tel={tel}, spec={spec}, pol={pol}, dualFeed={dualFeed}) \n  for target '{targetName}'")
 
         # always return a value to avoid unsupported operations
         if K < kmin:

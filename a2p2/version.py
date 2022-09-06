@@ -1,4 +1,4 @@
-__version__ = "0.5.1"
+__version__ = "0.5.2"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,14 +21,14 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.5.1": {
+    "0.5.2": {
         "STATUS": [
         ],
         "A2P2": [
         ],
         "VLTI": [
             "Update DIT tables to last instrument template (version is stored in the table config to report warning)",
-            "Do not stop OB creation if K mag is out of range during DIT calculation but show a warning",
+            "Do not stop OB creation if K mag is out of range during DIT calculation but show a warning and ask to proceed or abort",
         ],
         "CHARA": [
         ],
@@ -44,7 +44,6 @@ __release_notes__ = {
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
         ],
-    },"0.5.0": {
     },"0.4.6": {
         "STATUS": [
         ],
