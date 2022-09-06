@@ -112,7 +112,9 @@ class VltiFacility(Facility):
             insname = instrument.getShortName()
 
             # performs operation
-            if not self.isConnected():
+            if instrument.abortOB:
+                instrument.submitOB(ob, self.containerInfo)
+            elif not self.isConnected():
                 self.ui.showLoginFrame(ob)
             elif not self.isReadyToSubmit(ob):
                 # self.a2p2client.ui.addToLog("Receive OB for
@@ -124,12 +126,7 @@ class VltiFacility(Facility):
             elif  period != int(self.containerInfo.getIpVersion()):
                 self.ui.ShowErrorMessage(f"Aborting: container's IpVersion '{self.containerInfo.getIpVersion()}' in not applicable for received OB's one '{period}', please change it in Aspro2.")
             else:
-                self.ui.addToLog(
-                    "Everything ready! Request OB creation inside selected container ")
                 instrument.submitOB(ob, self.containerInfo)
-                self.ui.addToLog(
-                    "OB submitted! Please check logs and fix last details on P2 web.")
-
 
 
         # TODO add P2Error handling P2Error(r.status_code, method, url,

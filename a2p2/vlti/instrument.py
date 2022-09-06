@@ -29,6 +29,9 @@ class VltiInstrument(Instrument):
         self.rangeTable = None
         self.ditTable = None
 
+        # flags
+        self.abortOB = False
+
     def get(self, obj, fieldname, defaultvalue):
         if fieldname in obj._fields:
             return getattr(obj, fieldname)
@@ -60,6 +63,13 @@ class VltiInstrument(Instrument):
     def submitOB(self, ob, p2container):
         api = self.facility.getAPI()
         ui = self.ui
+
+        ui.addToLog("abortOB={self.abortOB}")
+        if self.abortOB :
+            self.abortOB=False
+            ui.addToLog("Submission has been marked to be aborted - do not proceed")
+            return
+        ui.addToLog("Everything ready! Request OB creation inside selected container ")
 
         # create new container
         obsconflist = ob.observationConfiguration
@@ -98,8 +108,13 @@ class VltiInstrument(Instrument):
         self.checkOB(ob, p2container)
 
         # refresh and select last created element tree
-        self.ui.updateTree(p2container.run, p2container.containerId)
-        self.ui.selectTreeItem(p2container.containerId)
+        ui.updateTree(p2container.run, p2container.containerId)
+        ui.selectTreeItem(p2container.containerId)
+        ui.addToLog("OB submitted! Please check logs and fix last details on P2 web.")
+
+
+    def abortOBSubmission(self):
+        self.abortOB = True
 
     def getCoords(self, target, requirePrecision=True):
         """
@@ -237,8 +252,11 @@ class VltiInstrument(Instrument):
             kmax = max(kmax, mags[i + 1] + dK)
 
         if showWarning:
-            self.ui.ShowWarningMessage(
-                f"According to the template manual {version} :\n   K mag ({K})  is out of ranges [{kmin},{kmax}]\n for this mode ( ∆K={dK} tel={tel}, spec={spec}, pol={pol}, dualFeed={dualFeed}) \n  for target '{targetName}'")
+            answer = self.ui.AskYesNoMessage(
+                f"According to the template manual {version} :\n   K mag ({K})  is out of ranges [{kmin},{kmax}]\n for this mode ( ∆K={dK} tel={tel}, spec={spec}, pol={pol}, dualFeed={dualFeed}) \n  for target '{targetName}'\n\nClick \"OK\" to proceed \"NO\" to abort the submission")
+            if answer == False:
+                self.abortOBSubmission()
+                self.ui.addToLog("Request to abort submission")
 
         # always return a value to avoid unsupported operations
         if K < kmin:
@@ -282,7 +300,6 @@ class VltiInstrument(Instrument):
             return value >= rangeTable[_tpl][key]['min'] and \
                 value <= rangeTable[_tpl][key]['max']
         if 'list' in rangeTable[_tpl][key].keys():
-            print(f"Searching {value} in {rangeTable[_tpl][key]['list']}")
             #
             # hack set to check for coordinates convention define by p2
             # vlue will be checked by p2 later...

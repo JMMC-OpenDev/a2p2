@@ -209,6 +209,16 @@ class MainWindow():
         self.addToLog("Info message")
         self.addToLog(text, False, logging.INFO)
 
+    def AskYesNoMessage(self, text):
+        if self.a2p2client.fakeAPI:
+            pass
+        else:
+            self.addToLog(f"Question: {text}", displayString=False)
+            ret = askyesno("", text)
+            self.addToLog(f"Reply: yes={ret}", displayString=False)
+            return ret
+
+
     def setProgress(self, perc):
         if perc > 1:
             perc = perc / 100.0
@@ -271,6 +281,9 @@ class FacilityUI(Frame):
 
     def ShowInfoMessage(self, *args, **kwargs):
         self.a2p2client.ui.ShowInfoMessage(*args, **kwargs)
+
+    def AskYesNoMessage(self,*args, **kwargs):
+        return self.a2p2client.ui.AskYesNoMessage(*args, **kwargs)
 
     def setProgress(self, perc):
         """ Wrapper to update progress bar """
