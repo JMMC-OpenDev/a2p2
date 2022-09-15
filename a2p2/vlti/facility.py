@@ -133,7 +133,7 @@ class VltiFacility(Facility):
             elif  period != int(self.containerInfo.getIpVersion()):
                 self.ui.ShowErrorMessage(f"Aborting: container's IpVersion '{self.containerInfo.getIpVersion()}' in not applicable for received OB's one '{period}', please change it in Aspro2.")
             else:
-                ui.addToLog("Everything ready! Request OB creation inside selected container")
+                self.ui.addToLog("Everything ready! Request OB creation inside selected container")
                 instrument.submitOB(ob, self.containerInfo)
 
 
