@@ -115,7 +115,17 @@ AO Flat Star:
             buffer += "Object:\n"
             fluxes = ", ".join([e[0] + "=" + e[1]
                                 for e in ob.getFluxes(sct).items()])
-            info = sct.SPECTYP + ", " + sct.PARALLAX
+            try:
+                info = sct.SPECTYP
+            except:
+                info = "no SPECTYP"
+            info+=", "
+            try:
+                info += sct.PARALLAX
+            except:
+                info += "no PARALLAX"
+
+
             buffer += sct.name + " (" + info + ") : " + fluxes + "\n"
             if ftt:
                 buffer += "Fringe Finder:\n"
