@@ -33,7 +33,8 @@ You can also build and install from sources using git:
 
 Prerequisites
 -------------
-Some basic tests have been operated on windows, Linux and Mac OS.
+Some basic tests have been operated on windows, Linux and Mac OS. pytest-datafiles must be installed previously.
+
 
 a2p2 should launch the program. 
 
