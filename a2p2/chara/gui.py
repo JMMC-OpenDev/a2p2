@@ -109,8 +109,10 @@ AO Flat Star:
 
         for oc in sciences:
             sct = oc.SCTarget
+            extrainfos = self.get(sct, "EXTRA_INFORMATIONS")
             ftt = self.get(oc, "FTTarget")
             aot = self.get(oc, "AOTarget")
+
             buffer += oc.observationConstraints.LSTinterval + "\n"
             buffer += "Object:\n"
             fluxes = ", ".join([e[0] + "=" + e[1]
@@ -142,6 +144,12 @@ AO Flat Star:
                 buffer += "Cals:\n"
                 for cal in cals:
                     buffer += "- " + cal + "\n"
+
+            # Display Extra_Informations if any
+            if extrainfos:
+                buffer += "Extra_infos:\n"
+                for field in extrainfos._fields:
+                    buffer += "- " + field + "=" + getattr(extrainfos,field) +"\n"
 
             buffer += _HR
 
