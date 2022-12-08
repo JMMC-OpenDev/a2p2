@@ -1,4 +1,4 @@
-__version__ = "0.5.3"
+__version__ = "0.6.0"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,14 +21,13 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.5.3": {
+    "0.6.0": {
         "STATUS": [
         ],
         "A2P2": [
+            "Read Extra_informations from last Aspro2 OBXML"
         ],
         "VLTI": [
-            "Update DIT tables to last instrument template (version is stored in the table config to report warning)",
-            "Do not stop OB creation if K mag is out of range during DIT calculation but show a warning and ask to proceed or abort",
         ],
         "CHARA": [
         ],
@@ -43,6 +42,17 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },"0.5.3": {
+        "STATUS": [
+        ],
+        "A2P2": [
+        ],
+        "VLTI": [
+            "Update DIT tables to last instrument template (version is stored in the table config to report warning)",
+            "Do not stop OB creation if K mag is out of range during DIT calculation but show a warning and ask to proceed or abort",
+        ],
+        "CHARA": [
         ],
     },"0.4.6": {
         "STATUS": [
@@ -77,7 +87,7 @@ __release_notes__ = {
         ],
     },"0.4.3": {
         "A2P2": [
-            "Enhance a2p2.jmmc.models._model so it automagically computes component names >{(())°>",
+            "Enhance a2p2.jmmc.models._model so it automagically computes component names >{(())>",
         ],
     },"0.4.2": {
         "A2P2": [
