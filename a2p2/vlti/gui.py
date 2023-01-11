@@ -57,7 +57,7 @@ class VltiUI(FacilityUI):
         self.treeFrame.tkraise()
 
     def fillTree(self, runs):
-        logger.debug("Start filling tree with {len(run)} runs")
+        logger.debug(f"Start filling tree with {len(runs)} runs")
         if len(runs) == 0:
             self.ShowErrorMessage(
                 "No Runs defined, impossible to program ESO's P2 interface.")
