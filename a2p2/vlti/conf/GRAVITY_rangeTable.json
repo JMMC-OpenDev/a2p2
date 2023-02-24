@@ -3,26 +3,40 @@
     {
         "COU.AG.ALPHA":               {"default": "00:00:00.000", "list": ["ra"]},
         "COU.AG.DELTA":               {"default": "00:00:00.000", "list": ["dec"]},
-        "COU.AG.GSSOURCE":            {"default": "SCIENCE", "list": ["SCIENCE", "SETUPFILE"]},
+        "COU.AG.EPOCH":               {"default": 2000, "min": -2000, "max": 3000},
+        "COU.AG.GSSOURCE":            {"default": "FT", "list": ["SCIENCE", "FT", "SETUPFILE"]},
+        "COU.AG.PARALLAX":            {"default": 0, "min": -20, "max": 20},
         "COU.AG.PMA":                 {"default": 0, "min": -10, "max": 10},
         "COU.AG.PMD":                 {"default": 0, "min": -10, "max": 10},
-        "COU.AG.TYPE":                {"default": "ADAPT_OPT", "list": ["NONE", "DEFAULT", "AUTO_GUIDE", "ADAPT_OPT", "ADAPT_OPT_TCCD", "IR_AO_OFFAXIS"]},
+        "COU.AG.TYPE":                {"default": "ADAPT_OPT", "list": ["ADAPT_OPT", "ADAPT_OPT_TCCD", "IR_AO_OFFAXIS"]},
         "COU.GS.MAG":                 {"default": 0, "min": -3, "max": 25},
-        "INS.FT.POL":                 {"default": "IN", "list": ["IN", "OUT"]},
-        "INS.SPEC.POL":               {"default": "IN", "list": ["IN", "OUT"]},
+        "INS.FT.POL":                 {"default": "OUT", "list": ["IN", "OUT"]},
+        "INS.SPEC.POL":               {"default": "OUT", "list": ["IN", "OUT"]},
         "INS.SPEC.RES":               {"default": "MED", "list": ["LOW", "MED", "HIGH"]},
+
         "ISS.BASELINE":               {"list": ["small", "medium", "large", "astrometric", "UTs"]},
+
         "ISS.VLTITYPE":               {"list": ["snapshot", "imaging", "time-series", "astrometry"]},
-        "SEQ.FI.HMAG":                {"default": 0, "min": -10, "max": 25},
+        "SEQ.FT.MODE":                {"default": "AUTO", "list": ["AUTO", "1", "2", "7", "9"]},
+
+        "SEQ.FT.ROBJ.DIAMETER":       {"default": 0, "min": 0, "max": 300},
+        "SEQ.FT.ROBJ.HMAG":           {"default": 0, "min": -10, "max": 30},
+        "SEQ.FT.ROBJ.MAG":            {"default": 0, "min": -10, "max": 30},
+        "SEQ.FT.ROBJ.NAME":           {"default": "Name"},
+        "SEQ.FT.ROBJ.VIS":            {"default": 1, "min": 0, "max": 1},
+
+        "SEQ.INS.SOBJ.DIAMETER":      {"default": 0},
 
         "SEQ.INS.SOBJ.HMAG":          {"default": 0, "min": -10, "max": 25},
 
-        "SEQ.FT.MODE":                {"default": "AUTO", "list": ["AUTO", "1", "2", "7", "9"]},
-        "SEQ.INS.SOBJ.DIAMETER":      {"default": 0},
         "SEQ.INS.SOBJ.MAG":           {"default": 0, "min": -10, "max": 30},
         "SEQ.INS.SOBJ.NAME":          {"default": "Name"},
         "SEQ.INS.SOBJ.VIS":           {"default": 1, "min": 0, "max": 1},
-        "SEQ.MET.MODE":               {"default": "ON", "list": ["ON", "FAINT", "WIDE", "OFF"]},
+
+        "SEQ.INS.SOBJ.X":             {"default": 0, "min": -60000, "max": 60000},
+        "SEQ.INS.SOBJ.Y":             {"default": 0, "min": -60000, "max": 60000},
+
+        "SEQ.MET.MODE":               {"default": "ON", "list": ["ON", "OFF"]},
         "TEL.TARG.PARALLAX":          {"default": 0, "min": -20, "max": 20}
     },
     "GRAVITY_single_obs_exp.tsf,GRAVITY_single_obs_calibrator.tsf,GRAVITY_dual_obs_exp.tsf,GRAVITY_dual_obs_calibrator.tsf":
