@@ -1,4 +1,4 @@
-__version__ = "0.6.3"
+__version__ = "0.6.4"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,13 +21,13 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.6.3": {
+     "0.6.4": {
         "STATUS": [
         ],
         "A2P2": [
+            "Fix import that may break run on windows..."
         ],
         "VLTI": [
-            "Always use GRAVITY acqTSF.SEQ_INS_SOBJ_HMAG after P110",
         ],
         "CHARA": [
         ],
@@ -42,6 +42,10 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },"0.6.3": {
+        "VLTI": [
+            "Always use GRAVITY acqTSF.SEQ_INS_SOBJ_HMAG after P110",
         ],
     },"0.6.2": {
         "STATUS": [
