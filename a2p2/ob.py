@@ -2,7 +2,6 @@
 
 __all__ = []
 
-from curses import def_shell_mode
 import logging
 import json
 import xml.etree.ElementTree as ET
