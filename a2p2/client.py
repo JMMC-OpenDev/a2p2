@@ -238,7 +238,7 @@ class A2P2ClientPreferences():
             p=A2P2ClientPreferences()
             versionInPref=p.getA2P2Version()
             if __version__ != versionInPref:
-                print(f"💡 You may try to backup this file (V{versionInPref}) and merge with a new generated one for V{__version__}.")
+                print(f"HINT: You may try to backup this file (V{versionInPref}) and merge with a new generated one for V{__version__}.")
         else:
             import getpass
 
@@ -248,7 +248,7 @@ class A2P2ClientPreferences():
             config['a2p2'] = {}
             s = config['a2p2']
             s['# A2P2 SECTION'] = ""
-            s['# = > please do not modify next properties unless you handle the possible cAtAstrOphE 🔥 ? <'] = ""
+            s['# = > please do not modify next properties <'] = ""
             s['version'] = __version__
 
 
