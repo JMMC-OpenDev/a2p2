@@ -34,9 +34,9 @@ class CharaFacility(Facility):
         if charaServer :
             try:
                 requests.post(charaServer, json=ob.as_dict())
-                self.a2p2client.ui.addToLog("OB sent to remote server queue")
+                self.a2p2client.ui.addToLog(f"OB sent to remote server queue")
             except:
-                self.a2p2client.ui.addToLog("Can't send OB to remote server queue")
+                self.a2p2client.ui.addToLog(f"Can't send OB to remote server queue, please check access to server {charaServer}")
 
 
 
