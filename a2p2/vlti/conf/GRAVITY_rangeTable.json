@@ -37,7 +37,11 @@
         "SEQ.INS.SOBJ.Y":             {"default": 0, "min": -60000, "max": 60000},
 
         "SEQ.MET.MODE":               {"default": "ON", "list": ["ON", "OFF"]},
-        "TEL.TARG.PARALLAX":          {"default": 0, "min": -20, "max": 20}
+        "TEL.TARG.PARALLAX":          {"default": 0, "min": -20, "max": 20},
+
+
+
+        "SEQ.FI.HMAG":                {"default": 0, "min": -10, "max": 25}
     },
     "GRAVITY_single_obs_exp.tsf,GRAVITY_single_obs_calibrator.tsf,GRAVITY_dual_obs_exp.tsf,GRAVITY_dual_obs_calibrator.tsf":
     {
