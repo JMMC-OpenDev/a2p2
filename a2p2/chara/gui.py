@@ -116,7 +116,7 @@ AO Flat Star:
             if self.get(oc,'observationConstraints'):
                 buffer += ", ".join(oc.observationConstraints.LSTinterval) + "\n"
             else:
-                buffer += " NOT OBSERVABLE \n"
+                buffer += "                   NOT OBSERVABLE \n"
             buffer += "Object:\n"
             fluxes = ", ".join([e[0] + "=" + e[1]
                                 for e in ob.getFluxes(sct).items()])
@@ -151,9 +151,9 @@ AO Flat Star:
             # Display Extra_Informations if any
             if extrainfos:
                 buffer += "Extra_infos:\n"
-                fields = extrainfos.field
+                fields = extrainfos._fields
                 for field in fields:
-                    buffer += f" - {field.name}={field.value}\n"
+                    buffer += f" - {field}={self.get(extrainfos,field)}\n"
 
             buffer += _HR
 
