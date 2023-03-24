@@ -55,23 +55,42 @@ def normalizeObj(obj):
                 normalizeObj(v)
                 obj[k]=[v]
             elif k=='EXTRA_INFORMATIONS':
-                print(f"Updating dict {k} was : {obj[k]}")
-                # replace fields by dict entries
+                #print(f"Updating dict {k} was : {obj[k]}")
+                # normalize input that may have various form on list of dict
                 try:
-                    fields = obj[k]["parameter"]+obj[k]["field"]
+                    fields=[]
+                    funits={}
+                    for fk in ["parameter","field"]:
+                        if fk in obj[k]:
+                            l=obj[k][fk].copy()
+                            #print(f"'{fk}' => {l}\n({type(l)})\n")
+                            if type(l) is dict:
+                                fields.append(l)
+                            else:
+                                fields+=l
+
+                    #print(f"Fields to update: {fields}")
+                    #store new fields
                     for vn in fields:
                         fname=vn["name"]
                         # test if we have to normalize field name that will become a python field
-                        if fname.isidentifier():
-                            obj[k][fname]=vn["value"]
-                        else:
+                        if not fname.isidentifier():
                             # replace unvalid chars by _ and append F to avoid starting by _
-                            nfname=re.sub('^_','F_', re.sub('\W|^(?=\d)','_', fname))
-                            obj[k][nfname]=vn["value"]
-
-
-                    del obj[k]["field"]
+                            fname=re.sub('^_','F_', re.sub('\W|^(?=\d)','_', fname))
+                        obj[k][fname]=vn["value"]
+                        if "unit" in vn:
+                            funits[fname]=vn["unit"]
+                    #store units
+                    obj[k]["field_units"]=funits
+                    # remove old arrays or dicts
+                    for fk in ["parameter","field"]:
+                        if fk in obj[k]:
+                            del obj[k][fk]
+                            pass
                 except:
+                    import traceback
+                    print (traceback.format_exc())
+                    print(f"\nCan't read {v}")
                     pass
             else:
                 normalizeObj(v)
