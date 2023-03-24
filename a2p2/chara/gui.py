@@ -113,7 +113,10 @@ AO Flat Star:
             ftt = self.get(oc, "FTTarget")
             aot = self.get(oc, "AOTarget")
 
-            buffer += oc.observationConstraints.LSTinterval + "\n"
+            if self.get(oc,'observationConstraints'):
+                buffer += ", ".join(oc.observationConstraints.LSTinterval) + "\n"
+            else:
+                buffer += " NOT OBSERVABLE \n"
             buffer += "Object:\n"
             fluxes = ", ".join([e[0] + "=" + e[1]
                                 for e in ob.getFluxes(sct).items()])
@@ -148,8 +151,9 @@ AO Flat Star:
             # Display Extra_Informations if any
             if extrainfos:
                 buffer += "Extra_infos:\n"
-                for field in extrainfos._fields:
-                    buffer += "- " + field + "=" + getattr(extrainfos,field) +"\n"
+                fields = extrainfos.field
+                for field in fields:
+                    buffer += f" - {field.name}={field.value}\n"
 
             buffer += _HR
 
