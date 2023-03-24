@@ -1,4 +1,4 @@
-__version__ = "0.6.5"
+__version__ = "0.6.6"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,7 +21,7 @@ __release_notes__ = {
     #
     #        ],
     #    },
-     "0.6.5": {
+     "0.6.6": {
         "STATUS": [
         ],
         "A2P2": [
@@ -29,7 +29,7 @@ __release_notes__ = {
         "VLTI": [
         ],
         "CHARA": [
-            "Experimental: forward OBs through json payload to the location defined in preference",
+            "Fix formating of OB supporting array of observability time intervals",
         ],
         "TODO-SCIENCE": [
             "Merge AO or GS in a same code section for every instruments",
@@ -42,6 +42,10 @@ __release_notes__ = {
             "Unify ob name creation in vlti instrument createOB()",
             "Complete test suite with real p2 submission",
             "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+        ],
+    },"0.6.5": {
+        "CHARA": [
+            "Experimental: forward OBs through json payload to the location defined in preference",
         ],
     },"0.6.4": {
         "STATUS": [

@@ -32,8 +32,12 @@ class CharaFacility(Facility):
         # forward message if a server is present in the preferences
         charaServer=self.a2p2client.preferences.getCharaQueueServer()
         if charaServer :
-            print ("fire")
-            requests.post(charaServer, json=ob.as_dict())
+            try:
+                requests.post(charaServer, json=ob.as_dict())
+                self.a2p2client.ui.addToLog("OB sent to remote server queue")
+            except:
+                self.a2p2client.ui.addToLog("Can't send OB to remote server queue")
+
 
 
     def consumeOB(self, ob):
