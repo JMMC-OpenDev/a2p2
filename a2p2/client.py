@@ -259,6 +259,13 @@ class A2P2ClientPreferences():
             s['#login'] = "my.email@my.lab"
             s['#password'] = "12345zZ"
 
+            config['chara'] = {}
+            s = config['chara']
+            s['# CHARA SECTION'] = ""
+            s['# = > please uncomment and update next properties to make it active <'] = ""
+            s['# = > queueserver may be uncommented to forward OB to a remote server instead <'] = ""
+            s['#queueserver'] = "http://localhost:2468/test"
+
             config['p2'] = {}
             s=config['p2']
             s['# ESO P2 SECTION'] = ""
@@ -313,6 +320,10 @@ class A2P2ClientPreferences():
 
     def getJmmcPassword(self):
         return self.getConfig("jmmc", "password", None)
+
+    # Retrieve CHARA prefs
+    def getCharaQueueServer(self):
+        return self.getConfig("chara", "queueserver", None)
 
 
     # Retrieve P2 prefs

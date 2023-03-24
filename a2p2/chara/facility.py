@@ -4,6 +4,7 @@ __all__ = []
 
 from a2p2.chara.gui import CharaUI
 from a2p2.facility import Facility
+import requests
 import logging
 
 HELPTEXT = "TODO update this HELP message in a2p2/chara/facility.py"
@@ -27,6 +28,13 @@ class CharaFacility(Facility):
 
         # give focus on last updated UI
         self.a2p2client.ui.showFacilityUI(self.charaUI)
+
+        # forward message if a server is present in the preferences
+        charaServer=self.a2p2client.preferences.getCharaQueueServer()
+        if charaServer :
+            print ("fire")
+            requests.post(charaServer, json=ob.as_dict())
+
 
     def consumeOB(self, ob):
         # for the prototype: just delegate handling to the GUI

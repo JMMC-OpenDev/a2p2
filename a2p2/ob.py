@@ -124,6 +124,9 @@ class OB():
         # store normalized source for str repr
         self.ds = ds
 
+    def as_dict(self):
+        return self.ds
+
     def getFluxes(self, target):
         """
         Return a flux mesurements as dict (ordered dict by BVRIJHK ).
