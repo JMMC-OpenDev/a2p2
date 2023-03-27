@@ -25,5 +25,5 @@ def status():
     return jsonify(data), 200
 
 
-app.run(host="localhost", port=2468, debug=True)
+app.run(host="0.0.0.0", port=2468, debug=True)
 
