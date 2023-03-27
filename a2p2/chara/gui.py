@@ -42,6 +42,10 @@ class CharaUI(FacilityUI):
         else:
             return None
 
+    def display(self, msg):
+        self.text.insert(END, msg)
+
+
     def displayOB(self, ob):
         try:
             buffer = self.extractReport(ob)
@@ -151,9 +155,7 @@ AO Flat Star:
             # Display Extra_Informations if any
             if extrainfos:
                 buffer += "Extra_infos:\n"
-                fields = extrainfos._fields
-                for field in fields:
-                    buffer += f" - {field}={self.get(extrainfos,field)}\n"
+                buffer += ", ".join([f"{field}={self.get(extrainfos,field)}" for field in extrainfos._fields])
 
             buffer += _HR
 
