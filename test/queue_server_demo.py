@@ -3,14 +3,27 @@
 # use pip install flask if not present
 #
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
+import socket
+from datetime import datetime
 app = Flask(__name__)
-r=0
+
 @app.route('/test', methods=['POST'])
 def result():
-    print(f"data: {request.get_data()}") 
-    print(f"json: {request.get_json()}") 
-    return 'Received !' # response to your request.
+    print(f"json OB :\n {request.get_json()}") 
+    return 'Received !' # next job is to handle it !
+
+
+@app.route('/test', methods=['GET'])
+def status():
+    data= {
+            "service": "OB2 - OBBroker",
+            "version": 0.1,
+            "datetime": datetime.now().isoformat(),
+            "hostname": socket.gethostname(),
+            }
+    return jsonify(data), 200
+
 
 app.run(host="localhost", port=2468, debug=True)
 
