@@ -1,4 +1,4 @@
-__version__ = "0.6.6"
+__version__ = "0.6.8"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,28 +21,36 @@ __release_notes__ = {
     #
     #        ],
     #    },
-     "0.6.6": {
-        "STATUS": [
-        ],
-        "A2P2": [
-        ],
-        "VLTI": [
-        ],
-        "CHARA": [
-            "Fix formating of OB supporting array of observability time intervals",
-        ],
-        "TODO-SCIENCE": [
-            "Merge AO or GS in a same code section for every instruments",
-            "Check DIT table from the last template user manuals (especially MATISSE) and remove PIONIER's one",
-            "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values?",
-        ],
-        "TODO-DEV": [
-            "Support multiple period version (two major at least)",
-            "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
-            "Unify ob name creation in vlti instrument createOB()",
-            "Complete test suite with real p2 submission",
-            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
-        ],
+    "0.6.8": {
+       "STATUS": [
+       ],
+       "A2P2": [
+           "increase astropy version to avoid a dependency issue with numy"
+       ],
+       "VLTI": [
+       ],
+       "CHARA": [
+       ],
+       "TODO-SCIENCE": [
+           "Merge AO or GS in a same code section for every instruments",
+           "Check DIT table from the last template user manuals (especially MATISSE) and remove PIONIER's one",
+           "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values?",
+       ],
+       "TODO-DEV": [
+           "Support multiple period version (two major at least)",
+           "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
+           "Unify ob name creation in vlti instrument createOB()",
+           "Complete test suite with real p2 submission",
+           "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+       ],
+    }, "0.6.7": {
+       "CHARA": [
+           "Enhance information  while using OB2 server prototype",
+       ]
+     }, "0.6.6": {
+       "CHARA": [
+           "Fix formating of OB supporting array of observability time intervals",
+       ],
     },"0.6.5": {
         "CHARA": [
             "Experimental: forward OBs through json payload to the location defined in preference",
@@ -58,45 +66,23 @@ __release_notes__ = {
             "Always use GRAVITY acqTSF.SEQ_INS_SOBJ_HMAG after P110",
         ],
     },"0.6.2": {
-        "STATUS": [
-        ],
-        "A2P2": [
-        ],
         "VLTI": [
             "Fix GRAVITY gen acq tsf",
         ],
-        "CHARA": [
-        ],
     },"0.6.1": {
-        "STATUS": [
-        ],
-        "A2P2": [
-        ],
         "VLTI": [
             "Updated configuration for ESO P111",
-        ],
-        "CHARA": [
-        ],
+        ]
     },"0.6.0": {
-        "STATUS": [
-        ],
         "A2P2": [
             "Read Extra_informations from last Aspro2 OBXML"
         ],
     },"0.5.3": {
-        "STATUS": [
-        ],
-        "A2P2": [
-        ],
         "VLTI": [
             "Update DIT tables to last instrument template (version is stored in the table config to report warning)",
             "Do not stop OB creation if K mag is out of range during DIT calculation but show a warning and ask to proceed or abort",
-        ],
-        "CHARA": [
-        ],
+        ]
     },"0.4.6": {
-        "STATUS": [
-        ],
         "A2P2": [
             "Huge speedup of ESO P2 runs treeview",
             "Explicit SAMP unregister reduce risk of SAMP ghosts",
@@ -104,8 +90,6 @@ __release_notes__ = {
         "VLTI": [
             "Check consistency between Aspro2 inteferometer period and RUN's IP version",
             "Handle use SEQ.INS.SOBJ.HMAG after P110 instead of SEQ.FI.HMAG",
-        ],
-        "CHARA": [
         ],
     },"0.4.5": {
         "A2P2": [

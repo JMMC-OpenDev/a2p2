@@ -24,7 +24,7 @@ setup(
     # we continue moving tk as first gui backend
     # install_requires=['astropy', 'p2api', 'python-tk'] + (['pygtk'] if
     # platform.startswith("win") else []),
-    install_requires=['astropy>=4.3.1', 'p2api', 'appdirs'],
+    install_requires=['astropy>=5.2.2', 'p2api', 'appdirs'],
     url='http://www.jmmc.fr/a2p2',
     author='JMMC Tech Group',
     author_email='jmmc-tech-group@jmmc.fr',
