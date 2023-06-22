@@ -44,9 +44,15 @@ class VltiUI(FacilityUI):
     def showLoginFrame(self, ob):
         self.ob = ob
         self.addToLog(
-            "Sorry, your %s OB can't be submitted, please log in first, select container and send OB again from Aspro2." %
+            "Sorry, your %s OB can't be submitted, please log in first, select container and press submit button." %
             (ob.instrumentConfiguration.name))
         self.loginFrame.tkraise()
+
+    def isBusy(self):
+        self.tree.configure(selectmode='none')
+
+    def isIdle(self):
+        self.tree.configure(selectmode='browse')
 
     def showTreeFrame(self, ob=None):
         if ob:
@@ -128,8 +134,10 @@ class VltiUI(FacilityUI):
         if len(ret['values']) > 0:
             self.facility.containerInfo.store(
                 self.treeItemToRuns[curItem], self.treeItemToP2Items[curItem])
+            self.facility.tryLastOB()
 
     def on_tree_open(self, selection):
+        logger.debug(f"tree open: {selection}")
         curItem = self.tree.focus()
         curChildren = self.tree.get_children(curItem)
         firstChild = curChildren[0]
@@ -141,27 +149,26 @@ class VltiUI(FacilityUI):
             parentContainerID = parentContainer['containerId']
             self.updateTree(parentRun, parentContainerID)
 
-    def isBusy(self):
-        self.tree.configure(selectmode='none')
-
-    def isIdle(self):
-        self.tree.configure(selectmode='browse')
-
-
+    def showOBConfirmationButtons(self,ob=None):
+        if not(ob):
+            self.treeFrame.enable_buttons(False)
+            return
+        else:
+            self.treeFrame.enable_buttons(True)
 class TreeFrame(Frame):
 
     def __init__(self, vltiUI):
         Frame.__init__(self, vltiUI.container)
         self.vltiUI = vltiUI
-
         subframe = Frame(self)
 
+        treeframe = Frame(subframe)
         self.tree = ttk.Treeview(
-            subframe, columns=('Project ID'))  # , 'instrument'))#, 'folder ID'))
+            treeframe, columns=('Project ID'), selectmode='browse')  # , 'instrument'))#, 'folder ID'))
         ysb = ttk.Scrollbar(
-            subframe, orient='vertical', command=self.tree.yview)
+            treeframe, orient='vertical', command=self.tree.yview)
         xsb = ttk.Scrollbar(
-            subframe, orient='horizontal', command=self.tree.xview)
+            treeframe, orient='horizontal', command=self.tree.xview)
 
         self.tree.configure(yscroll=ysb.set, xscroll=xsb.set)
         self.tree.heading('#0', text='Project ID', anchor='w')
@@ -170,7 +177,7 @@ class TreeFrame(Frame):
         self.tree.bind(
             '<<TreeviewOpen>>', self.vltiUI.on_tree_open)
         self.tree.bind(
-            '<ButtonRelease-1>', self.vltiUI.on_tree_selection_changed)
+            '<<TreeviewSelect>>', self.vltiUI.on_tree_selection_changed)
 
         # grid layout does not expand and fill all area then move to pack
         #       self.tree.grid(row=0, column=0, sticky='nsew')
@@ -180,9 +187,37 @@ class TreeFrame(Frame):
         ysb.pack(side=RIGHT, fill="y")
         # xsb.pack(side=BOTTOM, fill="y") # will probably require to add
         # another 2 frames
+        treeframe.pack(side=TOP, fill=BOTH, expand=True)
+
+        buttonframe = Frame(subframe)
+        self.abortButton = Button(buttonframe, text="Abort this OB",  command=self.on_abortbutton_clicked, state=DISABLED)
+        self.submitButton = Button(buttonframe, text="Submit", command=self.on_submitbutton_clicked, state=DISABLED)
+        self.abortButton.grid(row=0,column=0)
+        self.submitButton.grid(row=0,column=2)
+        buttonframe.pack(side=RIGHT)
 
         subframe.pack(side=TOP, fill=BOTH, expand=True)
 
+    def enable_buttons(self, flag):
+        if flag:
+            flag=NORMAL
+        else:
+            flag=DISABLED
+        self.submitButton["state"]=flag
+        self.abortButton["state"]=flag
+
+        # leave abort button always active to let user remove in case of error
+        if self.vltiUI.facility.hasOB():
+            self.abortButton["state"]=NORMAL
+
+
+    def on_submitbutton_clicked(self):
+        self.vltiUI.facility.popOB()
+        self.enable_buttons(False)
+
+    def on_abortbutton_clicked(self):
+        self.vltiUI.facility.popOB(ignore=True)
+        self.enable_buttons(False)
 
 class LoginFrame(Frame):
 

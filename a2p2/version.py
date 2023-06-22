@@ -1,4 +1,4 @@
-__version__ = "0.6.8"
+__version__ = "0.6.9"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,13 +21,14 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.6.8": {
+    "0.6.9": {
        "STATUS": [
        ],
        "A2P2": [
-           "increase astropy version to avoid a dependency issue with numy"
        ],
        "VLTI": [
+            "OB's tree list selection mode limited to a single selection",
+            "OB are stacked if Aspro2 send an OB without proper tree selection"
        ],
        "CHARA": [
        ],
@@ -40,10 +41,14 @@ __release_notes__ = {
            "Support multiple period version (two major at least)",
            "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
            "Unify ob name creation in vlti instrument createOB()",
-           "Complete test suite with real p2 submission",
+           "Complete test suite with more real p2 submissions",
            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
        ],
-    }, "0.6.7": {
+    },"0.6.8": {
+       "A2P2": [
+           "increase astropy version to avoid a dependency issue with numy"
+       ],
+    },"0.6.7": {
        "CHARA": [
            "Enhance information  while using OB2 server prototype",
        ]

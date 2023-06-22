@@ -83,6 +83,10 @@ class VltiFacility(Facility):
         self.username = None
         self.api = None
 
+        # store ob to insert after container selection if not done previously
+        self.ob_todo=[]
+
+
     def getName():
         return "VLTI"
 
@@ -99,15 +103,80 @@ class VltiFacility(Facility):
         self.ui.addToLog(str(ob), False)
 
         # OB is checked and submitted by instrument
-        instrument = self.getInstrument(ob.instrumentConfiguration.name)
         period = ob.getPeriod()
-        self.ui.addToLog(f"Request OB creation for P{period}")
+        self.ui.addToLog(f"Request received for OB creation for P{period}")
+
+        # always stores OB and pop them if everything is ok or later selecting containers in the tree
+        self.pushOB(ob)
+        self.tryLastOB()
+
+    def tryLastOB(self):
+        self.showOBConfirmationButtons()
+        # stop if no ob has to be handled
+        if not self.hasOB():
+            return
+
+        ob = self.ob_todo[-1]
+        # run checkOB which may raise some error before connection request
+        # TODO we should test much more because lot of stuff still are beeing processed on live ob creations
+
+        period = ob.getPeriod()
+        instrument = self.getInstrument(ob.instrumentConfiguration.name)
+        insname = instrument.getShortName()
+
+        # performs operation
+        if not self.isConnected():
+            self.ui.showLoginFrame(ob)
+        elif not self.isReadyToSubmit(ob):
+            # self.a2p2client.ui.addToLog("Receive OB for
+            # '"+ob.instrumentConfiguration.name+"'")
+            self.ui.addToLog(
+                f"Selected folder must not be a concatenation. please choose another container for '{insname}' P'{period}'.")
+        elif  insname.lower() != self.containerInfo.getInstrument().lower():
+            self.ui.addToLog(
+                f"'{self.containerInfo.getInstrument()}' selection in not applicable for received OB. Please choose another one for '{insname}' P'{period}'.")
+        elif  period != int(self.containerInfo.getIpVersion()):
+            self.ui.addToLog(
+                f"Container's IpVersion '{int(self.containerInfo.getIpVersion())}' is not applicable for received OB's one '{period}', please select another '{insname}' container or change it in Aspro2.")
+        else:
+            self.showOBConfirmationButtons(ob)
+
+    def showOBConfirmationButtons(self, ob=None):
+        self.ui.showOBConfirmationButtons(ob)
+
+    def isReadyToSubmit(self, ob):
+        return self.api and self.containerInfo.isOk(ob)
+
+    def isConnected(self):
+        return self.connected
+
+    def setConnected(self, flag):
+        self.connected = flag
+
+    def pushOB(self,ob):
+        self.ob_todo.append(ob)
+
+    def hasOB(self):
+        return len(self.ob_todo)>0
+
+    def popOB(self, ignore=False):
+        """ Called as last step : ob is for the selected container and User click on submit!
+        If ignore is set to True, last ob is simply removed else it is forwarded to P2 and removed from stack. """
+
+        if not self.hasOB():
+            return
+
+        # pop last OB
+        o = self.ob_todo.pop()
+        self.showOBConfirmationButtons()
+
+        if ignore:
+            self.ui.addToLog("Last received OB has been aborted")
+            return
 
         try:
-            # run checkOB which may raise some error before connection request
-            # TODO we should test much more because lot of stuff still are beeing processed on live ob creations
-
-            instrument.checkOB(ob)
+            instrument = self.getInstrument(o.instrumentConfiguration.name)
+            instrument.checkOB(o)
             # check for warnings and abort if requested by user
             if len(instrument.warnings)>0:
                 linesep="\n  -  "
@@ -118,27 +187,11 @@ class VltiFacility(Facility):
                     self.ui.addToLog("Submission has been marked to be aborted - do not proceed")
                     return
 
-            insname = instrument.getShortName()
+            self.ui.addToLog("Everything ready! Request OB creation inside selected container")
+            #instrument.submitOB(o, self.containerInfo)
 
-            # performs operation
-            if not self.isConnected():
-                self.ui.showLoginFrame(ob)
-            elif not self.isReadyToSubmit(ob):
-                # self.a2p2client.ui.addToLog("Receive OB for
-                # '"+ob.instrumentConfiguration.name+"'")
-                self.ui.addToLog(
-                    f"Please select a {insname}'s folder (not a concatenation) in the above list to submit your science object (OBs are not shown).")
-            elif  insname.lower() != self.containerInfo.getInstrument().lower():
-                self.ui.ShowErrorMessage(f"Aborting: container's instrument '{self.containerInfo.getInstrument()}' in not applicable for received OB's one '{insname}'.")
-            elif  period != int(self.containerInfo.getIpVersion()):
-                self.ui.ShowErrorMessage(f"Aborting: container's IpVersion '{self.containerInfo.getIpVersion()}' in not applicable for received OB's one '{period}', please change it in Aspro2.")
-            else:
-                self.ui.addToLog("Everything ready! Request OB creation inside selected container")
-                instrument.submitOB(ob, self.containerInfo)
-
-
-        # TODO add P2Error handling P2Error(r.status_code, method, url,
-        # r.json()['error'])
+            # TODO add P2Error handling P2Error(r.status_code, method, url,
+            # r.json()['error'])
         except ValueError as e:
             traceback.print_exc()
             trace = traceback.format_exc(limit=1)
@@ -160,18 +213,12 @@ class VltiFacility(Facility):
             self.ui.addToLog(trace, False)
             self.ui.setProgress(0)
 
-    def isReadyToSubmit(self, ob):
-        return self.api and self.containerInfo.isOk(ob)
-
-    def isConnected(self):
-        return self.connected
-
-    def setConnected(self, flag):
-        self.connected = flag
-
     def getStatus(self):
+        ob_info=""
+        if self.hasOB():
+            ob_info=f" / {len(self.ob_todo)} OB in stack"
         if self.isConnected():
-            return " P2API(%s) connected with %s" % ( self.apitype, self.username )
+            return f" P2API({self.apitype}) connected with {self.username} { ob_info }"
 
     def connectAPI(self, username, password, ob):
         if username == TUTORIAL_LOGIN: # or username == JMMC_LOGIN:
@@ -239,9 +286,15 @@ class P2Container:
         self.containerId = item['containerId']
         self.log()
 
+    def reset(self):
+        self.run = None  # dict returned by p2api
+        self.containerId = None
+        self.item = None
+
     def log(self):
         logmsg = f"*** Working with {self} ***"
         if self.run != self.item and self.item['itemType'] == ITEMTYPE_CONCATENATION:
+            self.reset()
             self.facility.ui.addToLog(
                 "*** Please do not select a Concatenation and select another container. Or just append a calibrator. ***")
             logger.info(logmsg)
