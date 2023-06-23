@@ -18,6 +18,7 @@ else:
 
 logger = logging.getLogger(__name__)
 
+
 class VltiUI(FacilityUI):
 
     def __init__(self, a2p2client):
@@ -39,7 +40,7 @@ class VltiUI(FacilityUI):
         self.treeItemToRuns = {}
         self.treeItemToP2Items = {}
 
-        self.ob=None
+        self.ob = None
 
     def showLoginFrame(self, ob):
         self.ob = ob
@@ -59,7 +60,8 @@ class VltiUI(FacilityUI):
             instrum = ob.instrumentConfiguration.name
         else:
             instrum = "incoming"
-        self.addToLog("Please select a runId in ESO P2 database to process %s OB" % instrum )
+        self.addToLog(
+            "Please select a runId in ESO P2 database to process %s OB" % instrum)
         self.treeFrame.tkraise()
 
     def fillTree(self, runs):
@@ -82,7 +84,8 @@ class VltiUI(FacilityUI):
                 self._insertInTree('', run['progId'], cid, run, run)
 
     def updateTree(self, run, containerId):
-        logger.debug(f"updateTree with run : {run}\n and containerId: {containerId}")
+        logger.debug(
+            f"updateTree with run : {run}\n and containerId: {containerId}")
         items, _ = self.facility.api.getItems(containerId)
         logger.debug(f"sub items are {items}")
         logger.debug(f"item keys in tree: {self.treeItemToP2Items.keys()}")
@@ -92,17 +95,18 @@ class VltiUI(FacilityUI):
                     logger.debug(f"Item {item['containerId']} already in tree")
                 else:
                     logger.debug(f"adding in tree : {item}")
-                    self._insertInTree(containerId, item['name'], item['containerId'], run, item)
+                    self._insertInTree(
+                        containerId, item['name'], item['containerId'], run, item)
             else:
                 logger.debug(f"not inserted in tree : {item}")
         # TODO get children of our tree and remove part non present in items
 
     def selectTreeItem(self, containerId):
-        item=str(containerId)
+        item = str(containerId)
         self.tree.selection_set(item)
         self.tree.see(item)
-        self.facility.containerInfo.store(self.treeItemToRuns[item], self.treeItemToP2Items[item])
-
+        self.facility.containerInfo.store(
+            self.treeItemToRuns[item], self.treeItemToP2Items[item])
 
     def _insertInTree(self, parentContainerID, name, containerID, run, item):
         instrument = run['instrument']
@@ -123,7 +127,8 @@ class VltiUI(FacilityUI):
 
         # add a dummy child so we can show to the user he has to walk into the tree
         if run['itemCount'] > 0:
-            self.tree.insert(containerID, 'end', f"{containerID}_fillme", values=[])
+            self.tree.insert(containerID, 'end',
+                             f"{containerID}_fillme", values=[])
         # return new tree item
         return e
 
@@ -149,12 +154,16 @@ class VltiUI(FacilityUI):
             parentContainerID = parentContainer['containerId']
             self.updateTree(parentRun, parentContainerID)
 
-    def showOBConfirmationButtons(self,ob=None):
-        if not(ob):
+    def showOBConfirmationButtons(self, ob=None):
+        if not (ob):
             self.treeFrame.enable_buttons(False)
             return
         else:
             self.treeFrame.enable_buttons(True)
+
+    def getIssVltitypeVars(self):
+        return self.treeFrame.issVltiTypeCheckboxesVars
+
 class TreeFrame(Frame):
 
     def __init__(self, vltiUI):
@@ -189,27 +198,50 @@ class TreeFrame(Frame):
         # another 2 frames
         treeframe.pack(side=TOP, fill=BOTH, expand=True)
 
+        # Control button Panel to abort /submit or provide more information to the current OB
         buttonframe = Frame(subframe)
-        self.abortButton = Button(buttonframe, text="Abort this OB",  command=self.on_abortbutton_clicked, state=DISABLED)
-        self.submitButton = Button(buttonframe, text="Submit", command=self.on_submitbutton_clicked, state=DISABLED)
-        self.abortButton.grid(row=0,column=0)
-        self.submitButton.grid(row=0,column=2)
+
+        psection = "p2.iss.vltitype"
+        pvltitypes = self.vltiUI.facility.a2p2client.preferences.getConfigKeys(
+            psection)
+
+        poffset=0
+        if len(pvltitypes)==0:
+            poffset=1
+
+        cindex = 0
+        self.issVltiTypeCheckboxesVars = {}
+        for isvt in self.vltiUI.facility.getIssVltiTypes():
+            boolv = BooleanVar()
+            self.issVltiTypeCheckboxesVars[isvt]=boolv
+            boolv.set( isvt in pvltitypes or len(pvltitypes)==0 )
+            logger.debug(f"Set prefrence value for {isvt} : {boolv.get()}")
+            cb = Checkbutton(buttonframe, text=isvt, variable=boolv, onvalue=True, offvalue=False)
+            cb.grid(row=0, column=cindex)
+            cindex += 1
+
+        self.abortButton = Button(buttonframe, text="Abort this OB",
+                                  command=self.on_abortbutton_clicked, state=DISABLED)
+        self.submitButton = Button(
+            buttonframe, text="Submit", command=self.on_submitbutton_clicked, state=DISABLED)
+        self.abortButton.grid(row=0, column=cindex)
+        cindex += 1
+        self.submitButton.grid(row=0, column=cindex)
         buttonframe.pack(side=RIGHT)
 
         subframe.pack(side=TOP, fill=BOTH, expand=True)
 
     def enable_buttons(self, flag):
         if flag:
-            flag=NORMAL
+            flag = NORMAL
         else:
-            flag=DISABLED
-        self.submitButton["state"]=flag
-        self.abortButton["state"]=flag
+            flag = DISABLED
+        self.submitButton["state"] = flag
+        self.abortButton["state"] = flag
 
         # leave abort button always active to let user remove in case of error
         if self.vltiUI.facility.hasOB():
-            self.abortButton["state"]=NORMAL
-
+            self.abortButton["state"] = NORMAL
 
     def on_submitbutton_clicked(self):
         self.vltiUI.facility.popOB()
@@ -218,6 +250,7 @@ class TreeFrame(Frame):
     def on_abortbutton_clicked(self):
         self.vltiUI.facility.popOB(ignore=True)
         self.enable_buttons(False)
+
 
 class LoginFrame(Frame):
 

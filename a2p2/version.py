@@ -28,7 +28,8 @@ __release_notes__ = {
        ],
        "VLTI": [
             "OB's tree list selection mode limited to a single selection",
-            "OB are stacked if Aspro2 send an OB without proper tree selection"
+            "OB are stacked if Aspro2 send an OB without proper tree selection. stacked OB can be submitted after proper container selection or cancelled",
+            "Provide checkboxes of types of interferometric observations to complete full OB"
        ],
        "CHARA": [
        ],

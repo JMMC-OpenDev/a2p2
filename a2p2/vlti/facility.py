@@ -188,7 +188,7 @@ class VltiFacility(Facility):
                     return
 
             self.ui.addToLog("Everything ready! Request OB creation inside selected container")
-            #instrument.submitOB(o, self.containerInfo)
+            instrument.submitOB(o, self.containerInfo)
 
             # TODO add P2Error handling P2Error(r.status_code, method, url,
             # r.json()['error'])
@@ -260,6 +260,10 @@ class VltiFacility(Facility):
         returns the configuration directory with instrument's json files
         """
         return CONFDIR
+
+    def getIssVltiTypes(self):
+        return ['snapshot','imaging','time-series','astrometry']
+
 
 
 # TODO Move code out of this class
