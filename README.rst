@@ -1,4 +1,4 @@
-a2p2 |A2P2Badge| 
+a2p2 |A2P2Badge|
 ================
 
 **Move your Aspro2 observation details to an observatory proposal database.**
@@ -8,7 +8,7 @@ Description
 
 Prepare your observations within Aspro2_ ( V0.9.9.3+ ) and run a2p2_ to submit your OB.
 
-Once setup ready, select your target and use Interop Menu 
+Once setup ready, select your target and use Interop Menu
 
 CHARA OB are only displayed in the GUI for the first implementations.
 
@@ -24,19 +24,24 @@ The package is uploaded to `PyPI`_, so you can install the package (and/or upgra
 
    ``pip install --upgrade [--user] a2p2``
 
+We advice to use python environment. Prefer to use the ``--user`` option over running sudo that can break you system modules.
 
 You can also build and install from sources using git:
 
-    ``git clone https://github.com/JMMC-OpenDev/a2p2.git``
-    
-    ``pip install [--user] ./a2p2``
+   ``git clone https://github.com/JMMC-OpenDev/a2p2.git``
+
+   ``pip install [--user] ./a2p2``
+
+or pip :
+
+   ``pip install git+https://github.com/JMMC-OpenDev/a2p2``
 
 Prerequisites
 -------------
 Some basic tests have been operated on windows, Linux and Mac OS. pytest-datafiles must be installed previously.
 
 
-a2p2 should launch the program. 
+a2p2 should launch the program.
 
 You may have to install some package to run tk GUI (``python-tk`` on linux).
 
@@ -51,15 +56,15 @@ optional arguments:
  -c, --createprefs                 Create preferences file
  -v, --verbose                     Verbose
 
-A GUI is provided using tkinter. 
+A GUI is provided using tkinter.
 
 Once Aspro2_ is running and a2p2_ is connected to an OB submission service (using P2API_) :
- * select your target 
- * enter the Aspro2's menu ``Interop/Send Obs. block(s) to A2p2`` 
+ * select your target
+ * enter the Aspro2's menu ``Interop/Send Obs. block(s) to A2p2``
 
 After few seconds, you shoud get a report of your new submission.
 
-Each facilities get it's own code directory to manage specific GUI and specific OB processing. You can get associated inline help in the **HELP** tab. 
+Each facilities get it's own code directory to manage specific GUI and specific OB processing. You can get associated inline help in the **HELP** tab.
 
 Please fill an issue_ for any question, remark or enhancement request.
 
