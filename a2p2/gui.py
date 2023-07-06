@@ -19,6 +19,8 @@ else:
 
 from distutils.version import LooseVersion
 
+import signal
+
 HELPTEXT = """This application provides the link between ASPRO (that you should have started) and interferometers facilities.
 
 """
@@ -44,6 +46,8 @@ class MainWindow():
             print("Can not set tk scaling !")
 
         self.window.protocol("WM_DELETE_WINDOW", self._requestAbort)
+        # throws an exception self.window.bind_all('<Control-c>', self._requestAbort) # maybe already bound with WM_DELETE_WINDOW ?
+        signal.signal(signal.SIGINT, self._requestAbortSignal)
 
         self.notebook = ttk.Notebook(self.window)
 
@@ -95,6 +99,10 @@ class MainWindow():
 
     def _requestAbort(self):
         self.requestAbort = True
+
+    def _requestAbortSignal(self, arg1,arg2):
+        self.requestAbort = True
+
 
     def addHelp(self, tabname, txt):
         frame = Frame(self.helptabs)
