@@ -33,7 +33,7 @@ class Pionier(VltiInstrument):
 
         instrumentMode = instrumentConfiguration.instrumentMode
 
-        # Retrieve SPEC and POL info from instrumentMode
+        # Retrieve GRISM or FREE info from instrumentMode
         for disp in self.getRange("PIONIER_acq.tsf", "INS.DISP.NAME"):
             if disp in instrumentMode[0:len(disp)]:
                 ins_disp = disp
@@ -160,29 +160,6 @@ class Pionier(VltiInstrument):
                                      TEL_COU_MAG, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
 
-    def formatRangeTable(self):
-        rangeTable = self.getRangeTable()
-        buffer = ""
-        for l in rangeTable.keys():
-            buffer += l + "\n"
-            for k in rangeTable[l].keys():
-                constraint = rangeTable[l][k]
-                keys = constraint.keys()
-                buffer += ' %30s :' % (k)
-                if 'min' in keys and 'max' in keys:
-                    buffer += ' %f ... %f ' % (
-                        constraint['min'], constraint['max'])
-                elif 'list' in keys:
-                    buffer += str(constraint['list'])
-                elif "spaceseparatedlist" in keys:
-                    buffer += ' ' + " ".join(constraint['spaceseparatedlist'])
-                if 'default' in keys:
-                    buffer += ' (' + str(constraint['default']) + ')'
-                else:
-                    buffer += ' -no default-'
-                buffer += "\n"
-        return buffer
-
     def formatDitTable(self):
         buffer = ' No dit table in use \n'
 
@@ -239,8 +216,6 @@ class Pionier(VltiInstrument):
         # we use obId to populate OB
         ob['obsDescription']['name'] = OBS_DESCR[0:min(len(OBS_DESCR), 31)]
         ob['obsDescription']['userComments'] = self.getA2p2Comments()
-        # ob['obsDescription']['InstrumentComments'] = 'AO-B1-C2-E3' #should be
-        # a list of alternative quadruplets!
 
         # copy target info
         targetInfo = obTarget.getDict()
@@ -261,7 +236,7 @@ class Pionier(VltiInstrument):
         ui.setProgress(0.2)
 
         # then, attach acquisition template(s)
-        tpl, tplVersion = api.createTemplate(obId, 'PIONIER_acq')
+        tpl, tplVersion = api.createTemplate(obId, acqTSF.getP2Name())
         # and put values
         # start with acqTSF ones and complete manually missing ones
         values = acqTSF.getDict()

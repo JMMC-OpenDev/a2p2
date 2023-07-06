@@ -241,29 +241,6 @@ class Gravity(VltiInstrument):
                                     dualField, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
 
-    def formatRangeTable(self):
-        rangeTable = self.getRangeTable()
-        buffer = ""
-        for l in rangeTable.keys():
-            buffer += l + "\n"
-            for k in rangeTable[l].keys():
-                constraint = rangeTable[l][k]
-                keys = constraint.keys()
-                buffer += ' %30s :' % (k)
-                if 'min' in keys and 'max' in keys:
-                    buffer += ' %f ... %f ' % (
-                        constraint['min'], constraint['max'])
-                elif 'list' in keys:
-                    buffer += str(constraint['list'])
-                elif "spaceseparatedlist" in keys:
-                    buffer += ' ' + " ".join(constraint['spaceseparatedlist'])
-                if 'default' in keys:
-                    buffer += ' (' + str(constraint['default']) + ')'
-                else:
-                    buffer += ' -no default-'
-                buffer += "\n"
-        return buffer
-
     def formatDitTable(self):
         ditTable = self.getDitTable()
         buffer = '    Mode     |Spec |  Pol  |Tel |       K       | DIT(s)\n'
