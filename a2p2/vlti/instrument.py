@@ -153,7 +153,7 @@ class VltiInstrument(Instrument):
             return round(float(getattr(target, "FLUX_" + flux)), 3)
         except:
             raise ValueError(
-                f"Missing {flux} flux for target { getattr(target,'name') }")
+                f"Missing {flux} flux for target { getattr(target,'name') }") from None
 
     def getBaselineCode(self, baseline):
         # as of P104
