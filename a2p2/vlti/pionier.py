@@ -185,17 +185,6 @@ class Pionier(VltiInstrument):
 #            Hut = ditTable[tel]['Hut']
         return buffer
 
-    def getPionierTemplateName(self, templateType, OBJTYPE):
-        objType = "calibrator"
-        if OBJTYPE and "SCI" in OBJTYPE:
-            objType = "science"
-        if OBJTYPE:
-            return "_".join((self.getName(), templateType, objType))
-        return "_".join((self.getName(), templateType))
-
-    def getPionierObsTemplateName(self, OBJTYPE):
-        return self.getPionierTemplateName("obs", OBJTYPE)
-
     def createPionierOB(
             self, p2container, obTarget, obConstraints, acqTSF, obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode,
             LSTINTERVAL):
