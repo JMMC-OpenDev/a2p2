@@ -110,6 +110,12 @@ class Pionier(VltiInstrument):
                 # no PMRA, PMDE for GS !!
                 TEL_COU_MAG = float(gsTarget.FLUX_V)
 
+            acqTSF.TEL_COU_GSSOURCE = TEL_COU_GSSOURCE
+            acqTSF.TEL_COU_ALPHA = GSRA
+            acqTSF.TEL_COU_DELTA = GSDEC
+            acqTSF.TEL_COU_MAG = round(TEL_COU_MAG, 3)
+
+
             # LST interval
             try:
                 obsConstraint = observationConfiguration.observationConstraints
@@ -156,8 +162,7 @@ class Pionier(VltiInstrument):
                 ui.addToLog(darkTSF, False)
             else:
                 self.createPionierOB(p2container, obTarget, obConstraints, acqTSF,
-                                     obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode, TEL_COU_GSSOURCE, GSRA, GSDEC,
-                                     TEL_COU_MAG, LSTINTERVAL)
+                                     obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode, LSTINTERVAL)
                 ui.addToLog(obTarget.name + " submitted on p2")
 
     def formatDitTable(self):
@@ -193,7 +198,7 @@ class Pionier(VltiInstrument):
 
     def createPionierOB(
             self, p2container, obTarget, obConstraints, acqTSF, obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode,
-            TEL_COU_GSSOURCE, GSRA, GSDEC, TEL_COU_MAG, LSTINTERVAL):
+            LSTINTERVAL):
 
         api = self.facility.getAPI()
         ui = self.ui
@@ -240,13 +245,6 @@ class Pionier(VltiInstrument):
         # and put values
         # start with acqTSF ones and complete manually missing ones
         values = acqTSF.getDict()
-        # TODO move next updates earlier so it can be tested during checkOb phase
-        values.update({'TEL.COU.GSSOURCE': TEL_COU_GSSOURCE,
-                       'TEL.COU.ALPHA': GSRA,
-                       'TEL.COU.DELTA': GSDEC,
-                       'TEL.COU.MAG': round(TEL_COU_MAG, 3)
-                       })
-
         tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
         ui.setProgress(0.3)
 
