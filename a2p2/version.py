@@ -25,6 +25,7 @@ __release_notes__ = {
        "STATUS": [
        ],
        "A2P2": [
+            "ctrl-c support improved to qui a2p2 from terminal",
        ],
        "VLTI": [
             "OB's tree list selection mode limited to a single selection",
