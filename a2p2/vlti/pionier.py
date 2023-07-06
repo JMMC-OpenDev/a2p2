@@ -42,7 +42,7 @@ class Pionier(VltiInstrument):
 
             # create keywords storage objects
             acqTSF = TSF(self, "PIONIER_acq.tsf")
-            obsTSF = TSF(self, "PIONIER_obs_calibrator.tsf")
+
             # alias for PIONIER_obs_calibrator.tsf and
             # PIONIER_obs_science.tsf")
             kappaTSF = TSF(self, "PIONIER_gen_cal_kappa.tsf")
@@ -56,14 +56,15 @@ class Pionier(VltiInstrument):
 
             if 'SCIENCE' in observationConfiguration.type:
                 OBJTYPE = 'SCIENCE'
+                obsTSF = TSF(self, "PIONIER_obs_science.tsf")
             else:
                 OBJTYPE = 'CALIBRATOR'
+                obsTSF = TSF(self, "PIONIER_obs_calibrator.tsf")
 
             scienceTarget = observationConfiguration.SCTarget
 
             # define target
             # acqTSF.SEQ_INS_SOBJ_NAME = scienceTarget.name.strip()
-
 
             obTarget.name = scienceTarget.name.strip().replace(
                 ' ', '_')  # allowed characters: letters, digits, + - _ . and no spaces
@@ -72,7 +73,7 @@ class Pionier(VltiInstrument):
                 scienceTarget)
 
             # Set baseline  interferometric array code (should be a keywordlist)
-            acqTSF.ISS_BASELINE = [self.getBaselineCode(BASELINE)]
+            acqTSF.ISS_BASELINE = [self.getBaselineCode(ob)]
 
             self.checkIssVltiType(acqTSF)
 
@@ -114,7 +115,6 @@ class Pionier(VltiInstrument):
             acqTSF.TEL_COU_ALPHA = GSRA
             acqTSF.TEL_COU_DELTA = GSDEC
             acqTSF.TEL_COU_MAG = round(TEL_COU_MAG, 3)
-
 
             # LST interval
             try:
@@ -237,37 +237,22 @@ class Pionier(VltiInstrument):
 
         # time constraints if present
         self.saveSiderealTimeConstraints(api, obId, LSTINTERVAL)
-
         ui.setProgress(0.2)
 
         # then, attach acquisition template(s)
-        tpl, tplVersion = api.createTemplate(obId, acqTSF.getP2Name())
-        # and put values
-        # start with acqTSF ones and complete manually missing ones
-        values = acqTSF.getDict()
-        tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
+        self.createTemplate(obId, acqTSF)
         ui.setProgress(0.3)
 
         # Put Obs template
-        tpl, tplVersion = api.createTemplate(
-            obId, self.getPionierObsTemplateName(OBJTYPE))
-        ui.setProgress(0.4)
-        values = obsTSF.getDict()
-        tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
+        self.createTemplate(obId, obsTSF)
         ui.setProgress(0.5)
 
         # put Kappa Matrix Template
-        tpl, tplVersion = api.createTemplate(obId, 'PIONIER_gen_cal_kappa')
-        ui.setProgress(0.6)
-        values = kappaTSF.getDict()
-        tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
+        self.createTemplate(obId, kappaTSF)
         ui.setProgress(0.7)
 
         # put Dark Template
-        tpl, tplVersion = api.createTemplate(obId, 'PIONIER_gen_cal_dark')
-        ui.setProgress(0.8)
-        values = darkTSF.getDict()
-        tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
+        self.createTemplate(obId, darkTSF)
         ui.setProgress(0.9)
 
         # verify OB online

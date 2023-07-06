@@ -155,22 +155,14 @@ class VltiInstrument(Instrument):
             raise ValueError(
                 f"Missing {flux} flux for target { getattr(target,'name') }") from None
 
-    def getBaselineCode(self, baseline):
-        # as of P104
-        # take care if you change next branch order
-        if "B2" in baseline:
-            return "small"
-        elif "G2" in baseline:
-            return "medium"
-        elif "J3" in baseline:
-            return "large"
-        elif "K0" in baseline:
-            return "astrometric"
-        elif "U" in baseline:
-            return "UTs"
+    def getBaselineCode(self, ob):
+        confAltName = ob.get(ob.interferometerConfiguration, "confAltName")
+        stations = ob.get(ob.interferometerConfiguration, "stations")
+        if confAltName:
+            return confAltName
         else:
             raise ValueError(
-                "Can't detect Interferometric Array type from given baseline : %s)" % (baseline))
+                "Can't detect alt name of Interferometric Array type from given baseline : %s)" % (stations))
 
     def checkIssVltiType(self, acqTSF):
         # TODO improve handling of this keyword using input from Aspro2's OB
@@ -178,7 +170,7 @@ class VltiInstrument(Instrument):
         # use GUI live checkboxes instead of preferences
         vltitypesVars = self.facility.ui.getIssVltitypeVars()
         vltitypes = [v for v in vltitypesVars
-                        if vltitypesVars[v].get() and self.isInRange(acqTSF.tpl, "ISS.VLTITYPE", v)]
+                     if vltitypesVars[v].get() and self.isInRange(acqTSF.tpl, "ISS.VLTITYPE", v)]
         if vltitypes:
             self.ui.addToLog(
                 f"Set template's ISS_VLTITYPE to {vltitypes}")
@@ -477,6 +469,15 @@ class VltiInstrument(Instrument):
         # self.ui.ShowInfoMessage(msg)
         self.ui.addToLog(msg)
         self.ui.addToLog('\n'.join(response['messages']) + '\n\n')
+
+    def createTemplate(self, obId, tsf, templateName=None):
+        api = self.facility.getAPI()
+        if not templateName:
+            templateName = tsf.getP2Name()
+        tpl, tplVersion = api.createTemplate(obId, templateName)
+        values = tsf.getDict()
+        tpl, tplVersion = api.setTemplateParams(
+            obId, tpl, values, tplVersion)
 
 
 # TemplateSignatureFile

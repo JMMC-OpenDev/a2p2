@@ -2,7 +2,7 @@
     "PIONIER_acq.tsf":
     {
         "INS.DISP.NAME":              {"default": "FREE", "list": ["FREE", "GRISM"]},
-        "ISS.BASELINE":               {"list": ["small", "medium", "large", "UTs"]},
+        "ISS.BASELINE":               {"list": ["small", "medium", "large", "extended", "UTs"]},
         "ISS.IAS.HMAG":               {"default": 0, "min": -5, "max": 30},
         "ISS.VLTITYPE":               {"list": ["snapshot", "imaging", "time-series"]},
         "TEL.COU.ALPHA":              {"default": "0.", "list": ["ra"]},

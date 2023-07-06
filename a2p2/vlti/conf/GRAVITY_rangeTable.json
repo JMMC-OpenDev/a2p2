@@ -14,7 +14,7 @@
         "INS.SPEC.POL":               {"default": "OUT", "list": ["IN", "OUT"]},
         "INS.SPEC.RES":               {"default": "MED", "list": ["LOW", "MED", "HIGH"]},
 
-        "ISS.BASELINE":               {"list": ["small", "medium", "large", "astrometric", "UTs"]},
+        "ISS.BASELINE":               {"list": ["small", "medium", "large", "astrometric", "extended", "UTs"]},
 
         "ISS.VLTITYPE":               {"list": ["snapshot", "imaging", "time-series", "astrometry"]},
         "SEQ.FT.MODE":                {"default": "AUTO", "list": ["AUTO", "1", "2", "7", "9"]},

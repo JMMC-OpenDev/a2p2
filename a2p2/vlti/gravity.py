@@ -83,7 +83,7 @@ class Gravity(VltiInstrument):
                 scienceTarget)
 
             # Set baseline  interferometric array code (should be a keywordlist)
-            acqTSF.ISS_BASELINE = [self.getBaselineCode(BASELINE)]
+            acqTSF.ISS_BASELINE = [self.getBaselineCode(ob)]
 
             self.checkIssVltiType(acqTSF)
 
