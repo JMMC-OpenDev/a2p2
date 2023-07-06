@@ -149,7 +149,13 @@ class A2p2Client():
                 loop_cnt += 1
                 time.sleep(delay)
 
+#                if loop_cnt % each == 0:
+#                    logger.debug(f"loop {loop_cnt}")
+
                 self.ui.loop()
+
+                # process any stacked OBs
+                self.facilityManager.processOB()
 
                 if not self.a2p2SampClient.is_connected() and loop_cnt % each == 0:
                     try:

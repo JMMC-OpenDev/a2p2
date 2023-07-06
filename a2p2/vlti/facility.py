@@ -84,7 +84,8 @@ class VltiFacility(Facility):
         self.api = None
 
         # store ob to insert after container selection if not done previously
-        self.ob_todo=[]
+        self.ob_to_confirm=[]
+        self.ob_to_submit=[]
 
 
     def getName():
@@ -97,6 +98,11 @@ class VltiFacility(Facility):
         self.ui.showTreeFrame()
 
     def processOB(self, ob):
+        # process last accepted OB if ob is None
+        if not ob:
+            self.processLastAcceptedOB()
+            return
+
         # give focus on last updated UI
         self.a2p2client.ui.showFacilityUI(self.ui)
         # show ob dict for debug
@@ -104,7 +110,7 @@ class VltiFacility(Facility):
 
         # OB is checked and submitted by instrument
         period = ob.getPeriod()
-        self.ui.addToLog(f"Request received for OB creation for P{period}")
+        self.ui.addToLog(f"Request received for OB creation for P{period} - please press Submit or Abort button")
 
         # always stores OB and pop them if everything is ok or later selecting containers in the tree
         self.pushOB(ob)
@@ -116,7 +122,7 @@ class VltiFacility(Facility):
         if not self.hasOB():
             return
 
-        ob = self.ob_todo[-1]
+        ob = self.ob_to_confirm[-1]
         # run checkOB which may raise some error before connection request
         # TODO we should test much more because lot of stuff still are beeing processed on live ob creations
 
@@ -154,10 +160,10 @@ class VltiFacility(Facility):
         self.connected = flag
 
     def pushOB(self,ob):
-        self.ob_todo.append(ob)
+        self.ob_to_confirm.append(ob)
 
     def hasOB(self):
-        return len(self.ob_todo)>0
+        return len(self.ob_to_confirm)>0
 
     def popOB(self, ignore=False):
         """ Called as last step : ob is for the selected container and User click on submit!
@@ -167,13 +173,20 @@ class VltiFacility(Facility):
             return
 
         # pop last OB
-        o = self.ob_todo.pop()
+        o = self.ob_to_confirm.pop()
         self.showOBConfirmationButtons()
 
         if ignore:
             self.ui.addToLog("Last received OB has been aborted")
             return
+        else:
+            self.ob_to_submit.append(o)
 
+    def processLastAcceptedOB(self):
+        if len(self.ob_to_submit)==0:
+            return
+
+        o=self.ob_to_submit.pop()
         try:
             instrument = self.getInstrument(o.instrumentConfiguration.name)
             instrument.checkOB(o)
@@ -198,7 +211,7 @@ class VltiFacility(Facility):
             # ui.ShowErrorMessage("Value error :\n %s \n%s\n\n%s" % (e, trace,
             # "Aborting submission to P2. Look at the whole traceback in the log."))
             self.ui.ShowErrorMessage("Value error :\n %s \n\n%s" %
-                                     (e, "Aborting submission to P2. Please check LOG and fix before new submission."))
+                                    (e, "Aborting submission to P2. Please check LOG and fix before new submission."))
             trace = traceback.format_exc()
             self.ui.addToLog(trace, False)
             self.ui.setProgress(0)
@@ -216,7 +229,7 @@ class VltiFacility(Facility):
     def getStatus(self):
         ob_info=""
         if self.hasOB():
-            ob_info=f" / {len(self.ob_todo)} OB in stack"
+            ob_info=f" / {len(self.ob_to_confirm)} OB in stack"
         if self.isConnected():
             return f" P2API({self.apitype}) connected with {self.username} { ob_info }"
 
@@ -300,8 +313,8 @@ class P2Container:
         if self.run != self.item and self.item['itemType'] == ITEMTYPE_CONCATENATION:
             self.reset()
             self.facility.ui.addToLog(
-                "*** Please do not select a Concatenation and select another container. Or just append a calibrator. ***")
-            logger.info(logmsg)
+                "*** Please do not select a Concatenation and select another container. Or just append a calibrator. ***", level=logging.DEBUG)
+            logger.debug(logmsg)
         else:
             self.facility.ui.addToLog(logmsg)
 

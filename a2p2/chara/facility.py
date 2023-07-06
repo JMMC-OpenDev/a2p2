@@ -20,6 +20,9 @@ class CharaFacility(Facility):
         self.connected2OB2 = False
 
     def processOB(self, ob):
+        if not ob:
+            return
+
         self.a2p2client.ui.addToLog(
             "OB received for '" + self.facilityName + "' interferometer")
         # show ob dict for debug

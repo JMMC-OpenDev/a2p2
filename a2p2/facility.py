@@ -38,7 +38,17 @@ class FacilityManager():
 
         return " | ".join(status)
 
-    def processOB(self, ob):
+    def processOB(self, ob=None):
+
+        # handled queued obs if ob is null
+        # TODO add a new method in the futur
+        if not ob:
+            for f in self.facilities.values():
+                f.processOB(ob)
+            return
+
+        # else handle given ob
+
         """ Test instrument on facility that registerInstrument() before OB forward for specialized handling."""
         interferometer = ob.interferometerConfiguration.name
         insname = ob.instrumentConfiguration.name
