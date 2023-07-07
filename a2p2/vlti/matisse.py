@@ -162,8 +162,8 @@ class Matisse(VltiInstrument):
                 ui.addToLog(acqTSF, False)
                 ui.addToLog(obsTSF, False)
             else:
-                self.createMatisseOB(p2container, obTarget, obConstraints, acqTSF, obsTSF, obsTSF.DPR_CATG, instrumentMode,
-                                     LSTINTERVAL)
+                self.createOB(p2container, obTarget, obConstraints, obsTSF.DPR_CATG, instrumentMode,
+                                     LSTINTERVAL, [acqTSF, obsTSF])
 
     def formatDitTable(self):
         #    fluxTable = self.getDitTable()
@@ -183,34 +183,3 @@ class Matisse(VltiInstrument):
         #                    buffer += "\n"
 
         return buffer
-
-    def createMatisseOB(
-            self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-            LSTINTERVAL):
-
-        api = self.facility.getAPI()
-        ui = self.ui
-        ui.setProgress(0.1)
-
-        # create new OB in container:
-        ob = self.createOB(p2container.containerId, obTarget,
-                           obConstraints, OBJTYPE, instrumentMode)
-        ui.setProgress(0.2)
-
-        # time constraints if present
-        self.saveSiderealTimeConstraints(api, ob, LSTINTERVAL)
-        ui.setProgress(0.2)
-
-        # then, attach acquisition template
-        self.createTemplate(obId, acqTSF)
-        ui.setProgress(0.3)
-
-        # put observation template
-        self.createTemplate(obId, obsTSF)
-        ui.setProgress(0.5)
-
-        # verify OB online
-        response = self.verifyOB(ob)
-        ui.setProgress(1.0)
-
-        self.showP2Response(response, ob)

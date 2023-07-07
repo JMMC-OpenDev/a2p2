@@ -226,6 +226,9 @@ class MainWindow():
             self.addToLog(f"Reply: yes={ret}", displayString=False)
             return ret
 
+    def addProgress(self, offset=0.1):
+        self.setProgress(self.progress_value.get()+offset)
+
 
     def setProgress(self, perc):
         if perc > 1:

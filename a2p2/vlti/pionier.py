@@ -161,9 +161,8 @@ class Pionier(VltiInstrument):
                 ui.addToLog(kappaTSF, False)
                 ui.addToLog(darkTSF, False)
             else:
-                self.createPionierOB(p2container, obTarget, obConstraints, acqTSF,
-                                     obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode, LSTINTERVAL)
-                ui.addToLog(obTarget.name + " submitted on p2")
+                self.createOB(p2container, obTarget, obConstraints, OBJTYPE, instrumentMode,
+                              LSTINTERVAL, [acqTSF, obsTSF, kappaTSF, darkTSF])
 
     def formatDitTable(self):
         buffer = ' No dit table in use \n'
@@ -184,42 +183,3 @@ class Pionier(VltiInstrument):
 #                        buffer += "\n"
 #            Hut = ditTable[tel]['Hut']
         return buffer
-
-    def createPionierOB(
-            self, p2container, obTarget, obConstraints, acqTSF, obsTSF, kappaTSF, darkTSF, OBJTYPE, instrumentMode,
-            LSTINTERVAL):
-
-        api = self.facility.getAPI()
-        ui = self.ui
-        ui.setProgress(0.1)
-
-        # create new OB in container:
-        ob = self.createOB(p2container.containerId, obTarget,
-                           obConstraints, OBJTYPE, instrumentMode)
-        ui.setProgress(0.2)
-
-        # set time constraints if present
-        self.saveSiderealTimeConstraints(api, ob, LSTINTERVAL)
-        ui.setProgress(0.3)
-
-        # then, attach acquisition template
-        self.createTemplate(ob, acqTSF)
-        ui.setProgress(0.4)
-
-        # put Obs template
-        self.createTemplate(ob, obsTSF)
-        ui.setProgress(0.5)
-
-        # put Kappa Matrix Template
-        self.createTemplate(ob, kappaTSF)
-        ui.setProgress(0.7)
-
-        # put Dark Template
-        self.createTemplate(ob, darkTSF)
-        ui.setProgress(0.9)
-
-        # verify OB online
-        response = self.verifyOB(ob)
-        ui.setProgress(1.0)
-
-        self.showP2Response(response, ob)

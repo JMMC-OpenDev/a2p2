@@ -476,26 +476,27 @@ class VltiInstrument(Instrument):
         self.ui.addToLog(msg)
         self.ui.addToLog('\n'.join(response['messages']) + '\n\n')
 
-    def createOB(self, containerId, obTarget, obConstraints, OBJTYPE, instrumentMode):
-        """ Creates and return OB for latter template creation."""
+    def createOB(self, containerId, obTarget, obConstraints, OBJTYPE, instrumentMode, LSTINTERVAL, tsfs):
+        """ Creates an OB on P2 and attach a template for every given tsf."""
 
-        # everything seems OK
-        # TODO use a common function for next lines
+        ui = self.ui
+        ui.setProgress(0.1)
+
         goodName = re.sub('[^A-Za-z0-9]+', '_', obTarget.name)
         OBS_DESCR = '_'.join(
             (OBJTYPE[0:3], goodName, self.getName(), instrumentMode))
+        # removed from template name acqTSF.ISS_BASELINE[0]
 
         # dev code to debug without interracting with P2
         if True:
-            self.ui.addToLog(f"Request new ob from p2 ({OBS_DESCR})")
+            self.ui.addToLog(f"Skip ob creation : {OBS_DESCR}")
+            for tsf in tsfs:
+                self.ui.addToLog(f"Skip {tsf.getP2Name()} template creation")
             return None
-
-        self.ui.addToLog(f"Creating new ob from p2 ({OBS_DESCR})")
-
-        # removed from template name acqTSF.ISS_BASELINE[0]
+        else:
+            self.ui.addToLog(f"Creating new ob from p2 : {OBS_DESCR}")
 
         api = self.facility.getAPI()
-
 
         ob, obVersion = api.createOB(containerId, OBS_DESCR)
 
@@ -515,6 +516,20 @@ class VltiInstrument(Instrument):
 
         self.ui.addToLog("New OB saved to p2\n%s" % ob, False)
         ob, obVersion = api.saveOB(ob, obVersion)
+
+        # set time constraints if present
+        self.saveSiderealTimeConstraints(api, ob, LSTINTERVAL)
+        ui.addProgress()
+
+        for tsf in tsfs:
+            ui.addProgress()
+            self.createTemplate(ob,tsf)
+
+        # verify OB online
+        response = self.verifyOB(ob)
+        ui.setProgress(1.0)
+
+        self.showP2Response(response, ob)
 
         return ob
 

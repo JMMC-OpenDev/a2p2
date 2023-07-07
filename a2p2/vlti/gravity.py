@@ -247,8 +247,8 @@ class Gravity(VltiInstrument):
                 ui.addToLog(acqTSF, False)
                 ui.addToLog(obsTSF, False)
             else:
-                self.createGravityOB(p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-                                     LSTINTERVAL)
+                self.createOB(p2container, obTarget, obConstraints, OBJTYPE, instrumentMode,
+                              LSTINTERVAL, [acqTSF, obsTSF])
 
     def formatDitTable(self):
         ditTable = self.getDitTable()
@@ -298,34 +298,3 @@ class Gravity(VltiInstrument):
             return "_".join((self.getName(), field, templateType, ".tsf"))
         else:
             return "_".join((self.getName(), field, templateType, objType, ".tsf"))
-
-    def createGravityOB(
-            self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-            LSTINTERVAL):
-
-        # TODO replace ob by p2ob
-        api = self.facility.getAPI()
-        ui = self.ui
-        ui.setProgress(0.1)
-
-        # create new OB in container:
-        ob = self.createOB(p2container.containerId, obTarget, obConstraints, OBJTYPE, instrumentMode)
-        ui.setProgress(0.2)
-
-        # time constraints if present
-        self.saveSiderealTimeConstraints(api, ob, LSTINTERVAL)
-        ui.setProgress(0.3)
-
-        # then, attach acquisition template
-        self.createTemplate(ob, acqTSF)
-        ui.setProgress(0.5)
-
-        # put obs template
-        self.createTemplate(ob, obsTSF)
-        ui.setProgress(0.7)
-
-        # verify OB online
-        response = self.verifyOB(ob)
-        ui.setProgress(1.0)
-
-        self.showP2Response(response, ob)
