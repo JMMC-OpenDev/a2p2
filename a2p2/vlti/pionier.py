@@ -193,58 +193,33 @@ class Pionier(VltiInstrument):
         ui = self.ui
         ui.setProgress(0.1)
 
-        # TODO compute value
-        VISIBILITY = 1.0
-
-        # everything seems OK
         # create new OB in container:
-        # TODO use a common function for next lines
-        goodName = re.sub('[^A-Za-z0-9]+', '_', obTarget.name)
-        OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_PIONIER_' + \
-            acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
-
-        ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
-        ui.addToLog("Getting new ob from p2: ")
-        obId = ob['obId']
-
-        # we use obId to populate OB
-        ob['obsDescription']['name'] = OBS_DESCR[0:min(len(OBS_DESCR), 31)]
-        ob['obsDescription']['userComments'] = self.getA2p2Comments()
-
-        # copy target info
-        targetInfo = obTarget.getDict()
-        for key in targetInfo:
-            ob['target'][key] = targetInfo[key]
-
-        # copy constraints info
-        constraints = obConstraints.getDict()
-        for k in constraints:
-            ob['constraints'][k] = constraints[k]
-
-        ui.addToLog("Save ob to p2:\n%s" % ob, False)
-        ob, obVersion = api.saveOB(ob, obVersion)
-
-        # time constraints if present
-        self.saveSiderealTimeConstraints(api, obId, LSTINTERVAL)
+        ob = self.createOB(p2container.containerId, obTarget,
+                           obConstraints, OBJTYPE, instrumentMode)
         ui.setProgress(0.2)
 
-        # then, attach acquisition template(s)
-        self.createTemplate(obId, acqTSF)
+        # set time constraints if present
+        self.saveSiderealTimeConstraints(api, ob, LSTINTERVAL)
         ui.setProgress(0.3)
 
-        # Put Obs template
-        self.createTemplate(obId, obsTSF)
+        # then, attach acquisition template
+        self.createTemplate(ob, acqTSF)
+        ui.setProgress(0.4)
+
+        # put Obs template
+        self.createTemplate(ob, obsTSF)
         ui.setProgress(0.5)
 
         # put Kappa Matrix Template
-        self.createTemplate(obId, kappaTSF)
+        self.createTemplate(ob, kappaTSF)
         ui.setProgress(0.7)
 
         # put Dark Template
-        self.createTemplate(obId, darkTSF)
+        self.createTemplate(ob, darkTSF)
         ui.setProgress(0.9)
 
         # verify OB online
-        response, _ = api.verifyOB(obId, True)
+        response = self.verifyOB(ob)
         ui.setProgress(1.0)
-        self.showP2Response(response, ob, obId)
+
+        self.showP2Response(response, ob)

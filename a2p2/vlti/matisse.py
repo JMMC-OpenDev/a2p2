@@ -52,7 +52,7 @@ class Matisse(VltiInstrument):
             obConstraints = OBConstraints(self)
 
             if 'SCIENCE' in observationConfiguration.type:
-                obsTSF.DPR_CATG = 'SCIENCE' # Default OB are CALIB
+                obsTSF.DPR_CATG = 'SCIENCE'  # Default OB are CALIB
             else:
                 obsTSF.DPR_CATG = 'CALIB'
 
@@ -104,24 +104,28 @@ class Matisse(VltiInstrument):
                 acqTSF.COU_AG_GSSOURCE = 'SETUPFILE'  # since we have a GS
                 # special hack waiting for uniform way
                 alpha, delta = self.getCoords(gsTarget, requirePrecision=False)
-                acqTSF.COU_AG_ALPHA, acqTSF.COU_AG_DELTA = alpha.replace(":",""), delta.replace(":","")
-                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords( gsTarget )
+                acqTSF.COU_AG_ALPHA, acqTSF.COU_AG_DELTA = alpha.replace(
+                    ":", ""), delta.replace(":", "")
+                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(
+                    gsTarget)
 
                 # no PMRA, PMDE for GS ??
 
                 acqTSF.COU_GS_MAG = self.getFlux(gsTarget, "V")
                 try:
-                    if "AT" in tel: # try better band observing on UT
+                    if "AT" in tel:  # try better band observing on UT
                         acqTSF.COU_GS_MAG = self.getFlux(gsTarget, "G")
                 except:
-                    ui.addToLog("G mag can't be retreived for AT on the guide star. Use V instead")
+                    ui.addToLog(
+                        "G mag can't be retreived for AT on the guide star. Use V instead")
             else:
                 acqTSF.COU_GS_MAG = self.getFlux(scienceTarget, "V")
                 try:
-                    if "AT" in tel: # try better band observing on UT
+                    if "AT" in tel:  # try better band observing on UT
                         acqTSF.COU_GS_MAG = self.getFlux(scienceTarget, "G")
                 except:
-                    ui.addToLog("G mag can't be retreived for AT on the science star. Use V instead")
+                    ui.addToLog(
+                        "G mag can't be retreived for AT on the science star. Use V instead")
 
             # LST interval
             try:
@@ -158,14 +162,13 @@ class Matisse(VltiInstrument):
                 ui.addToLog(acqTSF, False)
                 ui.addToLog(obsTSF, False)
             else:
-                self.createMatisseOB(p2container, obTarget, obConstraints, acqTSF, obsTSF, instrumentMode,
+                self.createMatisseOB(p2container, obTarget, obConstraints, acqTSF, obsTSF, obsTSF.DPR_CATG, instrumentMode,
                                      LSTINTERVAL)
-                ui.addToLog(obTarget.name + " submitted on p2")
 
     def formatDitTable(self):
         #    fluxTable = self.getDitTable()
         buffer = ' No dit table in use \n'
-        #buffer = '   Tel | Spec |  spec band  | Flux (Jy)    | tau(ms)\n'
+        # buffer = '   Tel | Spec |  spec band  | Flux (Jy)    | tau(ms)\n'
         #    buffer += '--------------------------------------------------------\n'
         #    for tel in ['AT']:
         #        for spec in ['Low','Med']:
@@ -182,62 +185,32 @@ class Matisse(VltiInstrument):
         return buffer
 
     def createMatisseOB(
-            self, p2container, obTarget, obConstraints, acqTSF, obsTSF, instrumentMode,
+            self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
             LSTINTERVAL):
 
         api = self.facility.getAPI()
         ui = self.ui
         ui.setProgress(0.1)
 
-        # TODO compute value
-        VISIBILITY = 1.0
-
-        # everything seems OK
         # create new OB in container:
-        # TODO use a common function for next lines
-        goodName = re.sub('[^A-Za-z0-9]+', '_', obTarget.name)
-        OBS_DESCR = obsTSF.DPR_CATG[0:3] + '_' + goodName + '_MATISSE_' + \
-            acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
-
-        ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
-        obId = ob['obId']
-
-        # we use obId to populate OB
-        ob['obsDescription']['name'] = OBS_DESCR[0:min(len(OBS_DESCR), 31)]
-        ob['obsDescription']['userComments'] = self.getA2p2Comments()
-        # ob['obsDescription']['InstrumentComments'] = 'AO-B1-C2-E3' #should be
-        # a list of alternative quadruplets!
-
-        # copy target info
-        targetInfo = obTarget.getDict()
-        for key in targetInfo:
-            ob['target'][key] = targetInfo[key]
-
-        # copy constraints info
-        constraints = obConstraints.getDict()
-        for k in constraints:
-            ob['constraints'][k] = constraints[k]
-
-        ui.addToLog("Save ob to p2:\n%s" % ob, False)
-        ob, obVersion = api.saveOB(ob, obVersion)
-
-        # time constraints if present
-        self.saveSiderealTimeConstraints(api, obId, LSTINTERVAL)
+        ob = self.createOB(p2container.containerId, obTarget,
+                           obConstraints, OBJTYPE, instrumentMode)
         ui.setProgress(0.2)
 
-        # then, attach acquisition & observation template and put associated values
-        tpl, tplVersion = api.createTemplate(obId, acqTSF.getP2Name())
-        tpl, tplVersion = api.setTemplateParams(
-            obId, tpl, acqTSF.getDict(), tplVersion)
+        # time constraints if present
+        self.saveSiderealTimeConstraints(api, ob, LSTINTERVAL)
+        ui.setProgress(0.2)
+
+        # then, attach acquisition template
+        self.createTemplate(obId, acqTSF)
         ui.setProgress(0.3)
 
-        tpl, tplVersion = api.createTemplate(obId, obsTSF.getP2Name())
-        ui.setProgress(0.4)
-        tpl, tplVersion = api.setTemplateParams(
-            obId, tpl, obsTSF.getDict(), tplVersion)
+        # put observation template
+        self.createTemplate(obId, obsTSF)
         ui.setProgress(0.5)
 
         # verify OB online
-        response, _ = api.verifyOB(obId, True)
+        response = self.verifyOB(ob)
         ui.setProgress(1.0)
-        self.showP2Response(response, ob, obId)
+
+        self.showP2Response(response, ob)

@@ -54,7 +54,25 @@ class Gravity(VltiInstrument):
 
         for observationConfiguration in self.getSequence(ob):
 
+            # define top level variable
+            if 'SCIENCE' in observationConfiguration.type:
+                OBJTYPE = 'SCIENCE'
+            else:
+                OBJTYPE = 'CALIBRATOR'
+
+            # dualField is true if FT Target is defined, else false
+            ftTarget = ob.get(observationConfiguration, "FTTarget")
+            if ftTarget:
+                dualField = True
+            else:
+                dualField = False
+
             # create keywords storage objects
+            acqTSF = TSF(self, self.getGravityAcqTemplateName(
+                OBJTYPE, dualField))
+            obsTSF = TSF(self, self.getGravityObsTemplateName(
+                OBJTYPE, dualField))
+
             acqTSF = TSF(self, "GRAVITY_gen_acq.tsf")
             obsTSF = TSF(self, "GRAVITY_single_obs_exp.tsf")
             # alias for
@@ -66,11 +84,6 @@ class Gravity(VltiInstrument):
             acqTSF.INS_SPEC_RES = ins_spec_res
             acqTSF.INS_FT_POL = ins_pol
             acqTSF.INS_SPEC_POL = ins_pol
-
-            if 'SCIENCE' in observationConfiguration.type:
-                OBJTYPE = 'SCIENCE'
-            else:
-                OBJTYPE = 'CALIBRATOR'
 
             scienceTarget = observationConfiguration.SCTarget
 
@@ -88,16 +101,13 @@ class Gravity(VltiInstrument):
             self.checkIssVltiType(acqTSF)
 
             # define some default values
-            acqTSF.SEQ_INS_SOBJ_DIAMETER = float(self.get(scienceTarget, "DIAMETER", 0.0))
-
-            # TODO compute value
-            VISIBILITY = 1.0
-            acqTSF.SEQ_INS_SOBJ_VIS = VISIBILITY
+            acqTSF.SEQ_INS_SOBJ_DIAMETER = float(
+                self.get(scienceTarget, "DIAMETER", 0.0))
 
             # Retrieve Fluxes
             acqTSF.COU_GS_MAG = self.getFlux(scienceTarget, "V")
             acqTSF.SEQ_INS_SOBJ_MAG = self.getFlux(scienceTarget, "K")
-            if ob.getPeriod() >= 110: # P111 use back again FI_HMAG
+            if ob.getPeriod() >= 110:  # P111 use back again FI_HMAG
                 acqTSF.SEQ_INS_SOBJ_HMAG = self.getFlux(scienceTarget, "H")
             else:
                 acqTSF.SEQ_FI_HMAG = self.getFlux(scienceTarget, "H")
@@ -105,9 +115,7 @@ class Gravity(VltiInstrument):
             # setup some default values, to be changed below
             GSRA = '00:00:00.000'
             GSDEC = '00:00:00.000'
-            dualField = False
             dualFieldDistance = 0.0  # needed as must exist for the argument list of createGravityOB
-
 
             # if FT Target is not ScTarget, we are in dual-field (TBD)
             ftTarget = ob.get(observationConfiguration, "FTTarget")
@@ -115,7 +123,7 @@ class Gravity(VltiInstrument):
                 acqTSF.SEQ_FT_ROBJ_NAME = ftTarget.name
                 FTRA, FTDEC = self.getCoords(ftTarget)
                 # no PMRA, PMDE for FT !!
-                if ob.getPeriod() == 110: # P111 use back again FI_HMAG
+                if ob.getPeriod() == 110:  # P111 use back again FI_HMAG
                     acqTSF.SEQ_INS_SOBJ_HMAG = self.getFlux(ftTarget, "H")
                 else:
                     acqTSF.SEQ_FI_HMAG = self.getFlux(ftTarget, "H")
@@ -123,9 +131,8 @@ class Gravity(VltiInstrument):
                 # just to say we must treat the case there
                 # is no FT Target
                 acqTSF.SEQ_FT_ROBJ_MAG = self.getFlux(ftTarget, "K")
-                #acqTSF.SEQ_FT_ROBJ_DIAMETER = 0.0  # FIXME
+                # acqTSF.SEQ_FT_ROBJ_DIAMETER = 0.0  # FIXME
                 SEQ_FT_ROBJ_VIS = 1.0  # FIXME
-                dualField = True
 
                 # test distance in dual field mode
                 if tel == "UT":
@@ -143,20 +150,21 @@ class Gravity(VltiInstrument):
                 elif np.abs(dualFieldDistance[0]) > SCtoREFmaxDist:
                     raise ValueError("Dual-Field distance of two stars is  > " + str(
                         SCtoREFmaxDist) + " mas, Please Correct.")
-                acqTSF.SEQ_INS_SOBJ_X=dualFieldDistance[0]
-                acqTSF.SEQ_INS_SOBJ_Y= dualFieldDistance[1]
+                acqTSF.SEQ_INS_SOBJ_X = dualFieldDistance[0]
+                acqTSF.SEQ_INS_SOBJ_Y = dualFieldDistance[1]
 
-                acqTSF.SEQ_FT_ROBJ_VIS= SEQ_FT_ROBJ_VIS
-                acqTSF.SEQ_FT_MODE= "AUTO"
-
+                acqTSF.SEQ_FT_ROBJ_VIS = SEQ_FT_ROBJ_VIS
+                acqTSF.SEQ_FT_MODE = "AUTO"
 
             # AO target
             aoTarget = ob.get(observationConfiguration, "AOTarget")
             if aoTarget != None:
                 AONAME = aoTarget.name
                 acqTSF.COU_AG_GSSOURCE = 'SETUPFILE'  # since we have an AO
-                acqTSF.COU_AG_ALPHA, acqTSF.COU_AG_DELTA = self.getCoords(aoTarget, requirePrecision=False)
-                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(aoTarget)
+                acqTSF.COU_AG_ALPHA, acqTSF.COU_AG_DELTA = self.getCoords(
+                    aoTarget, requirePrecision=False)
+                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(
+                    aoTarget)
                 # Case of CIAO to be implemented...based on v and k magnitudes?
                 acqTSF.COU_GS_MAG = float(aoTarget.FLUX_V)
 
@@ -164,8 +172,10 @@ class Gravity(VltiInstrument):
             gsTarget = ob.get(observationConfiguration, 'GSTarget')
             if gsTarget != None and aoTarget == None:
                 acqTSF.COU_AG_SOURCE = 'SETUPFILE'  # since we have an GS
-                acqTSF.COU_AG_ALPHA, acqTSF.COU_AG_DELTA = self.getCoords(gsTarget, requirePrecision=False)
-                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(gsTarget)
+                acqTSF.COU_AG_ALPHA, acqTSF.COU_AG_DELTA = self.getCoords(
+                    gsTarget, requirePrecision=False)
+                acqTSF.COU_AG_PMA, acqTSF.COU_AG_PMD = self.getPMCoords(
+                    gsTarget)
                 acqTSF.COU_GS_MAG = float(gsTarget.FLUX_V)
 
             # LST interval
@@ -238,8 +248,7 @@ class Gravity(VltiInstrument):
                 ui.addToLog(obsTSF, False)
             else:
                 self.createGravityOB(p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-                                    dualField, LSTINTERVAL)
-                ui.addToLog(obTarget.name + " submitted on p2")
+                                     LSTINTERVAL)
 
     def formatDitTable(self):
         ditTable = self.getDitTable()
@@ -267,89 +276,56 @@ class Gravity(VltiInstrument):
                 tel, Kut + Kdf)
         return buffer
 
-    def getGravityTemplateName(self, templateType, dualField, OBJTYPE):
-        objType = "calibrator"
-        if OBJTYPE and "SCI" in OBJTYPE:
+    def getGravityObsTemplateName(self, OBJTYPE, dualField):
+        return self.getGravityTemplateName("obs", OBJTYPE, dualField)
+
+    def getGravityAcqTemplateName(self, OBJTYPE, dualField):
+        return self.getGravityTemplateName("acq", OBJTYPE, dualField)
+
+    def getGravityTemplateName(self, templateType, OBJTYPE, dualField):
+
+        if "SCI" in OBJTYPE:
             objType = "exp"
-        field = "single"
+        else:
+            objType = "calibrator"
 
         if dualField:
             field = "dual"
-        if OBJTYPE:
-            return "_".join((self.getName(), field, templateType, objType))
-        return "_".join((self.getName(), field, templateType))
+        else:
+            field = "single"
 
-    def getGravityObsTemplateName(self, OBJTYPE, dualField=False):
-        return self.getGravityTemplateName("obs", dualField, OBJTYPE)
-
-    def getGravityAcqTemplateName(self, dualField=False, OBJTYPE=None):
-        return self.getGravityTemplateName("acq", dualField, OBJTYPE)
+        if templateType == 'acq':
+            return "_".join((self.getName(), field, templateType, ".tsf"))
+        else:
+            return "_".join((self.getName(), field, templateType, objType, ".tsf"))
 
     def createGravityOB(
             self, p2container, obTarget, obConstraints, acqTSF, obsTSF, OBJTYPE, instrumentMode,
-            dualField, LSTINTERVAL):
+            LSTINTERVAL):
 
+        # TODO replace ob by p2ob
         api = self.facility.getAPI()
         ui = self.ui
         ui.setProgress(0.1)
 
-        # everything seems OK
         # create new OB in container:
-        # TODO use a common function for next lines
-        goodName = re.sub('[^A-Za-z0-9]+', '_', acqTSF.SEQ_INS_SOBJ_NAME)
-        OBS_DESCR = OBJTYPE[0:3] + '_' + goodName + '_GRAVITY_' + \
-            acqTSF.ISS_BASELINE[0] + '_' + instrumentMode
-
-        ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
-        obId = ob['obId']
-
-        # we use obId to populate OB
-        ob['obsDescription']['name'] = OBS_DESCR[0:min(len(OBS_DESCR), 31)]
-        ob['obsDescription']['userComments'] = self.getA2p2Comments()
-        # ob['obsDescription']['InstrumentComments'] = 'AO-B1-C2-E3' #should be
-        # a list of alternative quadruplets!
-
-        # copy target info
-        targetInfo = obTarget.getDict()
-        for key in targetInfo:
-            ob['target'][key] = targetInfo[key]
-
-        # copy constraints info
-        constraints = obConstraints.getDict()
-        for k in constraints:
-            ob['constraints'][k] = constraints[k]
-
-        ui.addToLog("Save ob to p2:\n%s" % ob, False)
-        ob, obVersion = api.saveOB(ob, obVersion)
-
-        # time constraints if present
-        self.saveSiderealTimeConstraints(api, obId, LSTINTERVAL)
-
+        ob = self.createOB(p2container.containerId, obTarget, obConstraints, OBJTYPE, instrumentMode)
         ui.setProgress(0.2)
 
-        # then, attach acquisition template(s)
-        tpl, tplVersion = api.createTemplate(
-            obId, self.getGravityAcqTemplateName(dualField=dualField))
-        # and put values
-        # start with acqTSF ones and complete manually missing ones
-        values = acqTSF.getDict()
-        tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
+        # time constraints if present
+        self.saveSiderealTimeConstraints(api, ob, LSTINTERVAL)
         ui.setProgress(0.3)
 
-        tpl, tplVersion = api.createTemplate(
-            obId, self.getGravityObsTemplateName(OBJTYPE, dualField))
-        ui.setProgress(0.4)
-
-        # put values. they are the same except for dual obs science (?)
-        values = obsTSF.getDict()
-        # TODO move next updates earlier so it can be tested during checkOb phase
-        if dualField and OBJTYPE == 'SCIENCE':
-            values.update({'SEQ.RELOFF.X': [0.0], 'SEQ.RELOFF.Y': [0.0]})
-
-        tpl, tplVersion = api.setTemplateParams(obId, tpl, values, tplVersion)
+        # then, attach acquisition template
+        self.createTemplate(ob, acqTSF)
         ui.setProgress(0.5)
 
+        # put obs template
+        self.createTemplate(ob, obsTSF)
+        ui.setProgress(0.7)
+
         # verify OB online
-        response, _ = api.verifyOB(obId, True)
+        response = self.verifyOB(ob)
         ui.setProgress(1.0)
-        self.showP2Response(response, ob, obId)
+
+        self.showP2Response(response, ob)

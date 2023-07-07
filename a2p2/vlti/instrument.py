@@ -402,9 +402,10 @@ class VltiInstrument(Instrument):
                 intervals.append({'from': lstStartSex, 'to': lstEndSex})
         return intervals
 
-    def saveSiderealTimeConstraints(self, api, obId, LSTINTERVAL):
+    def saveSiderealTimeConstraints(self, api, ob, LSTINTERVAL):
         # wait for next Aspro release to only send constraints set by user
         return
+        obId = ob['obId']
         intervals = self.getSiderealTimeConstraints(LSTINTERVAL)
         if intervals:
             sidTCs, stcVersion = api.getSiderealTimeConstraints(obId)
@@ -457,7 +458,12 @@ class VltiInstrument(Instrument):
                 buffer += "\n"
         return buffer
 
-    def showP2Response(self, response, ob, obId):
+    def showP2Response(self, response, ob,):
+        if not ob:
+            return
+
+        obId = ob['obId']
+
         if response['observable']:
             msg = 'OB ' + \
                   str(obId) + ' submitted successfully on P2\n' + \
@@ -470,14 +476,72 @@ class VltiInstrument(Instrument):
         self.ui.addToLog(msg)
         self.ui.addToLog('\n'.join(response['messages']) + '\n\n')
 
-    def createTemplate(self, obId, tsf, templateName=None):
+    def createOB(self, containerId, obTarget, obConstraints, OBJTYPE, instrumentMode):
+        """ Creates and return OB for latter template creation."""
+
+        # everything seems OK
+        # TODO use a common function for next lines
+        goodName = re.sub('[^A-Za-z0-9]+', '_', obTarget.name)
+        OBS_DESCR = '_'.join(
+            (OBJTYPE[0:3], goodName, self.getName(), instrumentMode))
+
+        # dev code to debug without interracting with P2
+        if True:
+            self.ui.addToLog(f"Request new ob from p2 ({OBS_DESCR})")
+            return None
+
+        self.ui.addToLog(f"Creating new ob from p2 ({OBS_DESCR})")
+
+        # removed from template name acqTSF.ISS_BASELINE[0]
+
         api = self.facility.getAPI()
+
+
+        ob, obVersion = api.createOB(containerId, OBS_DESCR)
+
+        # we use obId to populate OB
+        ob['obsDescription']['name'] = OBS_DESCR[0:min(len(OBS_DESCR), 31)]
+        ob['obsDescription']['userComments'] = self.getA2p2Comments()
+
+        # copy target info
+        targetInfo = obTarget.getDict()
+        for key in targetInfo:
+            ob['target'][key] = targetInfo[key]
+
+        # copy constraints info
+        constraints = obConstraints.getDict()
+        for k in constraints:
+            ob['constraints'][k] = constraints[k]
+
+        self.ui.addToLog("New OB saved to p2\n%s" % ob, False)
+        ob, obVersion = api.saveOB(ob, obVersion)
+
+        return ob
+
+    def createTemplate(self, ob, tsf, templateName=None):
         if not templateName:
             templateName = tsf.getP2Name()
+
+        if not ob:
+            self.ui.addToLog(f"Request for new template ignored '{templateName}'")
+            return
+        self.ui.addToLog(f"Creating new template '{templateName}'")
+        obId = ob['obId']
+        api = self.facility.getAPI()
         tpl, tplVersion = api.createTemplate(obId, templateName)
         values = tsf.getDict()
         tpl, tplVersion = api.setTemplateParams(
             obId, tpl, values, tplVersion)
+
+    def verifyOB(self, ob):
+        if not ob:
+            self.ui.addToLog(f"Request to verify OB ignored")
+            return
+
+        api = self.facility.getAPI()
+        response, _=api.verifyOB(ob['obId'], True)
+        return response
+
 
 
 # TemplateSignatureFile
