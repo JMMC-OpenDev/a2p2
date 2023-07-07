@@ -296,6 +296,9 @@ class FacilityUI(Frame):
     def AskYesNoMessage(self,*args, **kwargs):
         return self.a2p2client.ui.AskYesNoMessage(*args, **kwargs)
 
+    def addProgress(self, offset=0.1):
+        self.a2p2client.ui.addProgress(offset)
+
     def setProgress(self, perc):
         """ Wrapper to update progress bar """
         if perc > 1:
