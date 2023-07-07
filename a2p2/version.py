@@ -1,4 +1,4 @@
-__version__ = "0.6.9"
+__version__ = "0.7.0"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,16 +21,13 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.6.9": {
+    "0.7.0": {
        "STATUS": [
        ],
        "A2P2": [
-            "ctrl-c support improved to qui a2p2 from terminal",
        ],
        "VLTI": [
-            "OB's tree list selection mode limited to a single selection",
-            "OB are stacked if Aspro2 send an OB without proper tree selection. stacked OB can be submitted after proper container selection or cancelled",
-            "Provide checkboxes of types of interferometric observations to complete full OB"
+            "Add first P112 support using radiobutton to select proper onaxis offaxis or wide GRAVITY templates"
        ],
        "CHARA": [
        ],
@@ -45,6 +42,19 @@ __release_notes__ = {
            "Unify ob name creation in vlti instrument createOB()",
            "Complete test suite with more real p2 submissions",
            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+       ],
+    },"0.6.9": {
+       "STATUS": [
+       ],
+       "A2P2": [
+            "ctrl-c support improved to qui a2p2 from terminal",
+       ],
+       "VLTI": [
+            "OB's tree list selection mode limited to a single selection",
+            "OB are stacked if Aspro2 send an OB without proper tree selection. stacked OB can be submitted after proper container selection or cancelled",
+            "Provide checkboxes of types of interferometric observations to complete full OB"
+       ],
+       "CHARA": [
        ],
     },"0.6.8": {
        "A2P2": [
