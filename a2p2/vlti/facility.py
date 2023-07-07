@@ -145,10 +145,10 @@ class VltiFacility(Facility):
             self.ui.addToLog(
                 f"Container's IpVersion '{int(self.containerInfo.getIpVersion())}' is not applicable for received OB's one '{period}', please select another '{insname}' container or change it in Aspro2.")
         else:
-            self.showOBConfirmationButtons(ob)
+            self.showOBConfirmationButtons(ob, insname=="GRAVITY" and period >= 112)
 
-    def showOBConfirmationButtons(self, ob=None):
-        self.ui.showOBConfirmationButtons(ob)
+    def showOBConfirmationButtons(self, ob=None, showAcqButtons=False):
+        self.ui.showOBConfirmationButtons(ob, showAcqButtons)
 
     def isReadyToSubmit(self, ob):
         return self.api and self.containerInfo.isOk(ob)
@@ -313,8 +313,8 @@ class P2Container:
         if self.run != self.item and self.item['itemType'] == ITEMTYPE_CONCATENATION:
             self.reset()
             self.facility.ui.addToLog(
-                "*** Please do not select a Concatenation and select another container. Or just append a calibrator. ***", level=logging.DEBUG)
-            logger.debug(logmsg)
+                "*** Please do not select a Concatenation and select another container. Or just append a calibrator. ***", )
+            logger.info(logmsg)
         else:
             self.facility.ui.addToLog(logmsg)
 

@@ -33,6 +33,12 @@ class VltiInstrument(Instrument):
         self.warnings = []
         self.errors = []
 
+    def isScience(self, objtype):
+        return "SCI" in objtype
+
+    def isCalibrator(self, objtype):
+        return "SCI" not in objtype
+
     def get(self, obj, fieldname, defaultvalue):
         if fieldname in obj._fields:
             return getattr(obj, fieldname)
@@ -163,6 +169,12 @@ class VltiInstrument(Instrument):
         else:
             raise ValueError(
                 "Can't detect alt name of Interferometric Array type from given baseline : %s)" % (stations))
+
+    def getAcquisitionType(self):
+        return self.facility.ui.getAcquisitionType()
+        return "onaxis"
+        return "offaxis"
+        return "wide"
 
     def checkIssVltiType(self, acqTSF):
         # TODO improve handling of this keyword using input from Aspro2's OB
@@ -594,6 +606,9 @@ class TSF(object):
 
     def getDict(self):
         return self.tsfParams
+
+    def getName(self):
+        return self.tpl
 
     def getP2Name(self):
         return self.tpl[0:-4]

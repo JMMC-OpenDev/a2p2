@@ -154,15 +154,19 @@ class VltiUI(FacilityUI):
             parentContainerID = parentContainer['containerId']
             self.updateTree(parentRun, parentContainerID)
 
-    def showOBConfirmationButtons(self, ob=None):
+    def showOBConfirmationButtons(self, ob=None, showAcqButtons=False):
         if not (ob):
-            self.treeFrame.enable_buttons(False)
+            self.treeFrame.enable_buttons(False, showAcqButtons)
             return
         else:
-            self.treeFrame.enable_buttons(True)
+            self.treeFrame.enable_buttons(True, showAcqButtons)
 
     def getIssVltitypeVars(self):
         return self.treeFrame.issVltiTypeCheckboxesVars
+
+    def getAcquisitionType(self):
+        return self.treeFrame.acquisitionType.get()
+
 
 class TreeFrame(Frame):
 
@@ -201,15 +205,29 @@ class TreeFrame(Frame):
         # Control button Panel to abort /submit or provide more information to the current OB
         buttonframe = Frame(subframe)
 
+        cindex = 0
+
+
+        acquisitionFrame = Frame(buttonframe)
+
+        self.acquisitionType = StringVar()
+        self.acquisitionType.set("onaxis") # initialiser
+        self.r1 = Radiobutton(acquisitionFrame, text="onaxis", variable=self.acquisitionType, value="onaxis")
+        self.r2 = Radiobutton(acquisitionFrame, text="offaxis", variable=self.acquisitionType, value="offaxis")
+        self.r3 = Radiobutton(acquisitionFrame, text="wide", variable=self.acquisitionType, value="wide")
+
+        acquisitionFrame.grid(row=0, column=cindex)
+        cindex += 1
+
+
+        label = Label(buttonframe, text="|")
+        label.grid(row=0, column=cindex)
+        cindex += 1
+
         psection = "p2.iss.vltitype"
         pvltitypes = self.vltiUI.facility.a2p2client.preferences.getConfigKeys(
             psection)
 
-        poffset=0
-        if len(pvltitypes)==0:
-            poffset=1
-
-        cindex = 0
         self.issVltiTypeCheckboxesVars = {}
         for isvt in self.vltiUI.facility.getIssVltiTypes():
             boolv = BooleanVar()
@@ -231,8 +249,17 @@ class TreeFrame(Frame):
 
         subframe.pack(side=TOP, fill=BOTH, expand=True)
 
-    def enable_buttons(self, flag):
-        if flag:
+    def enable_buttons(self, enableActions, showAcqButtons=False):
+        if showAcqButtons and enableActions:
+            self.r1.pack(side=LEFT)
+            self.r2.pack(side=LEFT)
+            self.r3.pack(side=LEFT)
+        else:
+            self.r1.pack_forget()
+            self.r2.pack_forget()
+            self.r3.pack_forget()
+
+        if enableActions:
             flag = NORMAL
         else:
             flag = DISABLED
