@@ -476,7 +476,7 @@ class VltiInstrument(Instrument):
         self.ui.addToLog(msg)
         self.ui.addToLog('\n'.join(response['messages']) + '\n\n')
 
-    def createOB(self, containerId, obTarget, obConstraints, OBJTYPE, instrumentMode, LSTINTERVAL, tsfs):
+    def createOB(self, p2container, obTarget, obConstraints, OBJTYPE, instrumentMode, LSTINTERVAL, tsfs):
         """ Creates an OB on P2 and attach a template for every given tsf."""
 
         ui = self.ui
@@ -488,17 +488,18 @@ class VltiInstrument(Instrument):
         # removed from template name acqTSF.ISS_BASELINE[0]
 
         # dev code to debug without interracting with P2
-        if True:
+        if False:
             self.ui.addToLog(f"Skip ob creation : {OBS_DESCR}")
             for tsf in tsfs:
                 self.ui.addToLog(f"Skip {tsf.getP2Name()} template creation")
+            ui.setProgress(1.0)
             return None
         else:
             self.ui.addToLog(f"Creating new ob from p2 : {OBS_DESCR}")
 
         api = self.facility.getAPI()
 
-        ob, obVersion = api.createOB(containerId, OBS_DESCR)
+        ob, obVersion = api.createOB(p2container.containerId, OBS_DESCR)
 
         # we use obId to populate OB
         ob['obsDescription']['name'] = OBS_DESCR[0:min(len(OBS_DESCR), 31)]
