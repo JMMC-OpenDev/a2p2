@@ -38,9 +38,9 @@ class Gravity(VltiInstrument):
         instrumentMode = instrumentConfiguration.instrumentMode
 
         if "COMBINED" in instrumentMode:
-            ins_pol = "OUT"
+            ins_spec_pol = "OUT"
         else:
-            ins_pol = 'IN'
+            ins_spec_pol = 'IN'
 
         for observationConfiguration in self.getSequence(ob):
 
@@ -87,9 +87,9 @@ class Gravity(VltiInstrument):
                         if res in instrumentMode[0:len(res)]:
                             ins_spec_res = res
                     acqTSF.INS_SPEC_RES = ins_spec_res
-                    acqTSF.INS_SPEC_POL = ins_pol
+                    acqTSF.INS_SPEC_POL = ins_spec_pol
 
-                acqTSF.INS_FT_POL = ins_pol
+                acqTSF.INS_FT_POL = ins_spec_pol
 
                 scienceTarget = observationConfiguration.SCTarget
 
@@ -214,7 +214,7 @@ class Gravity(VltiInstrument):
 
 
                 # compute dit, ndit, nexp
-                dit = self.getDit(tel, ins_spec_res, acqTSF.INS_SPEC_POL,
+                dit = self.getDit(tel, ins_spec_res, ins_spec_pol,
                                 acqTSF.SEQ_INS_SOBJ_MAG, dualField, targetName=scienceTarget.name.strip(),  showWarning=(p2container == None))
                 ndit = 300 / dit
                 if ndit < 10:
