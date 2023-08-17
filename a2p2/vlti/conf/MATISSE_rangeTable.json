@@ -29,7 +29,7 @@
         "COU.AG.PMD":                 {"default": 0, "min": -10, "max": 10},
         "COU.AG.TYPE":                {"default": "ADAPT_OPT", "list": ["DEFAULT", "NONE", "AUTO_GUID", "ADAPT_OPT", "ADAPT_OPT_TCCD"]},
         "COU.GS.MAG":                 {"default": 0, "min": -3, "max": 25},
-        "ISS.BASELINE":               {"list": ["small", "medium", "large", "UTs"]},
+        "ISS.BASELINE":               {"list": ["small", "medium", "large", "extended", "UTs"]},
         "ISS.VLTITYPE":               {"list": ["snapshot", "imaging", "time-series"]},
         "SEQ.TARG.FLUX.L":            {"default": 3000},
         "SEQ.TARG.FLUX.N":            {"default": 300},
