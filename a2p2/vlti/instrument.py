@@ -116,7 +116,7 @@ class VltiInstrument(Instrument):
 
     def getCoords(self, target, requirePrecision=True):
         """
-        Format coordinates from given target to be VLTI compliant.
+        Format HMS DMS coordinates from given target to be VLTI compliant.
         Throws an exception if requirePrecision is true and given inputs have less than 3 (RA) or 2 (DEC) digits.
         """
 
@@ -144,11 +144,19 @@ class VltiInstrument(Instrument):
 
     def getPMCoords(self, target, defaultPMRA=0.0, defaultPMDEC=0.0):
         """
-        Returns PMRA, PMDEC as float values rounded to 4 decimal digits. 0.0 is used as default if not present.
+        Returns PMRA, PMDEC in arcsec/year as float values rounded to 4 decimal digits. 0.0 is used as default if not present.
         """
         PMRA = self.get(target, "PMRA", defaultPMRA)
         PMDEC = self.get(target, "PMDEC", defaultPMDEC)
         return round(float(PMRA) / 1000.0, 4), round(float(PMDEC) / 1000.0, 4)
+
+    def getPARALLAX(self, target, defaultPARALLAX=0.0):
+        """
+        Returns PARALLAX in arcsec as float value rounded to 4 decimal digits. 0.0 is used as default if not present.
+        """
+        PARALLAX = self.get(target, "PARALLAX", defaultPARALLAX)
+        return round(float(PARALLAX) / 1000.0, 4)
+
 
     def getFlux(self, target, flux):
         """

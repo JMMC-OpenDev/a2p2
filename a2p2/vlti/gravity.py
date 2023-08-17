@@ -94,9 +94,9 @@ class Gravity(VltiInstrument):
                 scienceTarget = observationConfiguration.SCTarget
 
                 # define target
-                acqTSF.SEQ_INS_SOBJ_NAME = scienceTarget.name.strip()
-                obTarget.name = acqTSF.SEQ_INS_SOBJ_NAME.replace(
+                acqTSF.SEQ_INS_SOBJ_NAME = scienceTarget.name.strip().replace(
                     ' ', '_')  # allowed characters: letters, digits, + - _ . and no spaces
+                obTarget.name = acqTSF.SEQ_INS_SOBJ_NAME
                 obTarget.ra, obTarget.dec = self.getCoords(scienceTarget)
                 obTarget.properMotionRa, obTarget.properMotionDec = self.getPMCoords(
                     scienceTarget)
@@ -113,7 +113,7 @@ class Gravity(VltiInstrument):
                 # Retrieve Fluxes
                 acqTSF.COU_GS_MAG = self.getFlux(scienceTarget, "V")
                 acqTSF.SEQ_INS_SOBJ_MAG = self.getFlux(scienceTarget, "K")
-                if not dualField or not wideMode:
+                if not dualField or wideMode:
                     acqTSF.SEQ_INS_SOBJ_HMAG = self.getFlux(scienceTarget, "H")
 
                 # setup some default values, to be changed below
@@ -127,26 +127,26 @@ class Gravity(VltiInstrument):
                     acqTSF.SEQ_FT_ROBJ_MAG = self.getFlux(ftTarget, "K")
                     acqTSF.SEQ_FT_ROBJ_HMAG = self.getFlux(ftTarget, "H")
 
-                    # test arcseconds distance in dual field or wide mode (P112 values)
+                    # test arcseconds distance in dual field or wide mode (GRAVITY_TemplateManual_P112 values)
                     if tel == "UT":
                         if wideMode:
                             SCtoREFmaxDist = 30
-                            SCtoREFminDist = 1
+                            SCtoREFminDist = 2
                         elif offaxisMode:
                             SCtoREFmaxDist = 2
-                            SCtoREFminDist = .3
+                            SCtoREFminDist = .27
                         else:
-                            SCtoREFmaxDist = .69
+                            SCtoREFmaxDist = .6
                             SCtoREFminDist = 0
                     else:
                         if wideMode:
-                            raise ValueError(
-                                "Wide mode requires UT. Please correct.")
-                        if offaxisMode:
-                            SCtoREFmaxDist = 6
-                            SCtoREFminDist = 1.33
+                            SCtoREFmaxDist = 30
+                            SCtoREFminDist = 4
+                        elif offaxisMode:
+                            SCtoREFmaxDist = 4
+                            SCtoREFminDist = 1.17
                         else:
-                            SCtoREFmaxDist = 3.07
+                            SCtoREFmaxDist = 2.7
                             SCtoREFminDist = 0
 
                     FTRA, FTDEC = self.getCoords(ftTarget)
@@ -170,7 +170,9 @@ class Gravity(VltiInstrument):
                     FTPMA, FTPMD = self.getPMCoords(ftTarget)
                     acqTSF.SEQ_FT_ROBJ_PMA = FTPMA
                     acqTSF.SEQ_FT_ROBJ_PMD = FTPMD
-                    # TODO : Add missing PARALLAX ?
+
+                    FTPARALLAX = self.getPARALLAX(ftTarget)
+                    acqTSF.SEQ_FT_ROBJ_PARALLAX = FTPARALLAX
 
                     acqTSF.SEQ_FT_MODE = "AUTO"
 

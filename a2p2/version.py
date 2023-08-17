@@ -29,7 +29,7 @@ __release_notes__ = {
        "VLTI": [
             "Add first P112 support using radiobutton to select proper onaxis offaxis or wide GRAVITY templates",
             "Improve coordinate's checks and computations",
-            "Add FT's propermotion"
+            "Add FT's propermotions and parallax"
        ],
        "CHARA": [
        ],
