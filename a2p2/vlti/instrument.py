@@ -12,6 +12,7 @@ import logging
 
 import numpy as np
 from astropy.coordinates import SkyCoord
+import astropy.units as u
 
 from a2p2.instrument import Instrument
 
@@ -389,12 +390,15 @@ class VltiInstrument(Instrument):
                 res[key] = rangeTable[_tpl][key]["default"]
         return res
 
-    def getSkyDiff(self, ra, dec, ftra, ftdec):
-        science = SkyCoord(ra, dec, frame='icrs', unit='deg')
-        ft = SkyCoord(ftra, ftdec, frame='icrs', unit='deg')
-        ra_offset = (science.ra - ft.ra) * np.cos(ft.dec.to('radian'))
-        dec_offset = (science.dec - ft.dec)
-        return [ra_offset.deg * 3600 * 1000, dec_offset.deg * 3600 * 1000]  # in mas
+    def getSkySeparation(self, ra1, dec1, ra2, dec2):
+        target1 = SkyCoord(ra1, dec1, frame='icrs', unit=(u.hourangle, u.deg))
+        target2 = SkyCoord(ra2, dec2, frame='icrs', unit=(u.hourangle, u.deg))
+        return target1.separation(target2)
+
+    def getSkyOffset(self, ra, dec, originRa, originDec):
+        science = SkyCoord(ra, dec, frame='icrs', unit=(u.hourangle, u.deg))
+        origin = SkyCoord(originRa, originDec, frame='icrs', unit=(u.hourangle, u.deg))
+        return origin.spherical_offsets_to(science)
 
     def getSiderealTimeConstraints(self, LSTINTERVAL):
         # by default, above 40 degree. Will generate a WAIVERABLE ERROR if not.

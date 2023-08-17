@@ -113,55 +113,64 @@ class Gravity(VltiInstrument):
                 # Retrieve Fluxes
                 acqTSF.COU_GS_MAG = self.getFlux(scienceTarget, "V")
                 acqTSF.SEQ_INS_SOBJ_MAG = self.getFlux(scienceTarget, "K")
-                if not dualField and not wideMode:
+                if not dualField or not wideMode:
                     acqTSF.SEQ_INS_SOBJ_HMAG = self.getFlux(scienceTarget, "H")
 
                 # setup some default values, to be changed below
                 GSRA = '00:00:00.000'
                 GSDEC = '00:00:00.000'
-                dualFieldDistance = 0.0  # needed as must exist for the argument list of createGravityOB
 
                 # if FT Target is not ScTarget, we are in dual-field (TBD)
                 ftTarget = ob.get(observationConfiguration, "FTTarget")
                 if ftTarget != None:
                     acqTSF.SEQ_FT_ROBJ_NAME = ftTarget.name
-                    FTRA, FTDEC = self.getCoords(ftTarget)
-                    # no PMRA, PMDE for FT !!
                     acqTSF.SEQ_FT_ROBJ_MAG = self.getFlux(ftTarget, "K")
                     acqTSF.SEQ_FT_ROBJ_HMAG = self.getFlux(ftTarget, "H")
 
-                    # test distance in dual field or wide mode (P112 values)
+                    # test arcseconds distance in dual field or wide mode (P112 values)
                     if tel == "UT":
                         if wideMode:
-                            SCtoREFmaxDist = 30000
-                            SCtoREFminDist = 1000
+                            SCtoREFmaxDist = 30
+                            SCtoREFminDist = 1
                         elif offaxisMode:
-                            SCtoREFmaxDist = 2000
-                            SCtoREFminDist = 300
+                            SCtoREFmaxDist = 2
+                            SCtoREFminDist = .3
                         else:
-                            SCtoREFmaxDist = 690
+                            SCtoREFmaxDist = .69
                             SCtoREFminDist = 0
                     else:
                         if wideMode:
                             raise ValueError(
                                 "Wide mode requires UT. Please correct.")
                         if offaxisMode:
-                            SCtoREFmaxDist = 6000
-                            SCtoREFminDist = 1330
+                            SCtoREFmaxDist = 6
+                            SCtoREFminDist = 1.33
                         else:
-                            SCtoREFmaxDist = 3070
+                            SCtoREFmaxDist = 3.07
                             SCtoREFminDist = 0
-                    # compute x,y between science and ref beams:
-                    dualFieldDistance = self.getSkyDiff(
-                        obTarget.ra, obTarget.dec, FTRA, FTDEC)
-                    if np.abs(dualFieldDistance[0]) < SCtoREFminDist:
-                        raise ValueError("Dual-Field distance of two stars is  < " + str(
-                            SCtoREFminDist) + " mas, Please correct.")
-                    elif np.abs(dualFieldDistance[0]) > SCtoREFmaxDist:
-                        raise ValueError("Dual-Field distance of two stars is  > " + str(
-                            SCtoREFmaxDist) + " mas, Please correct.")
-                    acqTSF.SEQ_INS_SOBJ_X = dualFieldDistance[0]
-                    acqTSF.SEQ_INS_SOBJ_Y = dualFieldDistance[1]
+
+                    FTRA, FTDEC = self.getCoords(ftTarget)
+                    dualFieldSeparation = self.getSkySeparation(obTarget.ra, obTarget.dec, FTRA, FTDEC)
+                    dualFieldSeparation = dualFieldSeparation.arcsec
+                    if dualFieldSeparation <= SCtoREFminDist or dualFieldSeparation >= SCtoREFmaxDist:
+                        raise ValueError(f"Dual-Field separation of two stars {dualFieldSeparation:.3f}'' is out of range [{SCtoREFminDist}'', {SCtoREFmaxDist}''], Please correct.")
+                    else:
+                        ui.addToLog(f"Dual-Field separation of two stars is {dualFieldSeparation:.3f}''")
+
+                    # Provide FT position
+                    if wideMode:
+                        acqTSF.SEQ_FT_ROBJ_ALPHA = FTRA
+                        acqTSF.SEQ_FT_ROBJ_DELTA = FTDEC
+                    else:
+                        # compute x,y between science and ref beams and set X,Y (mas) keywords:
+                        dualFieldOffset = self.getSkyOffset(obTarget.ra, obTarget.dec, FTRA, FTDEC)
+                        acqTSF.SEQ_INS_SOBJ_X = dualFieldOffset[0].mas
+                        acqTSF.SEQ_INS_SOBJ_Y = dualFieldOffset[1].mas
+
+                    FTPMA, FTPMD = self.getPMCoords(ftTarget)
+                    acqTSF.SEQ_FT_ROBJ_PMA = FTPMA
+                    acqTSF.SEQ_FT_ROBJ_PMD = FTPMD
+                    # TODO : Add missing PARALLAX ?
 
                     acqTSF.SEQ_FT_MODE = "AUTO"
 
