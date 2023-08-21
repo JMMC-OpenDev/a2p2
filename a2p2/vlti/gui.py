@@ -4,17 +4,12 @@ __all__ = []
 
 import sys
 import logging
+from turtle import bgcolor
 
 from a2p2.gui import FacilityUI
 
-if sys.version_info[0] == 2:
-    from Tkinter import *
-    from tkMessageBox import *
-    import ttk
-else:
-    from tkinter import *
-    from tkinter.messagebox import *
-    import tkinter.ttk as ttk
+from tkinter import *
+from tkinter.ttk import *
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +20,8 @@ class VltiUI(FacilityUI):
         logger.info("init VltiUI")
         FacilityUI.__init__(self, a2p2client)
 
-        self.container = Frame(self, bd=3, relief=SUNKEN)
+        #self.container = Frame(self, bd=3, relief=SUNKEN)
+        self.container = Frame(self, relief=SUNKEN)
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
 
@@ -240,8 +236,12 @@ class TreeFrame(Frame):
 
         self.abortButton = Button(buttonframe, text="Abort this OB",
                                   command=self.on_abortbutton_clicked, state=DISABLED)
+        style = ttk.Style()
+        sButtonStyle="Custom.TButton"
+        ttk.Style().configure(sButtonStyle, background="green")
         self.submitButton = Button(
-            buttonframe, text="Submit", command=self.on_submitbutton_clicked, state=DISABLED)
+            buttonframe, text="Submit", command=self.on_submitbutton_clicked, state=DISABLED,
+            style=sButtonStyle)
         self.abortButton.grid(row=0, column=cindex)
         cindex += 1
         self.submitButton.grid(row=0, column=cindex)
