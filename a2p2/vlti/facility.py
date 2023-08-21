@@ -145,7 +145,7 @@ class VltiFacility(Facility):
             self.ui.addToLog(
                 f"Container's IpVersion '{int(self.containerInfo.getIpVersion())}' is not applicable for received OB's one '{period}', please select another '{insname}' container or change it in Aspro2.")
         else:
-            self.showOBConfirmationButtons(ob, insname=="GRAVITY" and period >= 112)
+            self.showOBConfirmationButtons(ob, insname=="GRAVITY")
 
     def showOBConfirmationButtons(self, ob=None, showAcqButtons=False):
         self.ui.showOBConfirmationButtons(ob, showAcqButtons)
