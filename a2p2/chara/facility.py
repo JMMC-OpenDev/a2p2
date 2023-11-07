@@ -51,7 +51,7 @@ class CharaFacility(Facility):
                 self.connected2OB2 = True
             except:
                 print(traceback.format_exc())
-                msg=f"Can't send OB to remote server queue, please check access to server {charaServer}"
+                msg=f"Can't send OB to the queue server, please launch it or check your ssh port forwarding ( {charaServer} )"
                 self.connected2OB2 = False
 
             self.a2p2client.ui.addToLog(msg)
