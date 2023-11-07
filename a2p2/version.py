@@ -32,6 +32,7 @@ __release_notes__ = {
             "Add FT's propermotions and parallax"
        ],
        "CHARA": [
+            "Display log of received OB also for calibrators"
        ],
        "TODO-SCIENCE": [
            "Merge AO or GS in a same code section for every instruments",

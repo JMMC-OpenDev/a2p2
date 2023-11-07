@@ -95,8 +95,8 @@ AO Flat Star:
         targets = {}  # store  ids for futur retrieval in schedule
         for oc in ob.observationConfiguration:
             targets[oc.id] = oc
-            if "SCI" in oc.type:
-                sciences.append(oc)
+            # if "SCI" in oc.type:
+            sciences.append(oc)
 
         # Retrieve cals from schedule
         cals = {}
@@ -121,7 +121,7 @@ AO Flat Star:
                 buffer += ", ".join(oc.observationConstraints.LSTinterval) + "\n"
             else:
                 buffer += "                   NOT OBSERVABLE \n"
-            buffer += "Object:\n"
+            buffer += f"{oc.type} Object:\n"
             fluxes = ", ".join([e[0] + "=" + e[1]
                                 for e in ob.getFluxes(sct).items()])
             try:
