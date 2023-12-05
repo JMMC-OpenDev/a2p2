@@ -8,6 +8,7 @@ from turtle import bgcolor
 
 from a2p2.gui import FacilityUI
 
+from tkinter import ttk
 from tkinter import *
 from tkinter.ttk import *
 

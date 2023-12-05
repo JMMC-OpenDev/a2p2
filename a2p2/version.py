@@ -1,4 +1,4 @@
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,10 +21,11 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.7.0": {
+    "0.7.1": {
        "STATUS": [
        ],
        "A2P2": [
+           "Fix ttk import on MacOS",
        ],
        "VLTI": [
             "Add first P112 support using radiobutton to select proper onaxis offaxis or wide GRAVITY templates",
