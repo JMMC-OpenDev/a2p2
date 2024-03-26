@@ -48,7 +48,7 @@ class Pionier(VltiInstrument):
             kappaTSF = TSF(self, "PIONIER_gen_cal_kappa.tsf")
             darkTSF = TSF(self, "PIONIER_gen_cal_dark.tsf")
 
-            obTarget = OBTarget()
+
             obConstraints = OBConstraints(self)
 
             # set common properties
@@ -63,14 +63,7 @@ class Pionier(VltiInstrument):
 
             scienceTarget = observationConfiguration.SCTarget
 
-            # define target
-            # acqTSF.SEQ_INS_SOBJ_NAME = scienceTarget.name.strip()
-
-            obTarget.name = scienceTarget.name.strip().replace(
-                ' ', '_')  # allowed characters: letters, digits, + - _ . and no spaces
-            obTarget.ra, obTarget.dec = self.getCoords(scienceTarget)
-            obTarget.properMotionRa, obTarget.properMotionDec = self.getPMCoords(
-                scienceTarget)
+            obTarget = OBTarget(self, scienceTarget)
 
             # Set baseline  interferometric array code (should be a keywordlist)
             acqTSF.ISS_BASELINE = [self.getBaselineCode(ob)]
