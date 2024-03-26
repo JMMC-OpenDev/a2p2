@@ -700,9 +700,14 @@ class FixedDict(object):
 
 class OBTarget(FixedDict):
 
-    def __init__(self):
+    def __init__(self, instrument, scienceTarget):
         FixedDict.__init__(
             self, ('name', 'ra', 'dec', 'properMotionRa', 'properMotionDec'))
+        # Target name can include any alphanumeric character, and space, dot, plus or minus signs [a-z][A-Z][0-9][.+- ]
+        # ( https://www.eso.org/sci/observing/phase2/p2intro/p2-tutorials/p2-ImportTargetList.html )
+        self.name = re.sub(r'[^a-zA-Z0-9.\+\- ]+','',scienceTarget.name.strip())
+        self.ra, self.dec = instrument.getCoords(scienceTarget)
+        self.properMotionRa, self.properMotionDec = instrument.getPMCoords(scienceTarget)
 
 
 class OBConstraints(TSF):

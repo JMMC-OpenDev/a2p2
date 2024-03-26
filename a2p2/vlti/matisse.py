@@ -48,7 +48,6 @@ class Matisse(VltiInstrument):
             acqTSF = TSF(self, f"MATISSE_img_acq{tsfSuffix}.tsf")  # or .tsfx?
             obsTSF = TSF(self, f"MATISSE_hyb_obs{tsfSuffix}.tsf")
 
-            obTarget = OBTarget()
             obConstraints = OBConstraints(self)
 
             if 'SCIENCE' in observationConfiguration.type:
@@ -57,15 +56,7 @@ class Matisse(VltiInstrument):
                 obsTSF.DPR_CATG = 'CALIB'
 
             scienceTarget = observationConfiguration.SCTarget
-
-            # define target
-
-            obTarget.name = scienceTarget.name.replace(' ',
-                                                       '_')  # allowed characters: letters, digits, + - _ . and no spaces
-            # allowed characters: letters, digits, + - _ . and no spaces
-            obTarget.ra, obTarget.dec = self.getCoords(scienceTarget)
-            obTarget.properMotionRa, obTarget.properMotionDec = self.getPMCoords(
-                scienceTarget)
+            obTarget = OBTarget(self, scienceTarget)
 
             # Set baseline  interferometric array code (should be a keywordlist)
             acqTSF.ISS_BASELINE = [self.getBaselineCode(ob)]

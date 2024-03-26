@@ -73,7 +73,6 @@ class Gravity(VltiInstrument):
                 obsTSF = TSF(self, self.getGravityObsTemplateName(
                     ob, OBJTYPE, dualField))
 
-                obTarget = OBTarget()
                 obConstraints = OBConstraints(self)
 
                 # Check SPEC_RES from instrumentMode and set SPEC_POL except for single_offaxis ( missing keyword INS_SPEC_RES)
@@ -93,13 +92,10 @@ class Gravity(VltiInstrument):
 
                 scienceTarget = observationConfiguration.SCTarget
 
+                obTarget = OBTarget(self, scienceTarget)
+
                 # define target
-                acqTSF.SEQ_INS_SOBJ_NAME = scienceTarget.name.strip().replace(
-                    ' ', '_')  # allowed characters: letters, digits, + - _ . and no spaces
-                obTarget.name = acqTSF.SEQ_INS_SOBJ_NAME
-                obTarget.ra, obTarget.dec = self.getCoords(scienceTarget)
-                obTarget.properMotionRa, obTarget.properMotionDec = self.getPMCoords(
-                    scienceTarget)
+                acqTSF.SEQ_INS_SOBJ_NAME = obTarget.name
 
                 # Set baseline  interferometric array code (should be a keywordlist)
                 acqTSF.ISS_BASELINE = [self.getBaselineCode(ob)]
