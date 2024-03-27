@@ -1,4 +1,4 @@
-__version__ = "0.7.1"
+__version__ = "0.7.2"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -25,15 +25,13 @@ __release_notes__ = {
        "STATUS": [
        ],
        "A2P2": [
-           "Auto update chara queueserver preference for support of multiple values",
+           "Auto update chara queueserver preference",
        ],
        "VLTI": [
-            "Add first P112 support using radiobutton to select proper onaxis offaxis or wide GRAVITY templates",
-            "Improve coordinate's checks and computations",
-            "Add FT's propermotions and parallax"
+            "Bugfix to support missin preference file"
        ],
        "CHARA": [
-            "Display log of received OB also for calibrators"
+            "Support and try every queueserver's Urls comma separated from the queuserver user preference"
        ],
        "TODO-SCIENCE": [
            "Merge AO or GS in a same code section for every instruments",
