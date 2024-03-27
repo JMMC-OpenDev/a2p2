@@ -26,6 +26,7 @@ __release_notes__ = {
        ],
        "A2P2": [
            "Auto update chara queueserver preference",
+           "a2p2 -r generates release-notes.md (rendered on a2p2 repository)"
        ],
        "VLTI": [
             "Bugfix to support missin preference file"
