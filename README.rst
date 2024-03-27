@@ -68,6 +68,9 @@ Each facilities get it's own code directory to manage specific GUI and specific 
 
 Please fill an issue_ for any question, remark or enhancement request.
 
+Release notes
+-------------
+`Check file <release-notes.md>`_
 
 License
 -------
