@@ -21,11 +21,11 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.7.1": {
+    "0.7.2": {
        "STATUS": [
        ],
        "A2P2": [
-           "Fix ttk import on MacOS",
+           "Auto update chara queueserver preference for support of multiple values",
        ],
        "VLTI": [
             "Add first P112 support using radiobutton to select proper onaxis offaxis or wide GRAVITY templates",
@@ -47,6 +47,20 @@ __release_notes__ = {
            "Complete test suite with more real p2 submissions",
            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
        ],
+    },"0.7.1": {
+       "STATUS": [
+       ],
+       "A2P2": [
+           "Fix ttk import on MacOS",
+       ],
+       "VLTI": [
+            "Add first P112 support using radiobutton to select proper onaxis offaxis or wide GRAVITY templates",
+            "Improve coordinate's checks and computations",
+            "Add FT's propermotions and parallax"
+       ],
+       "CHARA": [
+            "Display log of received OB also for calibrators"
+       ]
     },"0.6.9": {
        "STATUS": [
        ],

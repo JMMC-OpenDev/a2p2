@@ -36,26 +36,31 @@ class CharaFacility(Facility):
 
     def consumeOB(self, ob):
         # forward message if a server is present in the preferences
-        charaServer=self.a2p2client.preferences.getCharaQueueServer()
-        if charaServer :
-            try:
-                r = requests.post(charaServer, json=ob.as_dict())
-                msg = ""
-                if not self.connected2OB2:
-                    try:
-                        c=requests.get(charaServer)
-                        msg += f"Connection succeeded on OB2 server : {c.json()}\n"
-                    except:
-                        msg += f"Connection succeded on a non identified OB2 server\n"
-                msg+=f"OB sent to remote server queue : {r}"
-                self.connected2OB2 = True
-            except:
-                print(traceback.format_exc())
-                msg=f"Can't send OB to the queue server, please launch it or check your ssh port forwarding ( {charaServer} )"
-                self.connected2OB2 = False
+        queueServers=self.a2p2client.preferences.getCharaQueueServer()
+        if queueServers :
+            for queueServer in queueServers:
+                logger.debug(f'Trying to send OB on queuserver : {queueServer}')
+                try:
+                    if not self.connected2OB2:
+                        try:
+                            c=requests.get(queueServer, timeout=5)
+                            msg += f"Connection succeeded on OB2 server : {c.json()}\n"
+                        except:
+                            msg += f"Connection succeded on a non identified OB2 server\n"
+                    r = requests.post(queueServer, json=ob.as_dict(), timeout=5)
+                    msg = ""
+                    msg+=f"OB sent to remote server queue : {r}"
+                    self.connected2OB2 = True
+                    self.a2p2client.ui.addToLog(msg)
+                    self.charaUI.display(msg)
+                    break # do only send to the first server
+                except:
+                    print(traceback.format_exc())
+                    msg=f"Can't send OB to the '{queueServer}' queue server, please launch it, edit your preferences or check your ssh port forwarding "
+                    self.connected2OB2 = False
+                    self.a2p2client.ui.addToLog(msg)
+                    self.charaUI.display(msg)
 
-            self.a2p2client.ui.addToLog(msg)
-            self.charaUI.display(msg)
 
         # display OB
         self.charaUI.displayOB(ob)

@@ -59,7 +59,9 @@ class A2p2Client():
         self.facilityManager = FacilityManager(self)
 
         if self.preferences.exists():
-            pass
+            A2P2ClientPreferences.updatePreferencesFile()
+            self.ui.addToLog(
+                f"Using preference from '{A2P2ClientPreferences.getPreferencesFileName()}'.\n")
         else:
             self.ui.addToLog(
                 "No preference file found, please create one so your data persists (launch program with -c option).\n")
@@ -236,6 +238,15 @@ class A2P2ClientPreferences():
         preferences_file = os.path.join(user_config_dir(
             A2P2ClientPreferences.appname), "prefs.ini")
         return preferences_file
+    def updatePreferencesFile():
+        return
+        # TODO
+        # we suppose the file exists
+        filename = A2P2ClientPreferences.getPreferencesFileName()
+        buffer=""
+        for line in open(filename):
+            buffer+=line+"\n"
+        print (buffer)
 
     def createPreferencesFile():
         filename = A2P2ClientPreferences.getPreferencesFileName()
@@ -270,7 +281,7 @@ class A2P2ClientPreferences():
             s['# CHARA SECTION'] = ""
             s['# = > please uncomment and update next properties to make it active <'] = ""
             s['# = > queueserver may be uncommented to forward OB to a remote server instead <'] = ""
-            s['#queueserver'] = "http://localhost:2468/test"
+            s['#queueserver'] = 'http://192.168.3.153:2468/test,http://localhost:2468/test'
 
             config['p2'] = {}
             s=config['p2']
@@ -329,7 +340,9 @@ class A2P2ClientPreferences():
 
     # Retrieve CHARA prefs
     def getCharaQueueServer(self):
-        return self.getConfig("chara", "queueserver", None)
+        s = self.getConfig("chara", "queueserver", None)
+        if s:
+            return s.split(",")
 
 
     # Retrieve P2 prefs
