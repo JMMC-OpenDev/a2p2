@@ -1,4 +1,4 @@
-__version__ = "0.7.2"
+__version__ = "0.7.3"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -21,18 +21,9 @@ __release_notes__ = {
     #
     #        ],
     #    },
-    "0.7.2": {
-       "STATUS": [
-       ],
-       "A2P2": [
-           "Auto update chara queueserver preference",
-           "a2p2 -r generates release-notes.md (rendered on a2p2 repository)"
-       ],
-       "VLTI": [
-            "Bugfix to support missin preference file"
-       ],
+    "0.7.3": {
        "CHARA": [
-            "Support and try every queueserver's Urls comma separated from the queuserver user preference"
+            "Better reuse of last working queueserver"
        ],
        "TODO-SCIENCE": [
            "Merge AO or GS in a same code section for every instruments",
@@ -45,6 +36,19 @@ __release_notes__ = {
            "Unify ob name creation in vlti instrument createOB()",
            "Complete test suite with more real p2 submissions",
            "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+       ],
+    },"0.7.2": {
+       "STATUS": [
+       ],
+       "A2P2": [
+           "Auto update chara queueserver preference",
+           "a2p2 -r generates release-notes.md (rendered on a2p2 repository)"
+       ],
+       "VLTI": [
+            "Bugfix to support missin preference file"
+       ],
+       "CHARA": [
+            "Support and try every queueserver's Urls comma separated from the queuserver user preference"
        ],
     },"0.7.1": {
        "STATUS": [
