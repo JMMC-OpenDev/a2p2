@@ -229,8 +229,8 @@ class TreeFrame(Frame):
         for isvt in self.vltiUI.facility.getIssVltiTypes():
             boolv = BooleanVar()
             self.issVltiTypeCheckboxesVars[isvt]=boolv
-            boolv.set( isvt in pvltitypes or len(pvltitypes)==0 )
-            logger.debug(f"Set prefrence value for {isvt} : {boolv.get()}")
+            boolv.set( not pvltitypes or len(pvltitypes)==0 or isvt in pvltitypes )
+            logger.debug(f"Set preference value for {isvt} : {boolv.get()}")
             cb = Checkbutton(buttonframe, text=isvt, variable=boolv, onvalue=True, offvalue=False)
             cb.grid(row=0, column=cindex)
             cindex += 1
