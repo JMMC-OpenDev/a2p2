@@ -18,6 +18,7 @@ class CharaFacility(Facility):
         Facility.__init__(self, a2p2client, "CHARA", HELPTEXT)
         self.charaUI = CharaUI(self)
         self.connected2OB2 = False
+        self.validQueueServer = None
 
     def processOB(self, ob):
         if not ob:
@@ -34,33 +35,47 @@ class CharaFacility(Facility):
         # give focus on last updated UI
         self.a2p2client.ui.showFacilityUI(self.charaUI)
 
-    def consumeOB(self, ob):
-        # forward message if a server is present in the preferences
-        queueServers=self.a2p2client.preferences.getCharaQueueServer()
-        if queueServers :
-            for queueServer in queueServers:
-                logger.debug(f'Trying to send OB on queuserver : {queueServer}')
-                try:
-                    if not self.connected2OB2:
-                        try:
-                            c=requests.get(queueServer, timeout=5)
-                            msg += f"Connection succeeded on OB2 server : {c.json()}\n"
-                        except:
-                            msg += f"Connection succeded on a non identified OB2 server\n"
-                    r = requests.post(queueServer, json=ob.as_dict(), timeout=5)
-                    msg = ""
-                    msg+=f"OB sent to remote server queue : {r}"
-                    self.connected2OB2 = True
-                    self.a2p2client.ui.addToLog(msg)
-                    self.charaUI.display(msg)
-                    break # do only send to the first server
-                except:
-                    print(traceback.format_exc())
-                    msg=f"Can't send OB to the '{queueServer}' queue server, please launch it, edit your preferences or check your ssh port forwarding "
-                    self.connected2OB2 = False
-                    self.a2p2client.ui.addToLog(msg)
-                    self.charaUI.display(msg)
+    def checkServer(self):
+        if self.validQueueServer:
+            # recheck ?
+            return True
+        else:
+            # search and test servers from preferences
+            queueServers=self.a2p2client.preferences.getCharaQueueServer()
+            msg=""
+            if queueServers :
+                for queueServer in queueServers:
+                    logger.debug(f'Trying to send OB on queuserver : {queueServer}')
+                    try:
+                        c=requests.get(queueServer, timeout=3)
+                        msg+=f"Connection succeeded on OB server : {c.json()}\n"
+                        self.validQueueServer = queueServer
+                        break
+                    except:
+                        msg+=f"Connection failed on {queueServer}\n"
 
+            self.a2p2client.ui.addToLog(msg)
+            self.charaUI.display(msg)
+
+            return self.validQueueServer
+
+    def consumeOB(self, ob):
+        if self.checkServer():
+            try:
+                r = requests.post(self.validQueueServer, json=ob.as_dict(), timeout=3)
+                msg = ""
+                msg+=f"OB sent to remote server queue : {r}"
+                self.connected2OB2 = True
+                self.a2p2client.ui.addToLog(msg)
+                self.charaUI.display(msg)
+            except:
+                print(traceback.format_exc())
+                msg=f"Can't send OB to the '{self.validQueueServer}' queue server, please relaunch it or try again for a new one."
+                self.validQueueServer = None
+                self.a2p2client.ui.addToLog(msg)
+                self.charaUI.display(msg)
+        else:
+            msg=f"Can't find any queue server, please launch it, edit your preferences or check your ssh port forwarding"
 
         # display OB
         self.charaUI.displayOB(ob)
