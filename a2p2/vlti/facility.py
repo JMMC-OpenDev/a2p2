@@ -191,10 +191,17 @@ class VltiFacility(Facility):
             instrument = self.getInstrument(o.instrumentConfiguration.name)
             instrument.checkOB(o)
             # check for warnings and abort if requested by user
+            # this implementation should be more detailled so we can have various VERSION associated to various warning
             if len(instrument.warnings)>0:
                 linesep="\n  -  "
-                version=instrument.getDitTable()["VERSION"]
-                answer = self.ui.AskYesNoMessage(f"According to the template manual {version} :\n \n  -  {linesep.join(instrument.warnings)}\n\nClick \"Yes\" to proceed \"No\" to abort the submission")
+                header=""
+                try:
+                    # some ditTable may have a VERSION entry some not...
+                    version=instrument.getDitTable()["VERSION"]
+                    header= f"According to the template manual {version} :\n \n  - \n"
+                except:
+                    pass
+                answer = self.ui.AskYesNoMessage(f"{header} {linesep.join(instrument.warnings)}\n\nClick \"Yes\" to proceed \"No\" to abort the submission")
                 instrument.warnings.clear()
                 if answer == False:
                     self.ui.addToLog("Submission has been marked to be aborted - do not proceed")
