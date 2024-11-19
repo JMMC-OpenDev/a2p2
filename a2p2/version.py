@@ -1,45 +1,39 @@
-__version__ = "0.7.3"
+__version__ = "0.7.4"
 
 __release_notes__ = {
     # "0.1.6": {
-    #    "STATUS":[
-    #             "This version get lot of changes and may contain bugs or missing features, please provide any feedback to improve and prepare a better future release !"
-    #         ],
     #    "A2P2": [
-    #
     #        ],
     #    "VLTI": [
-    #
     #        ],
     #    "CHARA": [
-    #
-    #        ],
-    #    "TODO-SCIENCE": [
-    #
-    #        ],
-    #    "TODO-DEV": [
-    #
     #        ],
     #    },
-    "0.7.3": {
+#
+#       "TODO-SCIENCE": [
+#           "Merge AO or GS in a same code section for every instruments",
+#          "Check DIT table from the last template user manuals (especially MATISSE) and remove PIONIER's one",
+#           "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values?",
+#       ],
+#       "TODO-DEV": [
+#           "Support multiple period version (two major at least)",
+#           "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
+#          "Unify ob name creation in vlti instrument createOB()",
+#          "Complete test suite with more real p2 submissions",
+#          "Try to read OB in P2 and send them back to Aspro2 as a new obs",
+#      ],
+
+    "0.7.4": {
+       "A2P2": [
+           "Use pyproject.toml for python installation",
+        ],"VLTI": [
+            "Log automatic PIONIER mode change to FREE if not set on Aspro2 side"
+        ],
+    },"0.7.3": {
        "CHARA": [
             "Better reuse of last working queueserver"
        ],
-       "TODO-SCIENCE": [
-           "Merge AO or GS in a same code section for every instruments",
-           "Check DIT table from the last template user manuals (especially MATISSE) and remove PIONIER's one",
-           "flag ~important~ keywords which MUST be set in a2p2 code and not leaved to there default values?",
-       ],
-       "TODO-DEV": [
-           "Support multiple period version (two major at least)",
-           "Support numlist keyword : eg. SEQ.HWPOFF (done in conf but must be range check compatible)",
-           "Unify ob name creation in vlti instrument createOB()",
-           "Complete test suite with more real p2 submissions",
-           "Try to read OB in P2 and send them back to Aspro2 as a new obs",
-       ],
     },"0.7.2": {
-       "STATUS": [
-       ],
        "A2P2": [
            "Auto update chara queueserver preference",
            "a2p2 -r generates release-notes.md (rendered on a2p2 repository)"
@@ -51,8 +45,6 @@ __release_notes__ = {
             "Support and try every queueserver's Urls comma separated from the queuserver user preference"
        ],
     },"0.7.1": {
-       "STATUS": [
-       ],
        "A2P2": [
            "Fix ttk import on MacOS",
        ],
@@ -65,8 +57,6 @@ __release_notes__ = {
             "Display log of received OB also for calibrators"
        ]
     },"0.6.9": {
-       "STATUS": [
-       ],
        "A2P2": [
             "ctrl-c support improved to qui a2p2 from terminal",
        ],
@@ -94,8 +84,6 @@ __release_notes__ = {
             "Experimental: forward OBs through json payload to the location defined in preference",
         ],
     },"0.6.4": {
-        "STATUS": [
-        ],
         "A2P2": [
             "Fix import that may break run on windows..."
         ],
@@ -238,7 +226,7 @@ __release_notes__ = {
         ],
     },
     "0.2.14": {
-        "STATUS": [
+        "A2P2": [
             "BugFix: ask for container Name only if one is selected"
         ],
     },
