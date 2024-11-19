@@ -27,7 +27,7 @@ __release_notes__ = {
        "A2P2": [
            "Use pyproject.toml for python installation",
         ],"VLTI": [
-            "Log automatic PIONIER mode change to FREE if not set on Aspro2 side"
+            "Do not switch PIONIER mode to FREE when the magnitude of the IAS star is too high : an error may be provided by p2"
         ],
     },"0.7.3": {
        "CHARA": [
