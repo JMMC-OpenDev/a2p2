@@ -124,9 +124,6 @@ class Pionier(VltiInstrument):
             else:
                 obConstraints.skyTransparency = 'Clear'
 
-            if acqTSF.ISS_IAS_HMAG > 7.5:
-                acqTSF.INS_DISP_NAME = "FREE"
-
             # FIXME: error (OB): "Phase 2 constraints must closely follow what was requested in the Phase 1 proposal.
             # The seeing value allowed for this OB is >= java0x0 arcsec."
             # FIXME REPLACE SEEING THAT IS NO MORE SUPPORTED
