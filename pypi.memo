@@ -1,14 +1,20 @@
 Pypi deployement
 ----------------
+(from https://packaging.python.org/en/latest/tutorials/packaging-projects/ )
+
 Look at the a2p2/version.py then run:
 
-    ``python setup.py sdist``
+    ``python -m build``
 
-    ``twine upload --repository-url https://test.pypi.org/legacy/ dist/*``
+    ``python -m twine upload --repository testpypi dist/*``
 
-    ``twine upload dist/*``
+    ``python -m twine upload dist/*``
 
-or 
+or
 ```
 rm -rf dist/* ; python setup.py sdist ; twine upload dist/*
 ```
+
+You may have to install some pre-requisites:
+
+    ``pip install --upgrade build twine``
