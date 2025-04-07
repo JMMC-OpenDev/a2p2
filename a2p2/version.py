@@ -1,4 +1,4 @@
-__version__ = "0.7.4"
+__version__ = "0.7.5"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -23,7 +23,11 @@ __release_notes__ = {
 #          "Try to read OB in P2 and send them back to Aspro2 as a new obs",
 #      ],
 
-    "0.7.4": {
+    "0.7.5": {
+       "A2P2": [
+           "Add support for join and filter in a2p2.jmmc.Catalog wrapper",
+        ],
+    },"0.7.4": {
        "A2P2": [
            "Use pyproject.toml for python installation",
         ],"VLTI": [

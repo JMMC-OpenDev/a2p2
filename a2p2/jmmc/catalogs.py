@@ -4,6 +4,9 @@ __all__ = []
 
 import logging
 
+import pyvo
+import astropy.table.table
+
 from ..client import A2P2ClientPreferences
 
 from .utils import JmmcAPI
@@ -17,20 +20,36 @@ class Catalog():
         Credential can be explicitly given for method that require an authentication, else:
         - a2p2 preferences login will be used if present (see a2p2 -c)
         - or uses .netrc file
+        A where clause can be added to limit on rows of interest (adql syntax)
+        A joins list of dictionnary can be provided to combine this catalog to other ones ( format is: [{"name":"cattojoin","id":"commonkey"},...] )
     """
 
-    def __init__(self, catalogName, username=None, password=None, prod=False, apiUrl=None):
+    def __init__(self, catalogName, username=None, password=None, prod=False, apiUrl=None, tapUrl=None, where=None, joins=None):
         self.catalogName = catalogName
+        self.where = where
+        self.joins = joins
         self.prod = prod
+        self.colDelimiterName = "coldelimiter___"
 
         # Manage prod & preprod or user provided access points
         if apiUrl:
             self.apiUrl = apiUrl  # trust given url as catalogAPI if value is provided
-        elif self.prod:
-            self.apiUrl = "https://oidb.jmmc.fr/restxq/catalogs"
-        else:
-            self.apiUrl = "https://oidb-beta.jmmc.fr/restxq/catalogs"
+        if tapUrl:
+            self.tapUrl = tapUrl  # trust given url as TAP server if value is provided
 
+        if not(apiUrl):
+            if self.prod:
+                self.apiUrl = "https://oidb.jmmc.fr/restxq/catalogs"
+            else:
+                self.apiUrl = "https://oidb-beta.jmmc.fr/restxq/catalogs"
+
+        if not(tapUrl):
+            if self.prod:
+                self.tapUrl = "https://tap.jmmc.fr/vollt/tap"
+            else:
+                self.tapUrl = "https://tap-preprod.jmmc.fr/vollt/tap"
+
+        self.tap = pyvo.dal.TAPService(self.tapUrl)
         self.api = JmmcAPI(self.apiUrl, username, password)
 
         logger.info(f"Create catalog wrapper to access '{catalogName}' ({PRODLABEL[self.prod]} API at {self.api.rootURL})")
@@ -40,7 +59,7 @@ class Catalog():
         return self.api._get("")
 
     def metadata(self):
-        """ Get catalog metadata """
+        """ Get catalog metadata"""
         return self.api._get(f"/meta/{self.catalogName}")
 
     def pis(self):
@@ -66,11 +85,74 @@ class Catalog():
                 return pi["name"]
 
     def getRow(self, id):
-        """ Get a single catalog record for the given id.
+        """ Get a single catalog record for the given id on the main catalog.
 
             usage: cat.getRow(42)
         """
         return self.api._get(f"/{self.catalogName}/{id}")
+
+    def getTable(self, maxrec=10000):
+        """ Get an astropy table from the main catalog joined the other if provided in constructor.
+
+            usage: cat.getRows()
+        """
+        # using SELECT TOP N below to workarround astroquery.utils.tap BUG
+
+        clauses = []
+        if self.joins :
+            joinedCatalogNames = []
+            for join in self.joins:
+                joinedCatalogNames.append(join["name"] + ".*")
+
+            # colDelimiterName is added so we can keep the mainCatalog colnames for later updates (using rowsToDict)
+            clauses.append(f"SELECT TOP {maxrec} {self.catalogName}.*, '' as {self.colDelimiterName}, {', '.join(joinedCatalogNames)} FROM {self.catalogName}" )
+
+            for join in self.joins:
+                if "catalogKey" in join.keys():
+                    catalogKey=join["catalogKey"]
+                else:
+                    # we could use the (cached) metadata key, but this would add a additional remote call.A2P2ClientPreferences
+                    # let's try with this convention using the same key name
+                    catalogKey=join["id"]
+                name=join["name"]
+                id=join["id"]
+                # LEFT JOIN may be an option provided by join key ?
+                clauses.append (f" LEFT JOIN {name} ON {self.catalogName}.{catalogKey} = {name}.{id}")
+
+            if self.where:
+                clauses.append(f" WHERE {self.catalogName}.{self.where}")
+        else:
+            clauses.append(f"SELECT TOP {maxrec} * FROM {self.catalogName}")
+            if self.where:
+                clauses.append(f" WHERE {self.where}")
+
+        query = "  ".join(clauses)
+        logger.info(f"Queriing TAP : {query}")
+        return self.tap.search(query,maxrec=maxrec).to_table()
+
+
+    def tableToDict(self, table):
+        """ Convert table (astropy.table or row) to a list of dict so we can modify content and update remote catalog using updateRows().
+
+            usage: cat.tableToDict(table)
+        """
+        colnames = table.colnames
+        if "coldelimiter___" in colnames:
+            colnames = colnames[0:colnames.index("coldelimiter___")]
+        dicts=[]
+        # handle single row case
+        table = table if isinstance(table, astropy.table.table.Table ) else [table]
+        for row in table:
+            dict = {}
+            for colname in colnames:
+                v=row[colname]
+                if isinstance(v,str):
+                    dict[colname] = v
+                else:
+                    # avoid np.numeric type to make it json serializable
+                    dict[colname] = v.item()
+            dicts.append(dict)
+        return dicts
 
     def updateRow(self, id, values):
         """ Update record identified by given id and associated values.
@@ -87,6 +169,7 @@ class Catalog():
         """
 
         # We may check befere sending payload that we always provide an id for every record
+        # What is the behaviour if we provide various data assosiated to the same id ?
         return self.api._put(f"/{self.catalogName}", values)
 
     def addRows(self, values):
@@ -96,6 +179,7 @@ class Catalog():
             usage: addCatalogRows([ { "id":42, "col_a":"a" }, { "id":24, "col_b":"b" } ])
         """
         return self.api._post(f"/{self.catalogName}", json=values)
+
 
     def getDelegations(self, pi=None):
         """ Get -all- delegations.
