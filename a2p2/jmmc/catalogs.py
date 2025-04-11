@@ -91,10 +91,18 @@ class Catalog():
         """
         return self.api._get(f"/{self.catalogName}/{id}")
 
+    def getDataFrame(self):
+        """ Get a pandas DataFrame from the main catalog joined the other if provided in constructor.
+
+            usage: cat.getDataFrame()
+        """
+
+        return self.getTable().to_pandas()
+
     def getTable(self, maxrec=10000):
         """ Get an astropy table from the main catalog joined the other if provided in constructor.
 
-            usage: cat.getRows()
+            usage: cat.getTable()
         """
         # using SELECT TOP N below to workarround astroquery.utils.tap BUG
 
@@ -127,9 +135,8 @@ class Catalog():
                 clauses.append(f" WHERE {self.where}")
 
         query = "  ".join(clauses)
-        logger.info(f"Queriing TAP : {query}")
+        logger.info(f"Querying remote catalog : {query}")
         return self.tap.search(query,maxrec=maxrec).to_table()
-
 
     def tableToDict(self, table):
         """ Convert table (astropy.table or row) to a list of dict so we can modify content and update remote catalog using updateRows().
