@@ -26,6 +26,8 @@ class Catalog():
 
     def __init__(self, catalogName, username=None, password=None, prod=False, apiUrl=None, tapUrl=None, where=None, joins=None):
         self.catalogName = catalogName
+        self.updated = False
+        self.lastTable = None
         self.where = where
         self.joins = joins
         self.prod = prod
@@ -99,12 +101,15 @@ class Catalog():
 
         return self.getTable().to_pandas()
 
-    def getTable(self, maxrec=10000):
+    def getTable(self, maxrec=10000, forceUpdate=False):
         """ Get an astropy table from the main catalog joined the other if provided in constructor.
 
             usage: cat.getTable()
         """
         # using SELECT TOP N below to workarround astroquery.utils.tap BUG
+
+        if not self.updated and self.lastTable and not forceUpdate:
+            return self.lastTable
 
         clauses = []
         if self.joins :
@@ -136,7 +141,9 @@ class Catalog():
 
         query = "  ".join(clauses)
         logger.info(f"Querying remote catalog : {query}")
-        return self.tap.search(query,maxrec=maxrec).to_table()
+        self.lastTable = self.tap.search(query,maxrec=maxrec).to_table()
+        self.updated=False
+        return self.lastTable
 
     def tableToDict(self, table):
         """ Convert table (astropy.table or row) to a list of dict so we can modify content and update remote catalog using updateRows().
@@ -166,6 +173,7 @@ class Catalog():
 
             usage: cat.updateRows(42, {"col_a":"a", "col_b":"b" })
         """
+        self.updated = True
         return self.api._put(f"/{self.catalogName}/{id}", values)
 
     def updateRows(self, values):
@@ -174,7 +182,7 @@ class Catalog():
 
             usage: updateRows([ { "id":42, "col_a":"a" }, { "id":24, "col_b":"b" } ])
         """
-
+        self.updated = True
         # We may check befere sending payload that we always provide an id for every record
         # What is the behaviour if we provide various data assosiated to the same id ?
         return self.api._put(f"/{self.catalogName}", values)
@@ -185,6 +193,7 @@ class Catalog():
 
             usage: addCatalogRows([ { "id":42, "col_a":"a" }, { "id":24, "col_b":"b" } ])
         """
+        self.updated = True
         return self.api._post(f"/{self.catalogName}", json=values)
 
 

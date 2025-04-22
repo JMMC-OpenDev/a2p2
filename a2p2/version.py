@@ -1,4 +1,4 @@
-__version__ = "0.7.6"
+__version__ = "0.7.7"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -23,7 +23,11 @@ __release_notes__ = {
 #          "Try to read OB in P2 and send them back to Aspro2 as a new obs",
 #      ],
 
-    "0.7.6": {
+    "0.7.7": {
+       "A2P2": [
+           "save some data retrival until update or force request occurs",
+        ],
+    },"0.7.6": {
        "A2P2": [
            "add getDataFrame() to a2p2.jmmc.Catalog to provide remote data with pandas format",
         ],
