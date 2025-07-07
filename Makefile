@@ -11,7 +11,7 @@ clean:
 deploy_pypi:
 	rm -rf build dist
 	python -m build
-	read "Press enter to deploy on Pypi or ctrl^C to abort"
+	read -p "Press enter to deploy on Pypi or ctrl^C to abort" doit
 	python -m twine upload dist/*
 
 

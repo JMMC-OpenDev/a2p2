@@ -28,6 +28,7 @@ class Catalog():
         self.catalogName = catalogName
         self.updated = False
         self.lastTable = None
+        self.lastDataFrame = None
         self.where = where
         self.joins = joins
         self.prod = prod
@@ -93,13 +94,15 @@ class Catalog():
         """
         return self.api._get(f"/{self.catalogName}/{id}")
 
-    def getDataFrame(self):
+    def getDataFrame(self, forceUpdate=False):
         """ Get a pandas DataFrame from the main catalog joined the other if provided in constructor.
 
             usage: cat.getDataFrame()
         """
-
-        return self.getTable().to_pandas()
+        if not ( self.updated or forceUpdate or self.lastDataFrame is None):
+            return self.lastDataFrame
+        self.lastDataFrame = self.getTable(forceUpdate=forceUpdate).to_pandas()
+        return self.lastDataFrame
 
     def getTable(self, maxrec=10000, forceUpdate=False):
         """ Get an astropy table from the main catalog joined the other if provided in constructor.
@@ -108,7 +111,7 @@ class Catalog():
         """
         # using SELECT TOP N below to workarround astroquery.utils.tap BUG
 
-        if not self.updated and self.lastTable and not forceUpdate:
+        if not ( self.updated or forceUpdate or self.lastTable is None ):
             return self.lastTable
 
         clauses = []

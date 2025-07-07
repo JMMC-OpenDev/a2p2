@@ -1,4 +1,4 @@
-__version__ = "0.7.7"
+__version__ = "0.7.9"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -23,9 +23,17 @@ __release_notes__ = {
 #          "Try to read OB in P2 and send them back to Aspro2 as a new obs",
 #      ],
 
-    "0.7.7": {
+    "0.7.9": {
        "A2P2": [
-           "save some data retrival until update or force request occurs",
+           "catalogs : remove duplicated code and force auth on POST requests",
+        ],
+    },"0.7.8": {
+       "A2P2": [
+           "catalogs : use cache for dataFrame() so we can modify it (was recreated from astropy table on each call)",
+        ],
+    },"0.7.7": {
+       "A2P2": [
+           "catalogs : save some data retrieval until update or force request occurs",
         ],
     },"0.7.6": {
        "A2P2": [
