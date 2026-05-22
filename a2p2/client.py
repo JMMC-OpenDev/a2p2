@@ -275,6 +275,7 @@ class A2P2ClientPreferences():
             s['# = > please uncomment and update next properties to make it active <'] = ""
             s['#login'] = "my.email@my.lab"
             s['#password'] = "12345zZ"
+            s['# = > you can check your credential at https://apps.jmmc.fr/account/#checkPW'] = ""
 
             config['chara'] = {}
             s = config['chara']
