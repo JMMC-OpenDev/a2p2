@@ -1,4 +1,4 @@
-__version__ = "0.7.9"
+__version__ = "0.7.11"
 
 __release_notes__ = {
     # "0.1.6": {
@@ -23,7 +23,15 @@ __release_notes__ = {
 #          "Try to read OB in P2 and send them back to Aspro2 as a new obs",
 #      ],
 
-    "0.7.9": {
+    "0.7.11": {
+       "A2P2": [
+           "catalogAPI : fix put remote calls (broken since V0.7.9)",
+        ],
+    },"0.7.10": {
+       "A2P2": [
+           "config : add url next to the JMMC section to check credentials",
+        ],
+    },"0.7.9": {
        "A2P2": [
            "catalogs : remove duplicated code and force auth on POST requests",
         ],

@@ -77,7 +77,7 @@ class JmmcAPI():
         return self._request('GET', url)
 
     def _put(self, url, json):
-        return self._request('PUT', url, json)
+        return self._request('PUT', url, json=json)
 
     def _post(self, url, **kwargs):
         return self._request('POST', url, **kwargs)
